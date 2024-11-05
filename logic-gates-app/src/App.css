@@ -5,9 +5,88 @@
 .App-header {
   background-color: #282c34;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+  width: 100vw;
+}
+
+body {
+  background-size: 40px 40px;
+  
+  overflow: hidden;
+  width: 100vw;
+  position: relative;
+}
+
+
+/********** Side bar *************/
+
+
+.sidebar{
+  background-color: grey;
+  
+  border: 1px solid grey;
+  position: absolute;
+  top: 80vh;
+  left: 10vw;
+  box-shadow: 5px 5px 5px #0004;
+  border-top: 25px solid var(--theme-primary-color);
+  border-radius: 10px;
+  padding: 10px;
+  color: white;
+
+}
+
+.sidebar-header{
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  background-color: rgb(54, 54, 54);
+  color: white;
+  font-size: medium;
+  
+}
+
+
+/*********** Content Area ***********/
+.body-wrapper{
+  width: 100%;
+  margin: 0;
+  height: 90vh;
+}
+
+.content-area{
+  
+  width: 100%;
+  min-height: 80%;
+}
+
+
+
+/*************** User Input Box **************/
+
+#user-input {
+  padding: 5px;
+  width: 80%;
+  height: 10vh;
+  background-color: grey;
+  color: white;
+  box-shadow: 5px 5px 5px #0004;
+  border-radius: 10px;
+  border-top: 25px solid var(--theme-primary-color);
+  position: absolute;
+  top: 80vh;
+  left: 10vw;
+}
+
+#user-input::placeholder{
+  color: white;
+}
+
+
+/* CSS GLOBAL VARIABLES */
+
+:root{
+  --theme-primary-color: #282c34;
 }
