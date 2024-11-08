@@ -1,1 +1,13 @@
 node_modules/
+
+# Ignore virtual environment
+venv/
+
+# Ignore Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore IDE settings (e.g., VSCode, PyCharm)
+.vscode/
+.idea/
