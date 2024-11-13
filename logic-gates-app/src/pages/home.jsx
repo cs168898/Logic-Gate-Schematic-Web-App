@@ -1,8 +1,9 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';  // Import specific icons
 
-
 import { useEffect, useState } from 'react';
+import { Stage, Layer, Rect, Text } from 'react-konva';
+
 import axios from 'axios';
 
 // Component Imports
@@ -12,6 +13,7 @@ import Header from '../components/header';
 // Utilities (functions) Imports
 import { parseUserInput } from '../utils/parseUserInput';
 import { dragAndDrop } from '../utils/dragAndDrop'; // Allows users to drag and drop text area and sidebar windows
+import LogicGateCanvas from '../utils/LogicGateCanvas.jsx';
 
 
 
@@ -46,31 +48,36 @@ function Home() {
     }
 
   }
+
+  const [gate, setGate] = useState({
+    name: 'Gate1',
+    type: 'AND',
+    x: 6 ,  // Initial position of the gate on the canvas
+    y: 4 
+  });
+
     
   return (
     <div className="App">
         <Header />
       <div className='main-wrapper'>
   
-          <Grid />
+        <Grid />
         
-        <div className="body-wrapper">
+        <div className="content-overlay">
           
           <div className="sidebar">
             
             
             <div className="sidebar-tools">
-            
-            <h2>Sidebar</h2>
+              <h2>Sidebar</h2>
             
               <p>Sidebar Tools</p>
             </div>
           </div>
 
-          <div className="content-area ">
-            <h2>Main Content Area</h2>
-          </div> {/*content-area*/}
-
+          <LogicGateCanvas gate={gate} />
+          
           <div className="user-input">
             <div className="textarea-button-container">
               <textarea
@@ -91,7 +98,7 @@ function Home() {
           </div> {/*user-input*/}
           
           
-        </div> {/*body wrapper container*/}
+        </div> {/*content overlay container*/}
       </div>
     </div>
   );

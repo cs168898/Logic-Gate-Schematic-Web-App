@@ -10,16 +10,20 @@
   font-size: calc(10px + 2vmin);
   color: white;
   width: 100vw;
+  height: 60px; /* Set a fixed height for the header */
+
 }
 
 body {
   background-size: 40px 40px;
-  
   overflow: hidden;
   width: 100vw;
-  position: relative;
 }
 
+.sidebar, .user-input, .content-area {
+  position: relative;  /* Relative positioning to layer over the background */
+  z-index: 200;  /* Set to a higher value to stay above the SVG */
+}
 
 
 /********** Side bar *************/
@@ -51,16 +55,44 @@ body {
 
 
 /*********** Content Area ***********/
-.body-wrapper{
+
+.svg-grid {
+  position: relative; /* Keeps the SVG within the normal document flow */
+  z-index: 1; /* Lower value so other elements are above it */
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none; /* Allow mouse events to pass through the SVG */
+
+}
+
+.content-overlay {
+  position: absolute; /* Make sure this overlaps on top of the SVG */
+  top: 0;
+  left: 0;
   width: 100%;
-  margin: 0;
-  height: 90vh;
+  height: 100%;
+  z-index: 10; /* Higher value so it's on top of the SVG */
 }
 
 .content-area{
   
   width: 100%;
   min-height: 80%;
+  
+}
+
+.konvajs-container {
+  position: relative;
+  z-index: 1;
+  width: 100vw;
+  height: calc(100vh - 60px); /* Make the height of Konva container take full height minus the header */
+  margin-top: 60px; /* This ensures it starts after the header */
+}
+
+.konvajs-content {
+  position: unset !important;  /* Ensure it's visible */
+  border: 2px solid black;  /* Optional, to visually see the area */
+  z-index: 200;
 }
 
 
