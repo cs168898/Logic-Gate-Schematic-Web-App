@@ -13,20 +13,32 @@ initialize_database()
 
 app = FastAPI()
 
+
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the Logic Gate API!"}
+
+# define the create_logic_gate endpoint
+# a endpoint is where the API accepts requests and returns responses 
 @app.post("/logicgates/", response_model=schemas.LogicGate) # POST request using FAST API
-# define the function called create_logic_gate where the perimeter is gate and the database is session
+# define the function called create_logic_gate where the custom perimeter is gate and the database is session
 def create_logic_gate(gate: schemas.LogicGateCreate, db: Session = Depends(get_db)): 
+    # schemas.LogicGateCreate is to check and validate the input of the format (Pydantic)
 
     # Check if inputs is a list as inputs expect a List of Strings
     if not isinstance(gate.inputs, list):
         raise HTTPException(status_code=400, detail="Inputs must be a list")
 
+    #the db_gate object is a SQLAlchemy model which can ainteract directly with the db
     db_gate = models.LogicGate(
-        name=gate.name,
-        type=gate.type,
-        inputs=gate.inputs,  # Inputs is already a list, so this is fine
-        output=gate.output
+        name= gate.name,
+        type= gate.type,
+        inputs= gate.inputs,  # Inputs is already a list, so this is fine
+        output= gate.output,
+        svg_data= gate.svg_data #Store SVG-related data
     )
+    
+    # Add the gate to the database using the SQLAlchemy model.
     db.add(db_gate) #Adding the logic gate to the database
     db.commit() # commit after done creating
     db.refresh(db_gate) 
@@ -44,6 +56,3 @@ def read_logic_gate(gate_id: int, db: Session = Depends(get_db)):
         except json.JSONDecodeError:
             raise HTTPException(status_code=500, detail="Failed to parse inputs JSON")
 
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to the Logic Gate API!"}

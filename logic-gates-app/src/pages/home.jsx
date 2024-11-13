@@ -1,61 +1,52 @@
-import axios from 'axios'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';  // Import specific icons
 
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
+// Component Imports
 import Grid from '../components/background-grid';
 import Header from '../components/header';
 
+// Utilities (functions) Imports
+import { parseUserInput } from '../utils/parseUserInput';
+import { dragAndDrop } from '../utils/dragAndDrop'; // Allows users to drag and drop text area and sidebar windows
+
+
+
 function Home() {
-  // Drag start handler for regular drag functionality
-  function dragstartHandler(ev) {
-    ev.dataTransfer.setData("text/plain", ev.target.id);
+  /***************************** useState Definitions ***************************/
+  const [userInput, setuserInput] = useState("")
+  const [parsedUserInput, setParsedUserInput] = useState("")
+
+
+  /***************************** End Of useState Definitions ********************/
+
+
+  /***************************** useEffect Statements ***************************/
+
+    // useEffect hook to initialize dragAndDrop on component mount
+    useEffect(() => {
+      dragAndDrop(); // Initialize the custom drag and drop behavior
+    }, []); // Run once after component mounts
+
+  /***************************** End Of UseEffect Statements ***************************/
+  
+  // Create the handleSubmit function to send userInput into backend
+  const handleSubmit = async () =>{
+    try{
+      console.log(`The user input is: ${userInput}`)
+      const gateData = parseUserInput(userInput); // Parse user input before sending it to backend
+
+      const response = await axios.post('http://127.0.0.1:8000/logicgates/', gateData);
+      console.log("Logic Gate Created: ", response.data);
+    } catch (error){
+      console.error("Error: ", error.message) // Log the error if there are errors that happened in the backend
+    }
+
   }
-
-  // Custom drag and drop function
-  function dragAndDrop() {
-    let cursor = { x: null, y: null }; // Cursor position
-    let userInputPosition = { dom: null, x: null, y: null }; // Element position
-
-    document.addEventListener('mousedown', (event) => {
-      if (event.target.classList.contains('user-input2') || event.target.classList.contains('sidebar')) {
-        // Record initial cursor position and element position on mousedown
-        cursor = { x: event.clientX, y: event.clientY };
-        userInputPosition = {
-          dom: event.target,
-          x: event.target.getBoundingClientRect().left,
-          y: event.target.getBoundingClientRect().top
-        };
-      }
-    });
-
-    document.addEventListener('mousemove', (event) => {
-      if (userInputPosition.dom === null) return; // Only run if the element is selected
-      const currentCursor = { x: event.clientX, y: event.clientY };
-      const distance = {
-        x: currentCursor.x - cursor.x, // Distance moved horizontally
-        y: currentCursor.y - cursor.y  // Distance moved vertically
-      };
-      // Update the element's position based on distance moved
-      userInputPosition.dom.style.left = (userInputPosition.x + distance.x) + 'px';
-      userInputPosition.dom.style.top = (userInputPosition.y + distance.y) + 'px';
-      userInputPosition.dom.style.cursor = 'grab';
-    });
-
-    document.addEventListener('mouseup', () => {
-      if(userInputPosition.dom == null ) return;
-        userInputPosition.dom.style.cursor = 'auto';
-        userInputPosition.dom = null; // Stop dragging when the mouse button is released
-    });
-  }
-
-  // useEffect hook to initialize dragAndDrop on component mount
-  useEffect(() => {
-    dragAndDrop(); // Initialize the custom drag and drop behavior
-  }, []); // Run once after component mounts
-
+    
   return (
     <div className="App">
         <Header />
@@ -81,15 +72,24 @@ function Home() {
           </div> {/*content-area*/}
 
           <div className="user-input">
-            <textarea
-              name="user-input"
-              className='user-input2'
-              
-              id="user-input"
-              placeholder='-Enter your logic here-'
-              
-            ></textarea>
+            <div className="textarea-button-container">
+              <textarea
+                className='user-input2'
+                id="user-input"
+                name="user-input"
+                placeholder='-Enter your logic here-'
+                value={userInput}
+                onChange={(e) => setuserInput(e.target.value)}
+                
+              ></textarea>
+              <div className="button-wrapper">
+                <button className="overlay-button" onClick={handleSubmit}>
+                  Create Gate
+                </button>
+              </div>
+            </div>
           </div> {/*user-input*/}
+          
           
         </div> {/*body wrapper container*/}
       </div>

@@ -10,3 +10,4 @@ class LogicGate(Base):
         type = Column(String, index=True)
         inputs = Column(JSON)
         output = Column(String)
+        svg_data = Column(String) # Meta data to help recreate the SVG

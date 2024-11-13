@@ -12,6 +12,7 @@ class LogicGateBase(BaseModel): #This will also act like the blue print to creat
     type: str # The actual type of the logic gate, (e.g. AND , OR , NOT )
     inputs: List[str] # The inputs of the current logic gate
     output: str # The outputs of the current logic gate
+    svg_data: str #Contains the meta data of the SVG
 
 class LogicGateCreate(LogicGateBase): # Create the logic gate object with the blueprint (LogicGateBase) as reference.
     pass

@@ -1,0 +1,4 @@
+when inside root folder of project  ( fastapi_postgresql_project )
+run this to start the FASTAPI app in terminal: 
+
+uvicorn app.main:app --reload 
