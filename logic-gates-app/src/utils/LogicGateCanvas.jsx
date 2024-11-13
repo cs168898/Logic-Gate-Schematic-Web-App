@@ -1,31 +1,59 @@
 // LogicGateCanvas.js
 import React from 'react';
 import { Stage, Layer, Rect, Text } from 'react-konva';
+import { AndGate } from '../konvaLogicGates/andGate';
+import { OrGate } from '../konvaLogicGates/orGate';
+import { NotGate } from '../konvaLogicGates/notGate';
 
-function LogicGateCanvas({ gate }) {
+function LogicGateCanvas({ gates, setSelectedGateId, selectedGateId }) {
   // Define default properties if no gate data is passed
   console.log('logicgatecanvashere')
-  const { name = "Default Gate", type = "AND", x = 50, y = 20 } = gate || {};
-
+  
   return (
   
-    <Stage width={window.innerWidth} height={window.innerHeight} className='konvajs-container'>
+    <Stage 
+    width={window.innerWidth} 
+    height={window.innerHeight} 
+    className='konvajs-container'
+    onClick={(e) => {
+      // Check if the click is on the stage itself (not on any shape)
+      if (e.target === e.target.getStage()) {
+        setSelectedGateId(null); // Deselect the gate when clicking on the background
+      }
+    }}
+  >
       <Layer>
-        {/* Draw a rectangle to represent the gate */}
-        <Rect
-          x={x * 20}  // The x position of the gate on the canvas
-          y={y * 20}  // The y position of the gate on the canvas
-          width={100}  // Gate width
-          height={50}  // Gate height
-          fill="lightblue"  // Gate fill color
-        />
-        {/* Draw the gate label */}
-        <Text
-          x={x*20 + 10}  // Slightly offset from the rectangle
-          y={y*20 + 15}
-          text={`${name} (${type})`}
-          fill="black"  // Text color
-        />
+        {gates.map((gate) => (
+            <React.Fragment key={gate.id}>
+              {/* Render gate shape based on type */}
+        
+              {gate.type.toUpperCase() === "AND" && (
+                <AndGate
+                gate={gate}
+                selectedGateId={selectedGateId}
+                setSelectedGateId={setSelectedGateId}
+              />
+              )}
+
+               {gate.type.toUpperCase() === "OR" && (
+                <OrGate
+                gate={gate}
+                selectedGateId={selectedGateId}
+                setSelectedGateId={setSelectedGateId}
+              />
+              )}
+
+              {gate.type.toUpperCase() === "NOT" && (
+                <NotGate
+                gate={gate}
+                selectedGateId={selectedGateId}
+                setSelectedGateId={setSelectedGateId}
+              />
+              )} 
+
+              
+            </React.Fragment>
+          ))}
       </Layer>
     </Stage>
     

@@ -22,6 +22,9 @@ function Home() {
   const [userInput, setuserInput] = useState("")
   const [parsedUserInput, setParsedUserInput] = useState("")
 
+  const [gates, setGates] = useState([]);
+  const [selectedGateId, setSelectedGateId] = useState(null);
+
 
   /***************************** End Of useState Definitions ********************/
 
@@ -35,27 +38,45 @@ function Home() {
 
   /***************************** End Of UseEffect Statements ***************************/
   
+  /***************************** Event Handlers ***************************/
+  
+  // Handle clicking on a gate to select it
+  const handleSelectGate = (id) => {
+    if(id === selectedGateId){
+      setSelectedGateId(null);
+    } else{
+      setSelectedGateId(id);
+    }
+    
+  };
+
+  // Handle deleting the selected gate
+  const handleDeleteGate = () => {
+    if (selectedGateId !== null) {
+      setGates(gates.filter((gate) => gate.id !== selectedGateId));
+      setSelectedGateId(null);
+    }
+  };
+
+/***************************** End Of Event Handlers ***************************/
+
+
+
   // Create the handleSubmit function to send userInput into backend
   const handleSubmit = async () =>{
     try{
       console.log(`The user input is: ${userInput}`)
-      const gateData = parseUserInput(userInput); // Parse user input before sending it to backend
+      const gateData = parseUserInput(userInput, gates); // Parse user input before sending it to backend
 
-      const response = await axios.post('http://127.0.0.1:8000/logicgates/', gateData);
-      console.log("Logic Gate Created: ", response.data);
+      setGates([...gates, gateData])
+
+      //const response = await axios.post('http://127.0.0.1:8000/logicgates/', gateData);
+      //console.log("Logic Gate Created: ", response.data);
     } catch (error){
       console.error("Error: ", error.message) // Log the error if there are errors that happened in the backend
     }
 
   }
-
-  const [gate, setGate] = useState({
-    name: 'Gate1',
-    type: 'AND',
-    x: 6 ,  // Initial position of the gate on the canvas
-    y: 4 
-  });
-
     
   return (
     <div className="App">
@@ -76,7 +97,11 @@ function Home() {
             </div>
           </div>
 
-          <LogicGateCanvas gate={gate} />
+          <LogicGateCanvas
+            gates={gates}
+            setSelectedGateId={handleSelectGate}
+            selectedGateId={selectedGateId}
+          />
           
           <div className="user-input">
             <div className="textarea-button-container">
@@ -87,11 +112,14 @@ function Home() {
                 placeholder='-Enter your logic here-'
                 value={userInput}
                 onChange={(e) => setuserInput(e.target.value)}
-                
+                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
               ></textarea>
               <div className="button-wrapper">
-                <button className="overlay-button" onClick={handleSubmit}>
+                <button className="create-button" onClick={handleSubmit}>
                   Create Gate
+                </button>
+                <button className="delete-button" onClick={handleDeleteGate} disabled={selectedGateId === null}>
+                  Delete Gate
                 </button>
               </div>
             </div>

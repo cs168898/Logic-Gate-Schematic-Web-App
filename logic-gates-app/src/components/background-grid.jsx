@@ -1,7 +1,8 @@
 import React from 'react';
+import { gridSizeConst } from '../utils/gridSize';
 
 const Grid = () => {
-  const gridSize = 20;
+  const gridSize = gridSizeConst;
   const width = window.innerWidth;
   const height = window.innerHeight;
 

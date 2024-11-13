@@ -10,7 +10,7 @@
 
     */
 
-    export function parseUserInput(inputString){
+    export function parseUserInput(inputString, gates){
         // Split the input string using commas as delimiters
         const lines = inputString.split(";");
         const parsedData = {};
@@ -23,21 +23,34 @@
         })
       
         // Validate parsed data
-        if (!parsedData.name || !parsedData.type || !parsedData.input || !parsedData.output) {
-            throw new Error("Invalid input. Please provide name, type, input, and output.");
+        if (!parsedData.name || !parsedData.type || !parsedData.input || !parsedData.output || !parsedData.x || !parsedData.y) {
+            throw new Error("Invalid input. Please provide name, type, input, output , X and Y.");
         }
+
+
+        // Check if the user entered a valid gate type
+        const gatesList = ['AND', 'OR', 'NOT']
+
+        if (!gatesList.includes(parsedData.type.toUpperCase())) {
+            throw new Error("Please enter a valid gate type");
+          }
       
         // Extract inputs as a list
         const inputs = parsedData.input.split(",").map(input => input.trim());
+        const numInputs = inputs.length
 
 
       
         // Return an object ready to be sent to the backend
         return {
+            id: gates.length,
             name: parsedData.name,
-            type: parsedData.type,
+            type: parsedData.type.toUpperCase(),
             inputs: inputs,
-            output: parsedData.output
+            output: parsedData.output,
+            x: parseInt(parsedData.x),
+            y: parseInt(parsedData.y),
+            numInputs: numInputs
         };
       }
   

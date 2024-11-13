@@ -107,7 +107,7 @@ body {
   min-width: 500px;
   height: auto;
   left: 40vw;  /* Start closer to the left */
-  top: 80vh;   /* Start closer to the top */
+  top: 75vh;   /* Start closer to the top */
   border-radius: 10px;
   padding-top: 30px;
 }
@@ -115,31 +115,47 @@ body {
 .textarea-button-container{
   background-color: grey;
   border-radius: 0 0 10px 10px;
-  max-height: 500px;
+  padding: 10px;
+}
+
+.textarea-button-container textarea{
+  height: 150px;
 }
 
 .button-wrapper{
   text-align: end;
 }
 
-.overlay-button {
+.create-button {
   background-color: var(--theme-primary-color);
   color: white;
   border: none;
   padding: 5px 10px;
   cursor: pointer;
   border-radius: 10px;
-  margin: 0 10px 10px 0;
+  margin: 0 10px 0 0;
 
 }
 
-.overlay-button:hover{
+.create-button:hover{
   background-color: #4f5868;
+}
+
+.delete-button{
+  background-color: white;
+  color: black;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.delete-button:hover{
+  background-color: #dfe7f4;
 }
 
 /* Text area for user input */
 .user-input2 {
-  padding: 5px;
   width: 100%;
   border: none;
   color: white;
@@ -147,14 +163,23 @@ body {
   background-color: grey;
   resize: none;
   border: none;
-    overflow: auto;
-    outline: none;
-
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
+  overflow: auto;
+  outline: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
 }
 
+.user-input2::-webkit-scrollbar {
+  width: 10px;
+}
+
+.user-input2::-webkit-scrollbar-thumb{
+  margin-right: 10px;
+  background: var(--theme-primary-color);
+  border-radius: 8px;
+  cursor: auto;
+}
 
 
 #user-input::placeholder{
