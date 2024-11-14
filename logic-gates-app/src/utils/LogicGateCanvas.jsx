@@ -6,7 +6,7 @@ import { OrGate } from '../konvaLogicGates/orGate';
 import { NotGate } from '../konvaLogicGates/notGate';
 
 function LogicGateCanvas({ gates, setSelectedGateId, selectedGateId }) {
-  
+
   return (
   
     <Stage 
@@ -24,7 +24,6 @@ function LogicGateCanvas({ gates, setSelectedGateId, selectedGateId }) {
         {gates.map((gate) => (
             <React.Fragment key={gate.id}>
               {/* Render gate shape based on type */}
-        
               {gate.type.toUpperCase() === "AND" && (
                 <AndGate
                 gate={gate}

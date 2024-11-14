@@ -67,9 +67,9 @@ function Home() {
     try{
       console.log(`The user input is: ${userInput}`)
       const gateData = parseUserInput(userInput, gates); // Parse user input before sending it to backend
-
-      setGates([...gates, gateData])
-
+  
+      setGates([...gates, ...gateData]) // Keep track of all the logic gate inside the 'gates' variable
+      
       //const response = await axios.post('http://127.0.0.1:8000/logicgates/', gateData);
       //console.log("Logic Gate Created: ", response.data);
     } catch (error){
