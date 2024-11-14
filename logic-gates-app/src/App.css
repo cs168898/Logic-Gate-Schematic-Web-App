@@ -107,7 +107,7 @@ body {
   min-width: 500px;
   height: auto;
   left: 40vw;  /* Start closer to the left */
-  top: 75vh;   /* Start closer to the top */
+  top: 70vh;   /* Start closer to the top */
   border-radius: 10px;
   padding-top: 30px;
 }

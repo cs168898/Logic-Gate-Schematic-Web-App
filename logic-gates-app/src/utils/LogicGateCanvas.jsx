@@ -6,8 +6,6 @@ import { OrGate } from '../konvaLogicGates/orGate';
 import { NotGate } from '../konvaLogicGates/notGate';
 
 function LogicGateCanvas({ gates, setSelectedGateId, selectedGateId }) {
-  // Define default properties if no gate data is passed
-  console.log('logicgatecanvashere')
   
   return (
   

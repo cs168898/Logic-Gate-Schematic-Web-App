@@ -112,7 +112,7 @@ function Home() {
                 placeholder='-Enter your logic here-'
                 value={userInput}
                 onChange={(e) => setuserInput(e.target.value)}
-                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck="false"
               ></textarea>
               <div className="button-wrapper">
                 <button className="create-button" onClick={handleSubmit}>

@@ -10,17 +10,15 @@ export function NotGate({ gate, selectedGateId, setSelectedGateId }){
           Z
         `;
 
-
-
     // Circle properties for the NOT gate bubble
     const circleRadius = 5; // The radius of the circle
-    const circleX = 105; // X position (a bit outside of the triangle tip)
-    const circleY = 50;  // Y position (aligned with the middle of the triangle)
+    const circleX = gate.x *gridSizeConst + 105; // X position (a bit outside of the triangle tip)
+    const circleY = gate.y *gridSizeConst + 50;  // Y position (aligned with the middle of the triangle)
 
     // Define start and end points for the input wires
     const startX = gate.x * gridSizeConst; // Input wires will start at x = gate.x
     const startY = gate.y;
-    const endX = gate.x*gridSizeConst + 0; // This is the edge of the OR gate at x = 0
+    const endX = gate.x*gridSizeConst -20; // This is the edge of the OR gate at x = 0
     const endYTop = gate.y*gridSizeConst; // Top point of the input segment (0, 0)
     const endYBottom = gate.y*gridSizeConst + 100; // Bottom point of the input segment (0, 100)
     const numInputs = gate.numInputs;
@@ -35,12 +33,23 @@ export function NotGate({ gate, selectedGateId, setSelectedGateId }){
         inputWires.push(
         <Line
             key={`${gate.id}-w${i}`} // (e.g. GateID - w1) first wire
-            points={[startX- 20 , wireY, endX, wireY]} // Coordinates for the line
+            points={[startX , wireY, endX, wireY]} // Coordinates for the line
             stroke="black"
             strokeWidth={2}
         />
         );
     }
+
+    // Generate output wire
+    const outputwire =
+    <Line
+
+        key={`${gate.id}-w-output`}
+        points={[ circleX + 5, circleY, circleX + 20 , circleY]} // Coordinates for the line
+        stroke="black"
+        strokeWidth={2}  
+                                     
+    />
     
     return(
     <>
@@ -55,8 +64,8 @@ export function NotGate({ gate, selectedGateId, setSelectedGateId }){
         />
         {/* Draw the bubble/circle at the tip of the NOT gate */}
         <Circle
-            x={gate.x *gridSizeConst + circleX} // Position based on the triangle tip (adding a bit to x)
-            y={gate.y *gridSizeConst + circleY} // Align with the middle of the triangle
+            x={circleX} // Position based on the triangle tip (adding a bit to x)
+            y={circleY} // Align with the middle of the triangle
             radius={circleRadius} // Radius of the circle
             stroke="black" // Outline color of the circle
             strokeWidth={2}
@@ -64,8 +73,9 @@ export function NotGate({ gate, selectedGateId, setSelectedGateId }){
             onClick={() => setSelectedGateId(gate.id)} // Set as selected when clicked
         />
         {inputWires}
+        {outputwire}
         <Text
-                x={gate.x * gridSizeConst + 20}
+                x={gate.x * gridSizeConst + 10}
                 y={gate.y * gridSizeConst + 45}
                 text={`${gate.name} (${gate.type})`}
                 fill="black"

@@ -39,7 +39,9 @@
         const inputs = parsedData.input.split(",").map(input => input.trim());
         const numInputs = inputs.length
 
-
+        if(parsedData.type.toUpperCase() !== "NOT" && numInputs < 2){
+            throw new Error("Please enter more than 2 inputs for this Gate Type")
+        }
       
         // Return an object ready to be sent to the backend
         return {

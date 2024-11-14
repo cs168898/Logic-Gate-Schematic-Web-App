@@ -29,7 +29,7 @@ export function OrGate({ gate, selectedGateId, setSelectedGateId }){
         inputWires.push(
         <Line
             key={`${gate.id}-w${i}`} // (e.g. GateID - w1) first wire
-            points={[startX - 10, wireY, endX+19, wireY]} // Coordinates for the line
+            points={[startX, wireY, endX+19, wireY]} // Coordinates for the line
             stroke="black"
             strokeWidth={2}
         />
