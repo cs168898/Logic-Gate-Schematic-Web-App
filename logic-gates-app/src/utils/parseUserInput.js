@@ -99,7 +99,9 @@
         // Validate number of inputs
         const inputs = gateData.input.split(",").map((input) => input.trim());
         const numInputs = inputs.length;
-        if (gateData.type.toUpperCase() !== "NOT" && numInputs < 2) {
+        console.log(` The Gate Type and num inputs= ${ numInputs}`)
+        if (gateData.type.toUpperCase() === "NOT" && numInputs > 1) {
+            console.error(`NOT gate should not contain more than 1 input`);
         return false;
         }
     

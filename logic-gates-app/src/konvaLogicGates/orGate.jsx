@@ -35,6 +35,14 @@ export function OrGate({ gate, selectedGateId, setSelectedGateId }){
         />
         );
     }
+     // Generate output wire
+     const outputwire =
+     <Line
+         key={`${gate.id}-w-output`}
+         points={[ startX + 100, endYTop + 50, startX + 120, endYTop + 50]} // Coordinates for the line
+         stroke="black"
+         strokeWidth={2}                           
+     />
     
     return(
     <>
@@ -50,6 +58,7 @@ export function OrGate({ gate, selectedGateId, setSelectedGateId }){
 
         {/* Draw input wires */}
         {inputWires}
+        {outputwire}
 
         <Text
                 x={gate.x * gridSizeConst + 30}

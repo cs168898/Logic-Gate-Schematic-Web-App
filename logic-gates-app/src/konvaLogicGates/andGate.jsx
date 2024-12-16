@@ -14,7 +14,7 @@ export function AndGate({ gate, selectedGateId, setSelectedGateId }){
     
     // Define start and end points for the input wires
     const startX = gate.x * gridSizeConst; // Input wires will start at x = gate.x
-    const startY = gate.y;
+    const startY = gate.y * gridSizeConst;
     const endX = gate.x*gridSizeConst + 0; // This is the edge of the OR gate at x = 0
     const endYTop = gate.y*gridSizeConst; // Top point of the input segment (0, 0)
     const endYBottom = gate.y*gridSizeConst + 100; // Bottom point of the input segment (0, 100)
@@ -36,6 +36,15 @@ export function AndGate({ gate, selectedGateId, setSelectedGateId }){
         />
         );
     }
+
+    // Generate output wire
+    const outputwire =
+    <Line
+        key={`${gate.id}-w-output`}
+        points={[ startX + 75, endYTop + 50, startX + 100, endYTop + 50]} // Coordinates for the line
+        stroke="black"
+        strokeWidth={2}                           
+    />
     return(
     <>
         <Path
@@ -48,6 +57,7 @@ export function AndGate({ gate, selectedGateId, setSelectedGateId }){
         onClick={() => setSelectedGateId(gate.id)}
         />
         {inputWires}
+        {outputwire}
         <Text
                 x={gate.x * gridSizeConst + 5}
                 y={gate.y * gridSizeConst + 45}

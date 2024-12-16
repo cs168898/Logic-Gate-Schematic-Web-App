@@ -43,12 +43,10 @@ export function NotGate({ gate, selectedGateId, setSelectedGateId }){
     // Generate output wire
     const outputwire =
     <Line
-
         key={`${gate.id}-w-output`}
         points={[ circleX + 5, circleY, circleX + 20 , circleY]} // Coordinates for the line
         stroke="black"
-        strokeWidth={2}  
-                                     
+        strokeWidth={2}                           
     />
     
     return(

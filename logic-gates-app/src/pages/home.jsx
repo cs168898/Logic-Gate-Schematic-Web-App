@@ -1,10 +1,5 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars } from '@fortawesome/free-solid-svg-icons';  // Import specific icons
 
 import { useEffect, useState } from 'react';
-import { Stage, Layer, Rect, Text } from 'react-konva';
-
-import axios from 'axios';
 
 // Component Imports
 import Grid from '../components/background-grid';
