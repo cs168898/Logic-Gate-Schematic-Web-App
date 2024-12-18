@@ -1,12 +1,22 @@
 // LogicGateCanvas.js
 import React from 'react';
+import { useState, useCallback } from 'react';
 import { Stage, Layer, Rect, Text } from 'react-konva';
 import { AndGate } from '../konvaLogicGates/andGate';
 import { OrGate } from '../konvaLogicGates/orGate';
 import { NotGate } from '../konvaLogicGates/notGate';
+import { CreateConnections } from '../konvaLogicGates/create_connections';
 
 function LogicGateCanvas({ gates, setSelectedGateId, selectedGateId }) {
+  const [gatePositions, setGatePositions] = useState({}) // stores the positions of the input and output wire of gates
 
+  // Use useCallback to ensure a stable function reference
+  const handleWirePositionUpdate = useCallback((gateID, positions) => { // useCallback to ensure that onWirePositionUpdate does not get re-created on every render.
+    setGatePositions((prev) => ({
+      ...prev,
+      [gateID]: positions,
+    }));
+  }, []);
   return (
   
     <Stage 
@@ -29,6 +39,7 @@ function LogicGateCanvas({ gates, setSelectedGateId, selectedGateId }) {
                 gate={gate}
                 selectedGateId={selectedGateId}
                 setSelectedGateId={setSelectedGateId}
+                onWirePositionUpdate={handleWirePositionUpdate}
               />
               )}
 
@@ -37,6 +48,7 @@ function LogicGateCanvas({ gates, setSelectedGateId, selectedGateId }) {
                 gate={gate}
                 selectedGateId={selectedGateId}
                 setSelectedGateId={setSelectedGateId}
+                onWirePositionUpdate={handleWirePositionUpdate}
               />
               )}
 
@@ -45,12 +57,16 @@ function LogicGateCanvas({ gates, setSelectedGateId, selectedGateId }) {
                 gate={gate}
                 selectedGateId={selectedGateId}
                 setSelectedGateId={setSelectedGateId}
+                onWirePositionUpdate={handleWirePositionUpdate}
               />
               )} 
-
               
             </React.Fragment>
+            
           ))}
+          <CreateConnections
+            gatePositions={gatePositions}
+          /> 
       </Layer>
     </Stage>
     

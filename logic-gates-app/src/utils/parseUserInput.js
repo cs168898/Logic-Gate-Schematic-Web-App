@@ -102,6 +102,7 @@
         console.log(` The Gate Type and num inputs= ${ numInputs}`)
         if (gateData.type.toUpperCase() === "NOT" && numInputs > 1) {
             console.error(`NOT gate should not contain more than 1 input`);
+            alert("NOT gate should not contain more than 1 input");
         return false;
         }
     

@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Stage, Layer, Path, Text, Circle, Line } from 'react-konva';
 import { gridSizeConst } from '../utils/gridSize';
 
-export function NotGate({ gate, selectedGateId, setSelectedGateId }){
+export function NotGate({ gate, selectedGateId, setSelectedGateId, onWirePositionUpdate }){
     const notGatePath = `
           M 100,50 
           L 0,0
@@ -28,26 +28,62 @@ export function NotGate({ gate, selectedGateId, setSelectedGateId }){
 
     // Generate input wires
     const inputWires = [];
+    const inputPositions = [];
     for (let i = 1; i <= numInputs; i++) {
         const wireY = endYTop + interval * i;
+        inputPositions.push({inputName: gate.inputs[i-1], x: endX, y: wireY})
         inputWires.push(
+        
         <Line
             key={`${gate.id}-w${i}`} // (e.g. GateID - w1) first wire
             points={[startX , wireY, endX, wireY]} // Coordinates for the line
             stroke="black"
             strokeWidth={2}
+        />,
+        <Text //Text to label the inputs
+        key={`${gate.id}-input${i}`}
+        x={endX}
+        y={wireY - 15}
+        text={`${gate.inputs[i-1]}`}
+        fill="black"
         />
+        
         );
     }
 
     // Generate output wire
-    const outputwire =
+    const outputPosition = [];
+    outputPosition.push = [{outputName: gate.output, x: circleX + 20, y: circleY}] // set the coordinates of output wire
+    const outputwire =(
+    <>
     <Line
         key={`${gate.id}-w-output`}
         points={[ circleX + 5, circleY, circleX + 20 , circleY]} // Coordinates for the line
         stroke="black"
         strokeWidth={2}                           
     />
+    <Text   //Text to label the outputs
+        key={`${gate.id}-output-wire`}
+        x={circleX + 20}
+        y={circleY - 15}
+        text={`${gate.output}`}
+        fill="black"
+    />
+    </>
+    )
+
+    const prevPositions = useRef({}); // Holds the previous positions to compare
+        // Pass positions back to parent through a callback
+        React.useEffect(() => {
+            const newPositions = { inputPositions, outputPosition };
+            // Compare previous positions with new ones to avoid unnecessary updates
+        if (JSON.stringify(prevPositions.current) !== JSON.stringify(newPositions)) {
+    
+            onWirePositionUpdate(gate.id, newPositions);
+    
+            prevPositions.current = newPositions; // Update the previous positions
+          }
+        }, [gate.id, inputPositions, outputPosition, onWirePositionUpdate]);
     
     return(
     <>

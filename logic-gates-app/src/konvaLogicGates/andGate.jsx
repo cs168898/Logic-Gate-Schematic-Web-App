@@ -1,8 +1,8 @@
-import React from 'react';
 import { Stage, Layer, Path, Text, Line } from 'react-konva';
 import { gridSizeConst } from '../utils/gridSize';
+import React, { useEffect, useRef } from 'react';
 
-export function AndGate({ gate, selectedGateId, setSelectedGateId }){
+export function AndGate({ gate, selectedGateId, setSelectedGateId, onWirePositionUpdate }){
     const andGatePath = `
           M 75,50 
           Q 75,0 0,0 
@@ -25,26 +25,75 @@ export function AndGate({ gate, selectedGateId, setSelectedGateId }){
 
     // Generate input wires
     const inputWires = [];
+    const inputPositions = [];
     for (let i = 1; i <= numInputs; i++) {
-        const wireY = endYTop + interval * i;
+        const wireY = endYTop + interval * i; // The top of the gate + the (interval * how many times) 
+        inputPositions.push({inputName: gate.inputs[i-1], x: startX - 20, y: wireY}) // set the coordinates of input wire
+        // ************* NOTE : the startX and endX for ANDGate is switched , the start of the line starts from the gate extending out from the gate
         inputWires.push(
-        <Line
-            key={`${gate.id}-w${i}`} // (e.g. GateID - w1) first wire
-            points={[startX - 20, wireY, endX, wireY]} // Coordinates for the line
-            stroke="black"
-            strokeWidth={2}
-        />
+        
+            <Line
+                key={`${gate.id}-w${i}`} // (e.g. GateID - w1) first wire
+                points={[startX - 20, wireY, endX, wireY]} // Coordinates for the line
+                stroke="black"
+                strokeWidth={2}
+            />,
+            <Text //Text to label the inputs
+                key={`${gate.id}-input${i}`}
+                x={startX-20}
+                y={wireY - 15}
+                text={`${gate.inputs[i-1]}`}
+                fill="black"
+            />
+        
         );
     }
 
+    const outputPosition = [];
     // Generate output wire
-    const outputwire =
-    <Line
-        key={`${gate.id}-w-output`}
-        points={[ startX + 75, endYTop + 50, startX + 100, endYTop + 50]} // Coordinates for the line
-        stroke="black"
-        strokeWidth={2}                           
-    />
+    outputPosition.push = [{outputName: gate.output, x: startX + 75, y: endYTop + 50}] // set the coordinates of output wire
+    const outputwire =(
+        <>
+        <Line
+            key={`${gate.id}-w-output`}
+            points={[ startX + 75, endYTop + 50, startX + 100, endYTop + 50]} // Coordinates for the line
+            stroke="black"
+            strokeWidth={2}                           
+        />
+        <Text   //Text to label the outputs
+                key={`${gate.id}-output-wire`}
+                x={startX + 90}
+                y={endYTop + 35}
+                text={`${gate.output}`}
+                fill="black"
+            />
+        </>
+)
+    const prevPositions = useRef({}); // Holds the previous positions to compare
+    // Pass positions back to parent through a callback
+    React.useEffect(() => {
+        const newPositions = { inputPositions, outputPosition };
+        // Compare previous positions with new ones to avoid unnecessary updates
+    if (JSON.stringify(prevPositions.current) !== JSON.stringify(newPositions)) {
+
+        onWirePositionUpdate(gate.id, newPositions);
+
+        prevPositions.current = newPositions; // Update the previous positions
+      }
+    }, [gate.id, inputPositions, outputPosition, onWirePositionUpdate]);
+    
+
+    /* 
+    Data format of the onWirePositionUpdate function
+    [gate.id]: {
+        inputPositions: [
+        { inputName: "A", x: 50, y: 75 },
+        { inputName: "B", x: 50, y: 125 }
+        ],
+        outputPosition: { outputName: "C", x: 150, y: 100 }
+    }
+    
+  */
     return(
     <>
         <Path
