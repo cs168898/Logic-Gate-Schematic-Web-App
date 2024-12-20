@@ -12,10 +12,14 @@ function LogicGateCanvas({ gates, setSelectedGateId, selectedGateId }) {
 
   // Use useCallback to ensure a stable function reference
   const handleWirePositionUpdate = useCallback((gateID, positions) => { // useCallback to ensure that onWirePositionUpdate does not get re-created on every render.
-    setGatePositions((prev) => ({
-      ...prev,
-      [gateID]: positions,
-    }));
+    setGatePositions((prev) => {
+      const updatedGatePositions = {
+        ...prev,
+        [gateID]: positions,
+      };
+      console.log("Updated gatePositions:", updatedGatePositions); // Log the updated state
+      return updatedGatePositions;
+    });
   }, []);
   return (
   
@@ -66,6 +70,8 @@ function LogicGateCanvas({ gates, setSelectedGateId, selectedGateId }) {
           ))}
           <CreateConnections
             gatePositions={gatePositions}
+            selectedGateId={selectedGateId}
+            setSelectedGateId={setSelectedGateId}
           /> 
       </Layer>
     </Stage>

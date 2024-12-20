@@ -53,7 +53,7 @@ export function NotGate({ gate, selectedGateId, setSelectedGateId, onWirePositio
 
     // Generate output wire
     const outputPosition = [];
-    outputPosition.push = [{outputName: gate.output, x: circleX + 20, y: circleY}] // set the coordinates of output wire
+    outputPosition.push({outputName: gate.output, x: circleX + 20, y: circleY}) // set the coordinates of output wire
     const outputwire =(
     <>
     <Line

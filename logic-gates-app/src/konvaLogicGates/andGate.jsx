@@ -51,7 +51,7 @@ export function AndGate({ gate, selectedGateId, setSelectedGateId, onWirePositio
 
     const outputPosition = [];
     // Generate output wire
-    outputPosition.push = [{outputName: gate.output, x: startX + 75, y: endYTop + 50}] // set the coordinates of output wire
+    outputPosition.push({outputName: gate.output, x: startX + 75, y: endYTop + 50}) // set the coordinates of output wire
     const outputwire =(
         <>
         <Line

@@ -46,7 +46,7 @@ export function OrGate({ gate, selectedGateId, setSelectedGateId, onWirePosition
     }
     // Generate output wire
     const outputPosition = [];
-    outputPosition.push = [{outputName: gate.output, x: startX + 120, y: endYTop + 50}] // set the coordinates of output wire
+    outputPosition.push({outputName: gate.output, x: startX + 120, y: endYTop + 50}) // set the coordinates of output wire
     const outputwire =
     <>
      <Line
