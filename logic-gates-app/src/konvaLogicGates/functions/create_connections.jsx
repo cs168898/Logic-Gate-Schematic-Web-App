@@ -1,15 +1,35 @@
 import React from 'react';
 import { Stage, Layer, Path, Text, Line } from 'react-konva';
-import { gridSizeConst } from '../utils/gridSize';
+import { gridSizeConst } from '../../utils/gridSize';
+import {getDetourPath} from './get_Detour_path';
 
 
-export function CreateConnections({ gatePositions, selectedGateId, setSelectedGateId }){
+export function CreateConnections({ gatePositions, selectedGateId, setSelectedGateId, gates }){
+    /*
+        ARGS:
+
+            gatePositions: contains the object of 
+            [gate.id]: {
+                inputPositions: [
+                { inputName: "A", x: 50, y: 75 },
+                { inputName: "B", x: 50, y: 125 }
+                ],
+                outputPosition: { outputName: "C", x: 150, y: 100 }
+            }
+
+
+            gates: contains the information of the gate name, type, input, output, x and y
+
+            selectedGateId: the variable that contains the selected gate ID.
+    */
     
     console.log({gatePositions})
     console.log("Gate Positions:", gatePositions);
 
-    const gatesArray = Object.entries(gatePositions) //Convert the gatePositions object into an array for iteration
-    console.log("Derived gatesArray:", gatesArray); // Log gatesArray to ensure correctness
+    const gatesArray = Object.entries(gatePositions).filter(
+        ([gateID]) => gateID !== selectedGateId
+      ); // Exclude the deleted gate's connections
+      //console.log("Derived gatesArray:", gatesArray); // Log gatesArray to ensure correctness
 
     const pastOutputs = []; // Array to store past gates' outputs
 
@@ -37,22 +57,32 @@ export function CreateConnections({ gatePositions, selectedGateId, setSelectedGa
                const matchingOutput = pastOutputs.find(
                 (output) => output.outputName === inputPosition.inputName); 
                 
-                if (matchingOutput && matchingOutput.gateID !== selectedGateId){
+                if (
+                    matchingOutput &&
+                    matchingOutput.gateID !== selectedGateId && // Skip if the output gate is the deleted gate
+                    gateID !== selectedGateId // Skip if the input gate is the deleted gate
+                  ){
+                    console.log(`Wire key: wire-${matchingOutput.gateID}-${gateID}-${inputPosition.inputName}`);
                     console.log(`Matchingoutput has value: ${matchingOutput}` );
+                    console.log(`The selected gate id is: ${selectedGateId}`);
+                    // Calculate the wire path with obstruction checks
+                    const wirePath = getDetourPath(
+                        { x: matchingOutput.x, y: matchingOutput.y },
+                        { x: inputPosition.x, y: inputPosition.y },
+                        gates, // Pass the gates array to check for obstructions
+                        window.innerWidth,
+                        window.innerHeight
+                    );
                     return(
                         <Line                                   //Draw the line from the respective gate output to current input
                             key={`wire-${matchingOutput.gateID}-${gateID}-${inputPosition.inputName}`}
 
-                            points={[
-                            matchingOutput.x, matchingOutput.y, // Start point: matching output
-                            inputPosition.x, inputPosition.y  // End point: current input
-                            ]}
+                            points={wirePath} // This is obtained from the getDetourPath function
 
                             stroke={
                                 selectedGateId === gateID || selectedGateId === matchingOutput.gateID ? "red" : "black"} // Highlight wires of selected gate
                             strokeWidth={
                                 selectedGateId === gateID || selectedGateId === matchingOutput.gateID ? 3 : 2}     // Increase width for selected wires
-                            onClick={() => setSelectedGateId(gateID)}           // Set the selected gate
   
                         />
                     );

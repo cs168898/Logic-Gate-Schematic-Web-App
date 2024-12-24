@@ -5,10 +5,9 @@ import { Stage, Layer, Rect, Text } from 'react-konva';
 import { AndGate } from '../konvaLogicGates/andGate';
 import { OrGate } from '../konvaLogicGates/orGate';
 import { NotGate } from '../konvaLogicGates/notGate';
-import { CreateConnections } from '../konvaLogicGates/create_connections';
+import { CreateConnections } from '../konvaLogicGates/functions/create_connections';
 
-function LogicGateCanvas({ gates, setSelectedGateId, selectedGateId }) {
-  const [gatePositions, setGatePositions] = useState({}) // stores the positions of the input and output wire of gates
+function LogicGateCanvas({ gates, setSelectedGateId, selectedGateId, gatePositions, setGatePositions }) {
 
   // Use useCallback to ensure a stable function reference
   const handleWirePositionUpdate = useCallback((gateID, positions) => { // useCallback to ensure that onWirePositionUpdate does not get re-created on every render.
@@ -72,6 +71,7 @@ function LogicGateCanvas({ gates, setSelectedGateId, selectedGateId }) {
             gatePositions={gatePositions}
             selectedGateId={selectedGateId}
             setSelectedGateId={setSelectedGateId}
+            gates={gates}
           /> 
       </Layer>
     </Stage>

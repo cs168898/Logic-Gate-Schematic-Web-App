@@ -20,6 +20,8 @@ function Home() {
   const [gates, setGates] = useState([]);
   const [selectedGateId, setSelectedGateId] = useState(null);
 
+  const [gatePositions, setGatePositions] = useState({});
+
 
   /***************************** End Of useState Definitions ********************/
 
@@ -48,8 +50,17 @@ function Home() {
   // Handle deleting the selected gate
   const handleDeleteGate = () => {
     if (selectedGateId !== null) {
-      setGates(gates.filter((gate) => gate.id !== selectedGateId));
-      setSelectedGateId(null);
+      // Remove the gate from gates
+      setGates((prev) => prev.filter((gate) => gate.id !== selectedGateId));
+  
+      // Remove the gate's positions from gatePositions
+      setGatePositions((prev) => {
+        const { [selectedGateId]: _, ...rest } = prev; // Update the gatePositions state with the key selectedGateId to '_' which is a placeholder variable (not used).
+        console.log("Updated gatePositions after deletion:", rest);
+        return rest;
+      });
+  
+      setSelectedGateId(null); // Clear selection
     }
   };
 
@@ -96,6 +107,8 @@ function Home() {
             gates={gates}
             setSelectedGateId={handleSelectGate}
             selectedGateId={selectedGateId}
+            gatePositions={gatePositions}
+            setGatePositions={setGatePositions}
           />
           
           <div className="user-input">
