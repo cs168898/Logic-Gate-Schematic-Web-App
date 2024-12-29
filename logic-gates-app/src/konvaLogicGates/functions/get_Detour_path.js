@@ -1,23 +1,22 @@
 import { gridSizeConst } from "../../utils/gridSize";
 
 export function getDetourPath(output, input, gates, boardWidth, boardHeight) {
-  // 1) Build blocked array *Initialize a grid of 2d array of boolean values
+  // 1) Build blocked array
   const rows = Math.ceil(boardHeight / gridSizeConst);
   const cols = Math.ceil(boardWidth / gridSizeConst);
 
-  const blocked = Array.from({ length: rows }, () => 
-    Array(cols).fill(false)
-  );
+  const blocked = Array.from({ length: rows }, () => Array(cols).fill(false));
+
 
   // Mark the grid cells that are 'blocked' by gates
   for (const gate of gates) {
     if (gate.x == null || gate.y == null) continue;
-    const gateLeft = gate.x;
-    const gateTop = gate.y;
-    const gateRight = gateLeft + Math.ceil(100 / gridSizeConst);
-    const gateBottom = gateTop + Math.ceil(100 / gridSizeConst);
+    const gateLeft   = gate.x;
+    const gateTop    = gate.y;
+    const gateRight  = gateLeft + Math.ceil(100 / gridSizeConst);
+    const gateBottom = gateTop  + Math.ceil(100 / gridSizeConst);
+    console.log("gate type : ", gate.type, "gateLeft = ", gateLeft, "gateTop = ", gateTop, "gateRight = ", gateRight, "gateBottom = ", gateBottom);
 
-  // in grid terms, row = y and col = x, just imagine turning the screen sideways
     for (let r = gateTop; r < gateBottom; r++) {
       for (let c = gateLeft; c < gateRight; c++) {
         if (r >= 0 && r < rows && c >= 0 && c < cols) {
@@ -28,79 +27,152 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight) {
   }
 
   // 2) Convert output/input coords (in px) to grid coords
-  const startRow = Math.floor(output.y / gridSizeConst);
-  const startCol = Math.floor(output.x / gridSizeConst);
-  const endRow = Math.floor(input.y / gridSizeConst);
-  const endCol = Math.floor(input.x / gridSizeConst);
+  const startRow = Math.floor((output.y) / gridSizeConst);
+  const startCol = Math.floor((output.x )/ gridSizeConst);
+  const endRow   = Math.floor(input.y / gridSizeConst);
+  const endCol   = Math.floor(input.x / gridSizeConst);
+  console.log("Start grid:", startRow, startCol);
+  console.log("End grid:", endRow, endCol);
 
-  // 3) BFS
-  const bfsResult = bfsPath(startRow, startCol, endRow, endCol, blocked);
-  if (!bfsResult) {
+  // Quick boundary checks
+  if (startRow < 0 || startRow >= rows || startCol < 0 || startCol >= cols) {
+    console.error("Start point out of bounds:", startRow, startCol);
+    return null;
+  }
+  if (endRow < 0 || endRow >= rows || endCol < 0 || endCol >= cols) {
+    console.error("End point out of bounds:", endRow, endCol);
+    return null;
+  }
+
+  // 3) A* search
+  const aStarResult = aStarPath(startRow, startCol, endRow, endCol, blocked);
+  if (!aStarResult) {
     console.error("No path found!");
     return null;
   }
 
-  // 4) Convert BFS path to screen coords
-  let screenPath = bfsResult.map(([r, c]) => [
-    c * gridSizeConst + gridSizeConst / 2,
-    r * gridSizeConst + gridSizeConst / 2
+  // 4) Convert A* path from grid coords to pixel coords
+  let screenPath = aStarResult.map(([r, c]) => [
+    c * gridSizeConst + gridSizeConst % gridSizeConst,  // Intermediate grid point (center of grid cell)
+    r * gridSizeConst + gridSizeConst % gridSizeConst
   ]);
 
-  // 5) Simplify the path for orth routing
+  screenPath[0] = [screenPath[0][0], output.y];     // start wire *change the Y first
+  screenPath[1] = [output.x , screenPath[1][1]];     // start wire * change the X now
+
+
+  screenPath[screenPath.length - 1] = [screenPath[screenPath.length - 1][0], input.y]; // end wire *Change Y first 
+  screenPath[screenPath.length - 2] = [input.x, screenPath[screenPath.length - 2][1]]; // end wire
+
+  // 5) simplify the path
   screenPath = simplifyPath(screenPath);
 
-  return screenPath;
+  screenPath[0] = [output.x, output.y];
+  screenPath[screenPath.length - 1] = [input.x, input.y];
+
+  // 6) Flatten for Konva's <Line points={...} />
+  const flattened = screenPath.flatMap(([x, y]) => [x, y]);
+  return flattened;
 }
 
-// BFS logic
-function bfsPath(startRow, startCol, endRow, endCol, blocked) {
+/**
+ * Use A* to find a path on the blocked grid from (sr, sc) to (er, ec).
+ * Returns an array of [row, col] or null if no path found.
+ */
+function aStarPath(sr, sc, er, ec, blocked) {
   const rows = blocked.length;
   const cols = blocked[0].length;
+
+  // 4-directional movement
   const directions = [
-    [-1, 0], // up
-    [0, 1],  // right
-    [1, 0],  // down
-    [0, -1]  // left
+    [-1, 0, 0.05],  // up
+    [0, 1, 0],   // right
+    [1, 0, 0],   // down
+    [0, -1, 0],  // left
   ];
 
+  /**
+   * Basic Manhattan-distance heuristic
+   *    h = |r1 - r2| + |c1 - c2|
+   */
+  function heuristic(r, c, tr, tc) {
+    return Math.abs(r - tr) + Math.abs(c - tc);
+  }
+
+  // Store whether visited & the cost so far
   const visited = Array.from({ length: rows }, () => Array(cols).fill(false));
+  // Parent for path reconstruction
   const parent = Array.from({ length: rows }, () =>
     Array.from({ length: cols }, () => null)
   );
+  // Min-heap or priority queue for open set
+  // We'll just use a simple array .sort() for clarity, but you can use a real PQ library for performance
+  const openSet = [];
 
-  const queue = [];
-  queue.push([startRow, startCol]);
-  visited[startRow][startCol] = true;
+  // Start node
+  const startNode = {
+    r: sr,
+    c: sc,
+    g: 0, // cost from start
+    f: heuristic(sr, sc, er, ec), // estimated cost total: g + h
+  };
+  openSet.push(startNode); // This will store all the nodes that are being considered
 
-  while (queue.length) {
-    const [r, c] = queue.shift();
-    if (r === endRow && c === endCol) {
-      return reconstructPath(parent, startRow, startCol, r, c);
+  visited[sr][sc] = true;
+
+  while (openSet.length > 0) {
+    // 1) Sort to pop the node with the smallest f
+    openSet.sort((a, b) => a.f - b.f); // Sort the nodes with the least cost to the destination to the most
+    const current = openSet.shift(); // remove the node with smallest f
+
+    const { r, c, g } = current;
+    // 2) If we've reached the end, reconstruct path
+    if (r === er && c === ec) {
+      return reconstructPath(parent, sr, sc, er, ec);
     }
 
-    for (const [dr, dc] of directions) {
-      const nr = r + dr;
-      const nc = c + dc;
+    // 3) Explore neighbors
+    for (const [dr, dc, penalty] of directions) {
+      const nr = r + dr;  // new row
+      const nc = c + dc;  // new col
+      // Validate
       if (
         nr >= 0 && nr < rows &&
         nc >= 0 && nc < cols &&
-        !blocked[nr][nc] &&
-        !visited[nr][nc]
+        !blocked[nr][nc]
       ) {
-        visited[nr][nc] = true;
-        parent[nr][nc] = [r, c];
-        queue.push([nr, nc]);
+        if (!visited[nr][nc]) {
+          visited[nr][nc] = true;
+          parent[nr][nc] = [r, c];
+          let newG = 0;
+          if (sc > ec){     // If the starting point x axis is more than the end point x axis, meaning wire travels right to left
+            newG = g + 1 + penalty; // distance from the start so far
+          } else{
+            newG = g + 1; // distance from the start so far
+          }
+          
+          const hVal = heuristic(nr, nc, er, ec); // heuristic cost
+          const fVal = newG + hVal;   // estimated total cost of path
+
+          openSet.push({
+            r: nr,
+            c: nc,
+            g: newG,
+            f: fVal,
+          });
+        }
       }
     }
   }
 
-  return null; // no path
+  // no path
+  return null;
 }
 
+// Reconstruct path from parent array
 function reconstructPath(parent, sr, sc, er, ec) {
   let path = [];
   let current = [er, ec];
-
   while (current) {
     path.push(current);
     const [cr, cc] = current;
@@ -110,7 +182,6 @@ function reconstructPath(parent, sr, sc, er, ec) {
       break;
     }
   }
-
   path.reverse();
   return path;
 }
@@ -118,7 +189,7 @@ function reconstructPath(parent, sr, sc, er, ec) {
 function simplifyPath(points) {
   if (points.length <= 2) return points;
 
-  const simplified = [points[0]];
+  const simplified = [points[0]]; // Always include the first point
   for (let i = 1; i < points.length - 1; i++) {
     const [x1, y1] = points[i - 1];
     const [x2, y2] = points[i];
@@ -128,6 +199,6 @@ function simplifyPath(points) {
       simplified.push(points[i]);
     }
   }
-  simplified.push(points[points.length - 1]);
+  simplified.push(points[points.length - 1]); // Always include the last point
   return simplified;
 }

@@ -73,6 +73,10 @@ export function CreateConnections({ gatePositions, selectedGateId, setSelectedGa
                         window.innerWidth,
                         window.innerHeight
                     );
+                    if (wirePath === null){
+                        console.log("wirePath is null");
+                        return null;
+                    }
                     return(
                         <Line                                   //Draw the line from the respective gate output to current input
                             key={`wire-${matchingOutput.gateID}-${gateID}-${inputPosition.inputName}`}
