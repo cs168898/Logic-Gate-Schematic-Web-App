@@ -108,9 +108,9 @@ export function AndGate({ gate, selectedGateId, setSelectedGateId, onWirePositio
         {inputWires}
         {outputwire}
         <Text
-                x={gate.x * gridSizeConst + 5}
+                x={(startX + (20))} // increase 1 grid from the start of the gate x
                 y={gate.y * gridSizeConst + 45}
-                text={`${gate.name} (${gate.type})`}
+                text={`${gate.name}`}
                 fill="black"
                 onClick={() => setSelectedGateId(gate.id)} // Set as selected when clicked
         />

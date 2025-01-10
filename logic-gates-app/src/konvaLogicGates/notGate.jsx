@@ -53,12 +53,12 @@ export function NotGate({ gate, selectedGateId, setSelectedGateId, onWirePositio
 
     // Generate output wire
     const outputPosition = [];
-    outputPosition.push({outputName: gate.output, x: circleX + 20, y: circleY}) // set the coordinates of output wire
+    outputPosition.push({outputName: gate.output, x: circleX + 15, y: circleY}) // set the coordinates of output wire
     const outputwire =(
     <>
     <Line
         key={`${gate.id}-w-output`}
-        points={[ circleX + 5, circleY, circleX + 20 , circleY]} // Coordinates for the line
+        points={[ circleX + 5, circleY, circleX + 15 , circleY]} // Coordinates for the line
         stroke="black"
         strokeWidth={2}                           
     />
@@ -111,7 +111,7 @@ export function NotGate({ gate, selectedGateId, setSelectedGateId, onWirePositio
         <Text
                 x={gate.x * gridSizeConst + 10}
                 y={gate.y * gridSizeConst + 45}
-                text={`${gate.name} (${gate.type})`}
+                text={`${gate.name}`}
                 fill="black"
                 onClick={() => setSelectedGateId(gate.id)} // Set as selected when clicked
         />

@@ -1,10 +1,13 @@
 import { gridSizeConst } from "../../utils/gridSize";
 
 export function getDetourPath(output, input, gates, boardWidth, boardHeight) {
+  
+  const yValuesSet = new Set();
+  
   // 1) Build blocked array
   const rows = Math.ceil(boardHeight / gridSizeConst);
   const cols = Math.ceil(boardWidth / gridSizeConst);
-
+  
   const blocked = Array.from({ length: rows }, () => Array(cols).fill(false));
 
 
@@ -45,7 +48,7 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight) {
   }
 
   // 3) A* search
-  const aStarResult = aStarPath(startRow, startCol, endRow, endCol, blocked);
+  const aStarResult = aStarPath(startRow, startCol, endRow, endCol, blocked, yValuesSet);
   if (!aStarResult) {
     console.error("No path found!");
     return null;
@@ -57,18 +60,26 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight) {
     r * gridSizeConst + gridSizeConst % gridSizeConst
   ]);
 
-  screenPath[0] = [screenPath[0][0], output.y];     // start wire *change the Y first
-  screenPath[1] = [output.x , screenPath[1][1]];     // start wire * change the X now
+  // screenPath[0] = [screenPath[0][0], output.y];     // output wire *change the Y first
+  // screenPath[1] = [output.x , screenPath[1][1]];     // output wire * change the X now
 
-
-  screenPath[screenPath.length - 1] = [screenPath[screenPath.length - 1][0], input.y]; // end wire *Change Y first 
-  screenPath[screenPath.length - 2] = [input.x, screenPath[screenPath.length - 2][1]]; // end wire
+  
+  // if ((yValuesSet.size > 1)){
+  //   // add a bent right before the input wire
+  // screenPath[screenPath.length - 1] = [screenPath[screenPath.length - 1][0], input.y]; // input wire *Change Y first 
+  // screenPath[screenPath.length - 2] = [input.x, screenPath[screenPath.length - 2][1]]; // input wire
+  // }
 
   // 5) simplify the path
   screenPath = simplifyPath(screenPath);
+  
+  // 5b) Force the very first point to the exact output pin
+  if (screenPath.length > 0) {
+    screenPath[0] = [output.x, output.y];
+  }
 
-  screenPath[0] = [output.x, output.y];
-  screenPath[screenPath.length - 1] = [input.x, input.y];
+  // 5c) Adjust the final segment to the exact input pin y axis
+  screenPath = fixLastBend(screenPath, input, output);
 
   // 6) Flatten for Konva's <Line points={...} />
   const flattened = screenPath.flatMap(([x, y]) => [x, y]);
@@ -79,7 +90,7 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight) {
  * Use A* to find a path on the blocked grid from (sr, sc) to (er, ec).
  * Returns an array of [row, col] or null if no path found.
  */
-function aStarPath(sr, sc, er, ec, blocked) {
+function aStarPath(sr, sc, er, ec, blocked, yValuesSet) {
   const rows = blocked.length;
   const cols = blocked[0].length;
 
@@ -128,7 +139,7 @@ function aStarPath(sr, sc, er, ec, blocked) {
     const { r, c, g } = current;
     // 2) If we've reached the end, reconstruct path
     if (r === er && c === ec) {
-      return reconstructPath(parent, sr, sc, er, ec);
+      return reconstructPath(parent, sr, sc, er, ec, yValuesSet);
     }
 
     // 3) Explore neighbors
@@ -170,15 +181,23 @@ function aStarPath(sr, sc, er, ec, blocked) {
 }
 
 // Reconstruct path from parent array
-function reconstructPath(parent, sr, sc, er, ec) {
+function reconstructPath(parent, sr, sc, er, ec, yValuesSet) {
   let path = [];
   let current = [er, ec];
+
   while (current) {
     path.push(current);
+
+    // Convert grid row (Y) to pixel Y and add to the set
     const [cr, cc] = current;
+    const pixelY = cr * gridSizeConst + gridSizeConst / 2;
+    yValuesSet.add(pixelY);
+
     current = parent[cr][cc];
     if (current && current[0] === sr && current[1] === sc) {
       path.push(current);
+      const startPixelY = current[0] * gridSizeConst + gridSizeConst / 2;
+      yValuesSet.add(startPixelY);
       break;
     }
   }
@@ -187,18 +206,49 @@ function reconstructPath(parent, sr, sc, er, ec) {
 }
 
 function simplifyPath(points) {
+  // This function is to remove redundant points that dont change the direction of the wire
   if (points.length <= 2) return points;
 
-  const simplified = [points[0]]; // Always include the first point
+  const simplified = [points[0]]; // Always include the first point because it is the starting point
+
   for (let i = 1; i < points.length - 1; i++) {
-    const [x1, y1] = points[i - 1];
-    const [x2, y2] = points[i];
-    const [x3, y3] = points[i + 1];
+    const [x1, y1] = points[i - 1]; // Previous point
+    const [x2, y2] = points[i];     // Middle point
+    const [x3, y3] = points[i + 1]; // Next point
+
     // If not in a straight line, keep the middle point
     if (!((x1 === x2 && x2 === x3) || (y1 === y2 && y2 === y3))) {
-      simplified.push(points[i]);
+      simplified.push(points[i]); // Keep the middle point
     }
   }
   simplified.push(points[points.length - 1]); // Always include the last point
   return simplified;
+}
+
+
+function fixLastBend(screenPath, input, output) {
+  // If there's fewer than 2 points, nothing to fix
+  if (screenPath.length < 2) return screenPath;
+
+  // The second-to-last point
+  const secondToLastIdx = screenPath.length - 2;
+  const lastIdx         = screenPath.length - 1;
+
+  const [sx, sy] = screenPath[secondToLastIdx];
+  const [ex, ey] = [input.x, input.y]; // real final point
+
+  // Step 1) Make the second-to-last point match the final Y
+  //         so that vertical segment lines up with actual input.y
+  //         ( do the reverse if you prefer matching X first.)
+  if (input.x < output.x){
+    screenPath[secondToLastIdx] = [ex, sy];
+  } else{
+    screenPath[secondToLastIdx] = [sx, ey];
+  }
+  
+
+  // Step 2) Make the very last point exactly (input.x, input.y).
+  screenPath[lastIdx] = [ex, ey];
+
+  return screenPath;
 }

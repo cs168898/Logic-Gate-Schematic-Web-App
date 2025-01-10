@@ -27,11 +27,11 @@ export function OrGate({ gate, selectedGateId, setSelectedGateId, onWirePosition
     const inputPositions = [];
     for (let i = 1; i <= numInputs; i++) {
         const wireY = endYTop + interval * i;
-        inputPositions.push({inputName: gate.inputs[i-1], x: endX, y: wireY})
+        inputPositions.push({inputName: gate.inputs[i-1], x: endX-1, y: wireY}) // The endx - 1 is to avoid the line from touching the border of the gate
         inputWires.push(
         <Line
             key={`${gate.id}-w${i}`} // (e.g. GateID - w1) first wire
-            points={[startX + 20, wireY, endX, wireY]} // Coordinates for the line
+            points={[startX + 20, wireY, endX - 2, wireY]} // Coordinates for the line // the endx - 2 extends the line to make it cleaner
             stroke="black"
             strokeWidth={2}
         />,
@@ -95,7 +95,7 @@ export function OrGate({ gate, selectedGateId, setSelectedGateId, onWirePosition
         <Text
                 x={gate.x * gridSizeConst + 30}
                 y={gate.y * gridSizeConst + 45}
-                text={`${gate.name} (${gate.type})`}
+                text={`${gate.name}`}
                 fill="black"
                 onClick={() => setSelectedGateId(gate.id)} // Set as selected when clicked
         />
