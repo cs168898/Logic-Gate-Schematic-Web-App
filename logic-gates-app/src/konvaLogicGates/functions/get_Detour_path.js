@@ -103,11 +103,13 @@ function aStarPath(sr, sc, er, ec, blocked, yValuesSet) {
   ];
 
   /**
-   * Basic Manhattan-distance heuristic
+   * Modified Manhattan-distance heuristic
+   * Bias y-alignment early by adding a penalty if the y-axis is not aligned
    *    h = |r1 - r2| + |c1 - c2|
    */
   function heuristic(r, c, tr, tc) {
-    return Math.abs(r - tr) + Math.abs(c - tc);
+    const yMisalignmentPenalty = Math.abs(r - tr) > 0 ? 1 : 0; // Encourage y-alignment
+    return Math.abs(r - tr) + Math.abs(c - tc) + yMisalignmentPenalty;
   }
 
   // Store whether visited & the cost so far
@@ -161,7 +163,7 @@ function aStarPath(sr, sc, er, ec, blocked, yValuesSet) {
           } else{
             newG = g + 1; // distance from the start so far
           }
-          
+
           const hVal = heuristic(nr, nc, er, ec); // heuristic cost
           const fVal = newG + hVal;   // estimated total cost of path
 
@@ -221,6 +223,7 @@ function simplifyPath(points) {
       simplified.push(points[i]); // Keep the middle point
     }
   }
+ 
   simplified.push(points[points.length - 1]); // Always include the last point
   return simplified;
 }
