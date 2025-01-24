@@ -53,6 +53,21 @@ body {
   
 }
 
+.sidebar-tools button{
+  background-color: rgb(201, 8, 8);
+  color: white;
+  border: none;
+  padding: 5px 5px;
+  cursor: pointer;
+  border-radius: 10px;
+
+}
+
+.sidebar-tools button:hover{
+  background-color: white;
+  color: var(--theme-primary-color);
+}
+
 
 /*********** Content Area ***********/
 

@@ -60,6 +60,25 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight) {
     r * gridSizeConst + gridSizeConst % gridSizeConst
   ]);
 
+  // 4.5) Calculate all grid points covered by the path
+  const allGridPoints = [];
+  for (let i = 0; i < aStarResult.length - 1; i++) {
+      const [startR, startC] = aStarResult[i];
+      const [endR, endC] = aStarResult[i + 1];
+
+      if (startR === endR) {
+          // Horizontal line
+          for (let c = Math.min(startC, endC); c <= Math.max(startC, endC); c++) {
+              allGridPoints.push([startR, c]);
+          }
+      } else if (startC === endC) {
+          // Vertical line
+          for (let r = Math.min(startR, endR); r <= Math.max(startR, endR); r++) {
+              allGridPoints.push([r, startC]);
+          }
+      }
+  }
+
   // screenPath[0] = [screenPath[0][0], output.y];     // output wire *change the Y first
   // screenPath[1] = [output.x , screenPath[1][1]];     // output wire * change the X now
 
@@ -83,7 +102,9 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight) {
 
   // 6) Flatten for Konva's <Line points={...} />
   const flattened = screenPath.flatMap(([x, y]) => [x, y]);
-  return flattened;
+  console.log(`about to exit getDetourPath, all grid points = ${allGridPoints}`)
+  console.log(`about to exit getDetourPath, flattened = ${flattened}`)
+  return {flattened, allGridPoints};
 }
 
 /**

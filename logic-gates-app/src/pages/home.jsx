@@ -83,6 +83,22 @@ function Home() {
     }
 
   }
+  
+  const handleClearGates = async () =>{
+    try{
+      
+
+      setGates([]) // Keep track of all the logic gate inside the 'gates' variable
+      setGatePositions({}); // Clear all wire positions
+      setSelectedGateId(null); // Clear selection
+      
+      //const response = await axios.post('http://127.0.0.1:8000/logicgates/', gateData);
+      //console.log("Logic Gate Created: ", response.data);
+    } catch (error){
+      console.error("Error: ", error.message) // Log the error if there are errors that happened in the backend
+    }
+
+  }
     
   return (
     <div className="App">
@@ -99,7 +115,9 @@ function Home() {
             <div className="sidebar-tools">
               <h2>Sidebar</h2>
             
-              <p>Sidebar Tools</p>
+              <button className='clear' onClick={handleClearGates}>Clear All Gates
+              </button>
+
             </div>
           </div>
 
