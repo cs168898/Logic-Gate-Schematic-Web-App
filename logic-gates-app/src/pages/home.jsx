@@ -1,5 +1,4 @@
-
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 // Component Imports
 import Grid from '../components/background-grid';
@@ -8,19 +7,21 @@ import Header from '../components/header';
 // Utilities (functions) Imports
 import { parseUserInput } from '../utils/parseUserInput';
 import { dragAndDrop } from '../utils/dragAndDrop'; // Allows users to drag and drop text area and sidebar windows
-import LogicGateCanvas from '../utils/LogicGateCanvas.jsx';
-
-
+import LogicGateCanvas from '../utils/LogicGateCanvas';
+import { GatesContext } from '../context/GatesContext';
+import { GatesPositionContext } from '../context/GatesPositionContext';
 
 function Home() {
   /***************************** useState Definitions ***************************/
   const [userInput, setuserInput] = useState("")
   const [parsedUserInput, setParsedUserInput] = useState("")
 
-  const [gates, setGates] = useState([]);
+  const { gates, setGates } = useContext(GatesContext);
+
+  const { gatePositions, setGatePositions } = useContext(GatesPositionContext);
+
   const [selectedGateId, setSelectedGateId] = useState(null);
 
-  const [gatePositions, setGatePositions] = useState({});
 
 
   /***************************** End Of useState Definitions ********************/
@@ -122,11 +123,8 @@ function Home() {
           </div>
 
           <LogicGateCanvas
-            gates={gates}
             setSelectedGateId={handleSelectGate}
             selectedGateId={selectedGateId}
-            gatePositions={gatePositions}
-            setGatePositions={setGatePositions}
           />
           
           <div className="user-input">

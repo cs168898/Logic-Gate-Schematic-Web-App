@@ -1,6 +1,6 @@
 import { gridSizeConst } from "../../utils/gridSize";
 
-export function getDetourPath(output, input, gates, boardWidth, boardHeight) {
+export function getDetourPath(output, input, gates, boardWidth, boardHeight, wireTracker, endDestinationKey) {
   
   const yValuesSet = new Set();
   
@@ -8,26 +8,9 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight) {
   const rows = Math.ceil(boardHeight / gridSizeConst);
   const cols = Math.ceil(boardWidth / gridSizeConst);
   
-  const blocked = Array.from({ length: rows }, () => Array(cols).fill(false));
+  let blocked = Array.from({ length: rows }, () => Array(cols).fill(false));
 
-
-  // Mark the grid cells that are 'blocked' by gates
-  for (const gate of gates) {
-    if (gate.x == null || gate.y == null) continue;
-    const gateLeft   = gate.x;
-    const gateTop    = gate.y;
-    const gateRight  = gateLeft + Math.ceil(100 / gridSizeConst);
-    const gateBottom = gateTop  + Math.ceil(100 / gridSizeConst);
-    console.log("gate type : ", gate.type, "gateLeft = ", gateLeft, "gateTop = ", gateTop, "gateRight = ", gateRight, "gateBottom = ", gateBottom);
-
-    for (let r = gateTop; r < gateBottom; r++) {
-      for (let c = gateLeft; c < gateRight; c++) {
-        if (r >= 0 && r < rows && c >= 0 && c < cols) {
-          blocked[r][c] = true;
-        }
-      }
-    }
-  }
+  blocked = blockGrids(blocked, gates, wireTracker, input, endDestinationKey, rows, cols);
 
   // 2) Convert output/input coords (in px) to grid coords
   const startRow = Math.floor((output.y) / gridSizeConst);
@@ -48,9 +31,23 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight) {
   }
 
   // 3) A* search
-  const aStarResult = aStarPath(startRow, startCol, endRow, endCol, blocked, yValuesSet);
-  if (!aStarResult) {
-    console.error("No path found!");
+  let aStarResult = aStarPath(startRow, startCol, endRow, endCol, blocked, yValuesSet);
+  if (aStarResult) {
+    const pathLength = aStarResult.length;
+    const manhattanDist = Math.abs(startRow - endRow) + Math.abs(startCol - endCol);
+  
+    if (pathLength > manhattanDist * 3) {
+      console.warn("Detected a big detour. Ignoring conflict and re-running A* without blocking.");
+  
+      // Option A: Re-run A* but skip blocking
+      // Create a fresh 2D array of `false` so absolutely no cell is blocked
+      const unblockedArray = Array.from({ length: rows }, () => Array(cols).fill(false));
+      aStarResult = aStarPath(startRow, startCol, endRow, endCol, unblockedArray, yValuesSet);
+      // If fallbackResult is good, use that
+      // else fallback to aStarResult or return null
+    }
+  } else if(!aStarResult){
+    console.error("No path found by A*")
     return null;
   }
 
@@ -85,7 +82,7 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight) {
   
   // if ((yValuesSet.size > 1)){
   //   // add a bent right before the input wire
-  // screenPath[screenPath.length - 1] = [screenPath[screenPath.length - 1][0], input.y]; // input wire *Change Y first 
+  // screenPath[screenPath.length - 1] = [screenPath[screenPath.length - 1][0], input.y]; // input wire *Change Y  
   // screenPath[screenPath.length - 2] = [input.x, screenPath[screenPath.length - 2][1]]; // input wire
   // }
 
@@ -96,7 +93,7 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight) {
   if (screenPath.length > 0) {
     screenPath[0] = [output.x, output.y];
   }
-
+  
   // 5c) Adjust the final segment to the exact input pin y axis
   screenPath = fixLastBend(screenPath, input, output);
 
@@ -275,4 +272,44 @@ function fixLastBend(screenPath, input, output) {
   screenPath[lastIdx] = [ex, ey];
 
   return screenPath;
+}
+
+function blockGrids(blocked, gates, wireTracker, input, endDestinationKey, rows, cols){
+  // Mark the grid cells that are 'blocked' by gates
+  for (const gate of gates) {
+    if (gate.x == null || gate.y == null) continue;
+    const gateLeft   = gate.x;
+    const gateTop    = gate.y;
+    const gateRight  = gateLeft + Math.ceil(100 / gridSizeConst);
+    const gateBottom = gateTop  + Math.ceil(100 / gridSizeConst);
+    console.log("gate type : ", gate.type, "gateLeft = ", gateLeft, "gateTop = ", gateTop, "gateRight = ", gateRight, "gateBottom = ", gateBottom);
+
+    for (let r = gateTop; r < gateBottom; r++) {
+      for (let c = gateLeft; c < gateRight; c++) {
+        if (r >= 0 && r < rows && c >= 0 && c < cols) {
+          blocked[r][c] = true;
+        }
+      }
+    }
+  }
+
+  // If the end destination is different , block the grids with the wires from wireTracker
+  for (const key of Object.keys(wireTracker)){
+    if (key !== endDestinationKey){
+      // then we mark it as blocked
+      const wireDataArray = wireTracker[key];
+      wireDataArray.forEach(({gridCoordinates}) => {
+        if (gridCoordinates){
+          gridCoordinates.forEach(([r, c]) => {
+            if (r >= 0 && r < rows && c >= 0 && c < cols) {
+              blocked[r][c] = true;
+            }
+          });
+        }
+      })
+    }
+  }
+
+  return blocked;
+
 }

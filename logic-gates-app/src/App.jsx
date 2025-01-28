@@ -3,7 +3,9 @@ import axios from 'axios'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';  // Import specific icons
-
+import { GatesProvider } from './context/GatesContext';
+import { ConnectionsProvider } from './context/ConnectionsContext';
+import { GatesPositionProvider } from './context/GatesPositionContext';
 
 import { useEffect } from 'react';
 
@@ -14,7 +16,13 @@ import Home from './pages/home';
 function App() {
   
   return (
-    <Home />
+    <GatesProvider>
+      <GatesPositionProvider>
+        <ConnectionsProvider>
+          <Home />
+        </ConnectionsProvider>
+      </GatesPositionProvider>
+    </GatesProvider>
   );
 }
 
