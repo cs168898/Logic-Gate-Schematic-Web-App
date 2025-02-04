@@ -1,4 +1,4 @@
-    /**************************** User Input Functionality *******************************/
+/**************************** User Input Functionality *******************************/
 
     /* Expected User Input:
 
@@ -36,7 +36,7 @@
                 // if any key already exists in parsedData (which means a gate already exists) *Second iteration
                 if (parsedData.hasOwnProperty(cleanedKey) && Object.keys(parsedData).length > 0) {
                     console.log("duplicate entry found, inserting secodn object")
-                    if (isValidGate(parsedData)){ // Check if the gate type is valid
+                    if (isValidGate(parsedData, gatesArray)){ // Check if the gate type is valid
                         console.log("key successfully validated for second object")
                         //Add the first iteration gate we created to the gatesArray before starting with second
                         gatesArray.push({
@@ -61,7 +61,7 @@
       
         // Validate and push the last gate if it exists
         if (Object.keys(parsedData).length > 0) {
-            if (isValidGate(parsedData)) {
+            if (isValidGate(parsedData, gatesArray)) {
                 console.log("key successfully validated")
             gatesArray.push({
                 ...parsedData,
@@ -86,13 +86,12 @@
 
 
     // Helper function to validate gate data before adding it to the array
-    function isValidGate(gateData) {
+    function isValidGate(gateData, gatesArray) {
         // Check required fields
         if (
         !gateData.name ||
         !gateData.type ||
-        !gateData.input ||
-        !gateData.output
+        !gateData.input
         ) {
         return false;
         }
@@ -113,6 +112,16 @@
         return false;
         }
     
+        // Generate a random unique output if not provided
+        if (!gateData.output) {
+            let uniqueOutput;
+            do {
+              uniqueOutput = `OUT_${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+            } while (gatesArray.some((gate) => gate.output === uniqueOutput));
+            gateData.output = uniqueOutput;
+            console.log(`Generated unique output for gate ${gateData.name}: ${uniqueOutput}`);
+        }
+
         // Update gateData with parsed inputs and number of inputs if all checks pass
         gateData.inputs = inputs;
         gateData.numInputs = numInputs;

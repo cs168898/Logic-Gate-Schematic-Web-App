@@ -30,7 +30,7 @@ export function NotGate({ gate, selectedGateId, setSelectedGateId, onWirePositio
     const inputWires = [];
     const inputPositions = [];
     for (let i = 1; i <= numInputs; i++) {
-        const wireY = endYTop + interval * i;
+        const wireY = (Math.floor((endYTop + interval * i)/ gridSizeConst) * gridSizeConst) + gridSizeConst/2; // The top of the gate + the (interval * how many times) 
         inputPositions.push({inputName: gate.inputs[i-1], x: endX, y: wireY})
         inputWires.push(
         

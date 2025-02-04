@@ -26,12 +26,12 @@ export function OrGate({ gate, selectedGateId, setSelectedGateId, onWirePosition
     const inputWires = [];
     const inputPositions = [];
     for (let i = 1; i <= numInputs; i++) {
-        const wireY = endYTop + interval * i;
-        inputPositions.push({inputName: gate.inputs[i-1], x: endX-1, y: wireY}) // The endx - 1 is to avoid the line from touching the border of the gate
+        const wireY = (Math.floor((endYTop + interval * i)/ gridSizeConst) * gridSizeConst) + gridSizeConst/2; // The top of the gate + the (interval * how many times) 
+        inputPositions.push({inputName: gate.inputs[i-1], x: endX - gridSizeConst, y: wireY}) // The endx - 1 is to avoid the line from touching the border of the gate
         inputWires.push(
         <Line
             key={`${gate.id}-w${i}`} // (e.g. GateID - w1) first wire
-            points={[startX + 20, wireY, endX - 2, wireY]} // Coordinates for the line // the endx - 2 extends the line to make it cleaner
+            points={[startX + gridSizeConst*0.8, wireY, endX - gridSizeConst, wireY]} // Coordinates for the line // the endx - 2 extends the line to make it cleaner
             stroke="black"
             strokeWidth={2}
         />,

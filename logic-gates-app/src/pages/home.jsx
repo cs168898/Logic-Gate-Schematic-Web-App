@@ -72,9 +72,10 @@ function Home() {
   // Create the handleSubmit function to send userInput into backend
   const handleSubmit = async () =>{
     try{
+      console.clear(); // clear the console of all previous logs
       console.log(`The user input is: ${userInput}`)
       const gateData = parseUserInput(userInput, gates); // Parse user input before sending it to backend
-  
+      console.log("Gate Data: ", gateData)
       setGates([...gates, ...gateData]) // Keep track of all the logic gate inside the 'gates' variable
       
       //const response = await axios.post('http://127.0.0.1:8000/logicgates/', gateData);

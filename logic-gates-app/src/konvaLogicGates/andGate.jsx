@@ -27,7 +27,7 @@ export function AndGate({ gate, selectedGateId, setSelectedGateId, onWirePositio
     const inputWires = [];
     const inputPositions = [];
     for (let i = 1; i <= numInputs; i++) {
-        const wireY = endYTop + interval * i; // The top of the gate + the (interval * how many times) 
+        const wireY = (Math.floor((endYTop + interval * i)/ gridSizeConst) * gridSizeConst) + gridSizeConst/2; // The top of the gate + the (interval * how many times) 
         inputPositions.push({inputName: gate.inputs[i-1], x: startX - 20, y: wireY}) // set the coordinates of input wire
         // ************* NOTE : the startX and endX for ANDGate is switched , the start of the line starts from the gate extending out from the gate
         inputWires.push(

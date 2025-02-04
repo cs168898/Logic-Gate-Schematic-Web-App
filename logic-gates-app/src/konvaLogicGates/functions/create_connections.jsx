@@ -1,223 +1,248 @@
-import React, {useEffect, useContext} from 'react';
-import { Stage, Layer, Path, Text, Line } from 'react-konva';
+import React, { useEffect, useContext, useMemo } from 'react';
 import { gridSizeConst } from '../../utils/gridSize';
-import {getDetourPath} from './get_Detour_path';
-import { detectConflict } from './detectConflict';
+import { Layer, Line } from 'react-konva';
+import { getDetourPath } from './get_Detour_path';
 import { cleanUpWires } from './cleanUp_wires';
 import { ConnectionsContext } from '../../context/ConnectionsContext';
 import { GatesContext } from '../../context/GatesContext';
 import { GatesPositionContext } from '../../context/GatesPositionContext';
 
-export function CreateConnections({selectedGateId, setSelectedGateId}){
+/**
+ * Creates the wires for all gates except the selected/deleted gate.
+ */
+export function CreateConnections({ selectedGateId, setSelectedGateId }) {
+  const { gates } = useContext(GatesContext);
+  const { connections, setConnections } = useContext(ConnectionsContext);
+  const { gatePositions } = useContext(GatesPositionContext);
 
-   
-    /*
-        ARGS:
+  // Filter gates except the selected (deleted) one
+  const gatesArray = gates.filter(gate => gate.id !== selectedGateId);
+  console.log('gatesPositions in create_connections.jsx:', gatePositions);
+  console.log('gatesArray in create_connections.jsx:', gatesArray);
 
-            gatePositions: contains the object of 
-            [gate.id]: {
-                inputPositions: [
-                { inputName: "A", x: 50, y: 75 },
-                { inputName: "B", x: 50, y: 125 }
-                ],
-                outputPosition: { outputName: "C", x: 150, y: 100 }
-            }
+  // Reverse the gatesArray to iterate in reverse order
+  const reversedGatesArray = [...gatesArray].reverse();
+  console.log('reversedGatesArray: ', reversedGatesArray);
 
-
-            gates: contains the information of the gate name, type, input, output, x and y
-
-            selectedGateId: the variable that contains the selected gate ID.
-    */
-    
-    const { gates } = useContext(GatesContext);
-    const { connections, setConnections } = useContext(ConnectionsContext);
-    const { gatePositions} = useContext(GatesPositionContext);
-
-    console.log({gatePositions})
-    console.log("Gate Positions:", gatePositions);
-
-    const gatesArray = Object.entries(gatePositions).filter(
-        ([gateID]) => gateID !== selectedGateId
-      ); // Exclude the deleted gate's connections
-      //console.log("Derived gatesArray:", gatesArray); // Log gatesArray to ensure correctness
-    // Make a reversed copy
-    const reversedGatesArray = [...gatesArray].reverse();
-
-    const allOutputs = [];
-    for (const [gateID, positions] of gatesArray) {
-      const { outputPosition } = positions;
-      if (Array.isArray(outputPosition)) {
-        for (const output of outputPosition) {
-          allOutputs.push({
-            gateID,
-            outputName: output.outputName,
-            x: output.x,
-            y: output.y
-          });
-        }
+  // Build a quick list of all outputs
+  const allOutputs = [];
+  for (const gate of reversedGatesArray) {
+    const positions = gatePositions[gate.id];
+    if (positions && Array.isArray(positions.outputPosition)) {
+      for (const output of positions.outputPosition) {
+        allOutputs.push({
+          gateID: gate.id,
+          outputName: output.outputName,
+          x: output.x,
+          y: output.y
+        });
       }
     }
-    const pastOutputs = []; // Array to store past gates' outputs
-    const wireTracker = {}; // Tracker to store wire locations and their end destinations
-    const tempConnections = {}; // store newly computed wires in local object
+  }
 
-    useEffect(() => {
-      // Clean up if needed
-      const cleaned = cleanUpWires(connections);
-  
-      // Compare cleaned with existing
-      if (JSON.stringify(cleaned) !== JSON.stringify(connections)) {
-        setConnections(cleaned);
-        console.log("Updated connections with newly built wires.");
-      }
-    }, [tempConnections, connections, setConnections]);
+  /**
+   * 1) Build local wires in memory.
+   */
+  const localWires = useMemo(() => {
+    const wireTracker = {};
+    const wiresObj = {};
 
-    return(
-        <>
-        {reversedGatesArray.map(([gateID, positions]) =>{
-            
-            const reversedInputs = [...positions.inputPositions].reverse();
-            
-            const wireElements = reversedInputs.map((inputPosition) => {
-               const matchingOutput = allOutputs.find(
-                (output) => output.outputName === inputPosition.inputName); 
-                
-                if (
-                    matchingOutput &&
-                    matchingOutput.gateID !== selectedGateId && // Skip if the output gate is the deleted gate
-                    gateID !== selectedGateId // Skip if the input gate is the deleted gate
-                  ){
-                    // Group wires by end destination
-                    const endDestinationKey = inputPosition.inputName;
-                    console.log(`Wire key: wire-${matchingOutput.gateID}-${gateID}-${inputPosition.inputName}`);
-                    // Calculate the wire path with obstruction checks
-                    const wireKey = `wire-${matchingOutput.gateID}-${gateID}-${inputPosition.inputName}`;
-                    const pathResult = getDetourPath( // gridCoords is the current wires grid points
-                        { x: matchingOutput.x, y: matchingOutput.y },
-                        { x: inputPosition.x, y: inputPosition.y },
-                        gates,
-                        window.innerWidth,
-                        window.innerHeight,
-                        wireTracker,
-                        endDestinationKey
-                    );
+    for (const gate of reversedGatesArray) {
+      const positions = gatePositions[gate.id];
+      if (!positions) continue;
 
-                    console.log("pathResult:", pathResult); // Preferred
+      const { inputPositions } = positions;
+      // Reverse inputs to iterate in reverse order
+      const reversedInputs = [...inputPositions].reverse();
+
+      reversedInputs.forEach((inputPosition) => {
+        const matchingOutput = allOutputs.find(
+          (output) => output.outputName === inputPosition.inputName
+        );
+        if (
+          matchingOutput &&
+          matchingOutput.gateID !== selectedGateId &&
+          gate.id !== selectedGateId
+        ) {
+          const wireKey = `wire-${+matchingOutput.gateID + 1}-${+gate.id + 1}-${inputPosition.inputName}`;
+          console.log('wireKey:', wireKey);
+          const pathResult = getDetourPath(
+            { x: matchingOutput.x, y: matchingOutput.y },
+            { x: inputPosition.x, y: inputPosition.y },
+            gates,
+            window.innerWidth,
+            window.innerHeight,
+            wireTracker,
+            inputPosition.inputName
+          );
+
+          if (pathResult && pathResult.screenPath) {
+            const { screenPath: pixelCoords, allGridPoints: gridCoords, gridPath: gridPath } = pathResult;
+            console.log("pixelCoords snapshot:", JSON.stringify(pixelCoords));
+            console.log("gridPath snapshot:", JSON.stringify(gridPath));
+
+            if (!Array.isArray(pixelCoords) || pixelCoords.some(p => p === undefined)) {
+              console.error(`❌ Detected undefined inside pixelCoords BEFORE storing for ${wireKey}:`, pixelCoords);
+            }
+
+            console.log('Original screenPath:', pathResult.screenPath);
+            const clonedPixelCoords = pixelCoords.map(pair => [...pair]);
+            const clonedGridCoords = gridCoords.map(pair => [...pair]);
+            const clonedGridPath = gridPath.map(pair => [...pair]);
+            console.log("clonedpixelcoordinates snapshot:", JSON.stringify(clonedPixelCoords));
+            console.log('Cloned gridCoordinates:', JSON.stringify(clonedGridCoords));
+            console.log('Cloned gridPath:', JSON.stringify(clonedGridPath));
+
+            wiresObj[wireKey] = {
+              pixelCoordinates: clonedPixelCoords,
+              gridCoordinates: clonedGridCoords,
+              gridPath: clonedGridPath
+            };
+            console.log(`✅ Confirmed wiresObj[${wireKey}] after assignment:`, JSON.stringify(wiresObj[wireKey]));
 
 
-                    const { pixelCoordinates, gridCoordinates } = convertDetourPathToGridRowsCols(
-                      pathResult
-                    );
-
-                    // Save wire data in tempConnections
-                    tempConnections[wireKey] = { pixelCoordinates, gridCoordinates };
-                    
-
-                    if (!wireTracker[endDestinationKey]) { // If the array item does not exist yet,
-                        wireTracker[endDestinationKey] = []; //Create the array item as an empty array
-                    }
-
-                    // let pixelCoords = [...pixelCoordinates];
-                    // console.log(`the gridCoords are: ${gridCoordinates}`)
-                    // const [newpixelCoords, newGridCoords] = detectConflict(gridCoordinates, wireTracker, pixelCoords, endDestinationKey)
-
-                    // // Update the variables with the returned values
-                    // pixelCoords = newpixelCoords;
-                    // console.log(`pixelCoords = `, pixelCoords)
-                    // const gridCoords = newGridCoords;
-
-                    const flattenedpixelCoords = rowsColsToXyPairs(pixelCoordinates);
-                    console.log("Flattened Adjusted Path:", flattenedpixelCoords , 'for input:', endDestinationKey);
-
-                    // Store the adjusted path in the wire tracker
-                    wireTracker[endDestinationKey].push({ pixelCoordinates, gridCoordinates });
-                    
-
-                    
-                    return(
-                        <Line                                   //Draw the line from the respective gate output to current input
-                            key={wireKey}
-                            points={flattenedpixelCoords} // This is obtained from the getDetourPath function
-
-                            stroke={
-                                selectedGateId === gateID || selectedGateId === matchingOutput.gateID ? "red" : "black"} // Highlight wires of selected gate
-                            strokeWidth={
-                                selectedGateId === gateID || selectedGateId === matchingOutput.gateID ? 3 : 2}     // Increase width for selected wires
-  
-                        />
-                    );
-                }
-                return null; // If there is no matchingOutput,  no line.
+            if (!wireTracker[inputPosition.inputName]) {
+              wireTracker[inputPosition.inputName] = [];
+            }
+            wireTracker[inputPosition.inputName].push({
+              pixelCoordinates: clonedPixelCoords,
+              gridCoordinates: clonedGridCoords,
+              gridPath: clonedGridPath
             });
+          } else {
+            console.warn(`Missing pathResult for wire ${wireKey}`);
+          }
+        }
+      });
+    }
 
+    return wiresObj;
+  }, [gates, gatePositions, selectedGateId, allOutputs]);
 
-            // create checks for other wires along the way
-            // create checks for other gates along the way
-            // Render connections for this gate
-            return <React.Fragment key={`connections-${gateID}`}>{wireElements}</React.Fragment>;
-        })}
+  console.log('localWires:', JSON.stringify(localWires));
+  /**
+   * 2) Clean up wires if needed.
+   */
+  const cleanedWires = useMemo(() => {
+    return cleanUpWires(localWires);
+  }, [localWires]);
 
-        </>
+  /**
+   * 3) If cleaned wires differ from context, update context once.
+   */
+  console.log('the cleanedwires and connections are: ', cleanedWires, connections);
+  useEffect(() => {
+    if (!areSame(cleanedWires, connections)) {
+      console.log('connections are not the same, therefore setting connetions');
+      setConnections(cleanedWires);
+    }
+  }, [cleanedWires]);
+
+  /**
+   * 4) Convert cleaned wires to <Line> elements for rendering.
+   */
+  const lineElements = Object.entries(cleanedWires).map(([wireKey, wireData]) => {
+    let { pixelCoordinates } = wireData;
+    console.log('pixelCoordinates:', pixelCoordinates);
+    console.log('processing wirekey:', wireKey)
+    //pixelCoordinates = simplifyPathCustom(pixelCoordinates);
+
+    // Ensure pixelCoordinates are defined and flattened into a single array of numbers
+    const flattenedPoints = (pixelCoordinates || []).flatMap(([x, y]) => [x, y]);
+
+    return (
+      <Line
+        key={wireKey}
+        points={flattenedPoints}
+        stroke="black"
+        strokeWidth={2}
+      />
     );
-    
+  });
+
+  /**
+   * 5) Render final lines
+   */
+  return <>{lineElements}</>;
 }
 
-/**
- * Takes the object returned by getDetourPath:
- *   {
- *     pixelCoords: [x1, y1, x2, y2, ...],
- *     gridCoords:  [x1, y1, x2, y2, ...]  // may be undefined or empty
- *   }
- * 
- * And returns an object like:
- *   {
- *     pixelAsGrid: [ [r1, c1], [r2, c2], ... ],
- *     gridAsGrid:  [ [r1, c1], [r2, c2], ... ]  // or []
- *   }
- * 
- * Where [r, c] = [Math.floor(y / gridSizeConst), Math.floor(x / gridSizeConst)].
- */
-function convertDetourPathToGridRowsCols(detourPathResult) {
-  if (!detourPathResult) return null;
-
-  const { flattened: pixelCoords, allGridPoints: gridCoords } = detourPathResult;
-
-  // 1. Convert pixelCoords -> [r, c]
-  const pixelCoordinates = pixelCoords ? xyPairsToRowsCols(pixelCoords) : [];
-
-  // 2. Use gridCoords directly (no conversion needed)
-  const gridCoordinates = gridCoords || [];
-
-  return { pixelCoordinates, gridCoordinates };
+// Compare helper
+function areSame(obj1, obj2) {
+  if (obj1 === obj2) return true;
+  return JSON.stringify(obj1) === JSON.stringify(obj2);
 }
 
+function simplifyPathCustom(points) {
+  if (!points || points.length <= 2) return points;
 
-/**
- * Converts an array like [x1, y1, x2, y2, ...] 
- * into [ [row1, col1], [row2, col2], ... ]
- */
+  const first = points[0];
+  const last = points[points.length - 1];
 
-function xyPairsToRowsCols(xyArray) {
-  if (!xyArray || xyArray.length < 2) return [];
-  const out = [];
-  
-  for (let i = 0; i < xyArray.length; i += 2) {
-    const x = xyArray[i];
-    const y = xyArray[i + 1];
-    
-    out.push([y, x]);
+  // Case 1: Entire path is a straight horizontal or vertical line.
+  if (first[0] === last[0] || first[1] === last[1]) {
+    return [first, last];
   }
 
-  return out;
-}
+  // Case 2: Process segments. In grid paths the moves are usually purely horizontal or vertical.
+  const simplified = [];
+  let i = 0;
+  while (i < points.length) {
+    // Always add the current point (start of a segment)
+    simplified.push(points[i]);
+    
+    // Determine axis of motion between points[i] and points[i+1]
+    if (i === points.length - 1) break; // last point reached
+    const [x0, y0] = points[i];
+    const [x1, y1] = points[i + 1];
+    let axis = null;
+    if (x0 !== x1 && Math.abs(y1 - y0) < gridSizeConst) {
+      axis = 'x'; // horizontal move: y constant
+    } else if (y0 !== y1 && Math.abs(x1 - x0) < gridSizeConst) {
+      axis = 'y'; // vertical move: x constant
+    }
+    // If axis is not determined (e.g. a diagonal or duplicate point) just move on.
+    if (!axis) {
+      i++;
+      continue;
+    }
 
-function rowsColsToXyPairs(rowsColsArray) {
-  if (!rowsColsArray || rowsColsArray.length === 0) return [];
-  const flattened = [];
-  
-  for (const [y, x] of rowsColsArray) {
-    flattened.push(x, y);
+    // Look ahead until the axis changes.
+    let j = i + 1;
+    while (j < points.length) {
+      if (axis === 'x') {
+        // In a horizontal move the y must remain constant.
+        if (Math.abs(points[j][1] - y0) < gridSizeConst) break;
+      } else if (axis === 'y') {
+        // In a vertical move the x must remain constant.
+        if (Math.abs(points[j][0] - x0) < gridSizeConst) break;
+      }
+      j++; // j is the counter to look infront and will break when it meets the last point
+    }
+    // j is now the first index where the axis changes (or j === points.length).
+    // We want to keep the last point of the current straight segment.
+    // (It might be that j-1 is equal to i, in which case nothing extra is added.)
+    if (j - 1 > i) {  // just to do a check to make sure that they are not equal and point j is still within range of i
+      if (axis === 'x') {
+        points[i][0] = points[j - 1][0]; // ✅ Match start X to last X
+      } else if (axis === 'y') {
+        points[i][1] = points[j - 1][1]; // ✅ Match start Y to last Y
+      }
+      simplified.push(points[j - 1]);
+    }
+    i = j - 1; // Continue from the last point of the current segment.
+    // If not at the end, move one step forward.
+    if (i < points.length - 1) {
+      i++;
+    }
   }
+
+  // Ensure that the very last point is present.
   
-  return flattened;
+  const finalPoint = points[points.length - 1]; // this is the original last point
+  const lastSimplified = simplified[simplified.length - 1]; // this is the simplified last point
+
+  if (lastSimplified[0] !== finalPoint[0] || lastSimplified[1] !== finalPoint[1]) { // ensure that the original last point is present
+    simplified.push(finalPoint);
+  }
+  return simplified;
 }

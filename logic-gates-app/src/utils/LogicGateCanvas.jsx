@@ -46,6 +46,7 @@ function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
     }}
   >
       <Layer>
+        {console.log("Gates in LogicGateCanvas.jsx:", gates)}
         {gates.map((gate) => (
             <React.Fragment key={gate.id}>
               {/* Render gate shape based on type */}
@@ -80,12 +81,8 @@ function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
             
           ))}
           <CreateConnections
-            gatePositions={gatePositions}
             selectedGateId={selectedGateId}
             setSelectedGateId={setSelectedGateId}
-            gates={gates}
-            connections={connections}
-            setConnections={setConnections}
           /> 
       </Layer>
     </Stage>
