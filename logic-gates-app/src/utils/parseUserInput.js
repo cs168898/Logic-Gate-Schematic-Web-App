@@ -246,7 +246,7 @@
         }
     
         // After finishing this level, move to the right and reset vertical position
-        xPosition += 10;
+        xPosition += 14;
         yPosition = basePosition[1];
     }
     }

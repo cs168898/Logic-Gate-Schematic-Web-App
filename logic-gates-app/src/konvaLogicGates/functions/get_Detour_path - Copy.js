@@ -29,7 +29,7 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight, wir
                             inputRow, inputCol,
                             allInputOutputPositions);
 
-  console.log("Cost Grid total :", costGrid);
+  console.log("Cost Grid:", costGrid);
   // 2) Use pixel coordinates directly for start and end.
   const startX = output.x;
   const startY = output.y;
@@ -45,9 +45,7 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight, wir
   let aStarResult = aStarPathPixel(startX, startY, endX, endY, 
     costGrid , boardWidth, boardHeight, 
     yValuesSet,
-    rows, cols, 
-    outputRow, outputCol,
-    inputRow, inputCol);
+    rows, cols);
 
 
   // aStarResult is now our screenPath in pixel coordinates.
@@ -124,25 +122,12 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight, wir
   return {screenPath, allGridPoints, gridPath};
 }
 
-function directionFromDxDy(dx, dy) {
-  // dx, dy will be ±gridSizeConst or 0
-  // Return a simple string based on which way you’re moving
-  if (dx > 0)  return "right";
-  if (dx < 0)  return "left";
-  if (dy > 0)  return "down";
-  if (dy < 0)  return "up";
-  return null; // might happen at the start
-}
-
 /**
  * Use A* to find a path on the costGrid grid from (sr, sc) to (er, ec).
  * Returns an array of [row, col] or null if no path found.
  */
-function aStarPathPixel(startX, startY, endX, endY, costGrid, boardWidth, boardHeight, yValuesSet, rows, cols, outputRow, outputCol,
-  inputRow, inputCol) {
+function aStarPathPixel(startX, startY, endX, endY, costGrid, boardWidth, boardHeight, yValuesSet, rows, cols) {
   const step = gridSizeConst;
-
-  const turnCost = 2; // how much extra cost to add if you turn
   
   // Align start and end positions to grid centers
   startX = Math.floor(startX / step) * step + step / 2;
@@ -150,52 +135,23 @@ function aStarPathPixel(startX, startY, endX, endY, costGrid, boardWidth, boardH
   endX = Math.floor(endX / step) * step + step / 2;
   endY = Math.floor(endY / step) * step + step / 2;
 
-
-  // set costgrid of start and end points to 0
-
-  const padding = 1; // Adjust for larger/smaller coverage
-  
-  let arrayInputOutputGrids = [[outputRow, outputCol], [inputRow, inputCol]];
-  for (const gate of arrayInputOutputGrids) {
-  
-    let centerRow = Math.floor(gate[0]);
-    let centerCol = Math.floor(gate[1]);
-
-    for (let dr = -padding; dr <= padding; dr++) {
-        for (let dc = -padding; dc <= padding; dc++) {
-            let r = centerRow + dr;
-            let c = centerCol + dc;
-
-            // Ensure indices are within grid bounds
-            
-            if (r >= 0 && r < rows && c >= 0 && c < cols) {
-              costGrid[r][c] = 0;  // Setting this area to zero (not infinity)
-            }
-            
-        }
-    }
-  }
-  
-
   // Possible movement directions (ensuring movement by one full grid size)
   let directions;
-
-  const gridApart = 8;
     
   // check if they are on a different level
-  if (endX > startX + gridSizeConst * gridApart){
+  if (endX > startX + gridSizeConst * 5){
     if (endY < startY) {
       // Heavily encourage Up by using a bigger negative penalty for Y starting below and ending ontop
       directions = [
         [0, -step, -1.4],  // Up gets -1.0
         [step, 0,  0],     // Right
-        [0, step, 0],  // Down
+        [0, step, -0.5],  // Down
         [-step, 0,  0]     // Left
       ];
     } else{
       // Heavily encourage Down by using a bigger negative penalty for Y starting above and ending below
       directions = [
-        [0, -step, 0],  // Up gets -1.0
+        [0, -step, -0.5],  // Up gets -1.0
         [step, 0,  0],     // Right
         [0, step, -1.4],  // Down
         [-step, 0,  0]     // Left
@@ -228,8 +184,7 @@ function aStarPathPixel(startX, startY, endX, endY, costGrid, boardWidth, boardH
     x: startX,
     y: startY,
     g: 0,
-    f: heuristic(startX, startY, endX, endY),
-    dir: null
+    f: heuristic(startX, startY, endX, endY)
   });
 
   const gScore = {};
@@ -243,13 +198,11 @@ function aStarPathPixel(startX, startY, endX, endY, costGrid, boardWidth, boardH
   while (openSet.length > 0) {
     openSet.sort((a, b) => a.f - b.f);
     const current = openSet.shift();
-    const { x, y, dir: currentDir } = current;
+    const { x, y } = current;
 
     if (Math.abs(x - endX) <= step / 2 && Math.abs(y - endY) <= step / 2) {
       let path = [];
       let currKey = nodeKey(x, y);
-
-      
       while (currKey !== nodeKey(startX, startY)) {
         const [cx, cy] = currKey.split(',').map(Number);
         const centeredX = Math.floor(cx / step) * step + step / 2;
@@ -263,7 +216,6 @@ function aStarPathPixel(startX, startY, endX, endY, costGrid, boardWidth, boardH
       for (const [px, py] of path) {
         yValuesSet.add(py);
       }
-
       return path;
     }
 
@@ -280,21 +232,13 @@ function aStarPathPixel(startX, startY, endX, endY, costGrid, boardWidth, boardH
       const nyCentered = row * step + step / 2;
       
       const neighborKey = nodeKey(nxCentered, nyCentered);
+      const newG = gScore[nodeKey(x, y)] + costGrid[row][col] + 1 + penalty;
 
-           // Determine the direction we are moving in this step
-      const newDir = directionFromDxDy(dx, dy);
-      // If we changed direction compared to currentDir, add turnCost
-      const isTurning = currentDir && (currentDir !== newDir);
-      const extraTurn = isTurning ? turnCost : 0;
-
-      const newG = gScore[nodeKey(x, y)] + costGrid[row][col] + 1 + penalty + extraTurn;
-      
       if (newG < gScore[neighborKey]) {
-        console.log(`costgrid = ${costGrid[row][col]}`)
         gScore[neighborKey] = newG;
         parent.set(neighborKey, nodeKey(x, y));
         const fVal = newG + heuristic(nxCentered, nyCentered, endX, endY);
-        openSet.push({ x: nxCentered, y: nyCentered, g: newG, f: fVal, dir: newDir });
+        openSet.push({ x: nxCentered, y: nyCentered, g: newG, f: fVal });
       }
     }
   }
@@ -334,7 +278,6 @@ function setGridCosts(costGrid, gates, wireTracker, endDestinationKey,
     if (gate.x == null || gate.y == null) continue;
     const gateLeft   = gate.x;
     const gateTop    = gate.y;
-    console.log(`gate x and y ${gate.x}, ${gate.y}`)
     const gateRight  = gateLeft + Math.ceil(100 / gridSizeConst);
     const gateBottom = gateTop  + Math.ceil(100 / gridSizeConst);
 
@@ -375,13 +318,14 @@ function setGridCosts(costGrid, gates, wireTracker, endDestinationKey,
               ) {
                 // This is the input pin or the output pin. Skip!
                 inputOrOutput = true;
+                costGrid[r][c] = 20;
                 // // costGrid[r+1][c]= Number.POSITIVE_INFINITY;
                 // // costGrid[r-1][c]= Number.POSITIVE_INFINITY;
                 // costGrid[r][c+1]= Number.POSITIVE_INFINITY;
                 // costGrid[r][c-1]= Number.POSITIVE_INFINITY;
               } 
               if (!inputOrOutput){
-                costGrid[r][c] = 5; // or Infinity if you truly never want to cross wires
+                costGrid[r][c] = 10; // or Infinity if you truly never want to cross wires
               }
               
               
@@ -393,32 +337,19 @@ function setGridCosts(costGrid, gates, wireTracker, endDestinationKey,
   }
   // Ensure costGrid is properly initialized before using it
 
-  // Set all input/output positions in grid coordinates to Infinity
-  const padding = 1; // Adjust for larger/smaller coverage
 
-  for (const gate of allInputOutputPositions) {
-      let centerRow = Math.floor(gate.y / gridSizeConst);
-      let centerCol = Math.floor(gate.x / gridSizeConst);
-
-      for (let dr = -padding; dr <= padding; dr++) {
-          for (let dc = -padding; dc <= padding; dc++) {
-              let r = centerRow + dr;
-              let c = centerCol + dc;
-
-              // Ensure indices are within grid bounds
-              if (r >= 0 && r < rows && c >= 0 && c < cols) {
-                  costGrid[r][c] = Number.POSITIVE_INFINITY;
-                  console.log('Grid set to Infinity:', c, r);
-              }
-          }
-      }
+// Set all input/output positions in grid coordinates to Infinity
+for (const gate of allInputOutputPositions) {
+  let r = Math.floor(gate.x / gridSizeConst); // ✅ row corresponds to Y
+  let c = Math.floor(gate.y / gridSizeConst); // ✅ column corresponds to X
+  if (r >= 0 && r < rows && c >= 0 && c < cols) {
+    costGrid[r][c] = Number.POSITIVE_INFINITY;
+    console.log('grids that are set to infinity: ', r, c)
   }
-
-
-    return costGrid;
-
-  
-
-    
 }
 
+
+  return costGrid;
+
+  
+}

@@ -27,11 +27,11 @@ export function OrGate({ gate, selectedGateId, setSelectedGateId, onWirePosition
     const inputPositions = [];
     for (let i = 1; i <= numInputs; i++) {
         const wireY = (Math.floor((endYTop + interval * i)/ gridSizeConst) * gridSizeConst) + gridSizeConst/2; // The top of the gate + the (interval * how many times) 
-        inputPositions.push({inputName: gate.inputs[i-1], x: endX - gridSizeConst, y: wireY}) // The endx - 1 is to avoid the line from touching the border of the gate
+        inputPositions.push({inputName: gate.inputs[i-1], x: endX - (gridSizeConst * 0.5) , y: wireY}) // The endx - 1 is to avoid the line from touching the border of the gate
         inputWires.push(
         <Line
             key={`${gate.id}-w${i}`} // (e.g. GateID - w1) first wire
-            points={[startX + gridSizeConst*0.8, wireY, endX - gridSizeConst, wireY]} // Coordinates for the line // the endx - 2 extends the line to make it cleaner
+            points={[startX + gridSizeConst*0.8, wireY, endX - (gridSizeConst * 0.5), wireY]} // Coordinates for the line // the endx - 2 extends the line to make it cleaner
             stroke="black"
             strokeWidth={2}
         />,
@@ -46,12 +46,12 @@ export function OrGate({ gate, selectedGateId, setSelectedGateId, onWirePosition
     }
     // Generate output wire
     const outputPosition = [];
-    outputPosition.push({outputName: gate.output, x: startX + 120, y: endYTop + 50}) // set the coordinates of output wire
+    outputPosition.push({outputName: gate.output, x: startX + (gridSizeConst * 6.5), y: endYTop + 50}) // set the coordinates of output wire
     const outputwire =
     <>
      <Line
          key={`${gate.id}-w-output`}
-         points={[ startX + 100, endYTop + 50, startX + 120, endYTop + 50]} // Coordinates for the line
+         points={[ startX + 100, endYTop + 50, startX + (gridSizeConst * 6.5), endYTop + 50]} // Coordinates for the line
          stroke="black"
          strokeWidth={2}                           
     />

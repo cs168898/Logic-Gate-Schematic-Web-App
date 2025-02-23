@@ -28,13 +28,13 @@ export function AndGate({ gate, selectedGateId, setSelectedGateId, onWirePositio
     const inputPositions = [];
     for (let i = 1; i <= numInputs; i++) {
         const wireY = (Math.floor((endYTop + interval * i)/ gridSizeConst) * gridSizeConst) + gridSizeConst/2; // The top of the gate + the (interval * how many times) 
-        inputPositions.push({inputName: gate.inputs[i-1], x: startX - 20, y: wireY}) // set the coordinates of input wire
+        inputPositions.push({inputName: gate.inputs[i-1], x: startX - (gridSizeConst *1.5), y: wireY}) // set the coordinates of input wire
         // ************* NOTE : the startX and endX for ANDGate is switched , the start of the line starts from the gate extending out from the gate
         inputWires.push(
         
             <Line
                 key={`${gate.id}-w${i}`} // (e.g. GateID - w1) first wire
-                points={[startX - 20, wireY, endX, wireY]} // Coordinates for the line
+                points={[startX - (gridSizeConst *1.5), wireY, endX, wireY]} // Coordinates for the line
                 stroke="black"
                 strokeWidth={2}
             />,
@@ -51,12 +51,12 @@ export function AndGate({ gate, selectedGateId, setSelectedGateId, onWirePositio
 
     const outputPosition = [];
     // Generate output wire
-    outputPosition.push({outputName: gate.output, x: startX + 100, y: endYTop + 50}) // set the coordinates of output wire
+    outputPosition.push({outputName: gate.output, x: startX + (gridSizeConst*5)*1.5, y: endYTop + 50}) // set the coordinates of output wire
     const outputwire =(
         <>
         <Line
             key={`${gate.id}-w-output`}
-            points={[ startX + 75, endYTop + 50, startX + 100, endYTop + 50]} // Coordinates for the line
+            points={[ startX + 75, endYTop + 50, startX + (gridSizeConst*5)*1.5, endYTop + 50]} // Coordinates for the line
             stroke="black"
             strokeWidth={2}                           
         />

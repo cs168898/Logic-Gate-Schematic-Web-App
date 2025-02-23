@@ -14,16 +14,13 @@ export function CreateConnections({ selectedGateId, setSelectedGateId }) {
   const { gates } = useContext(GatesContext);
   const { connections, setConnections } = useContext(ConnectionsContext);
   const { gatePositions } = useContext(GatesPositionContext);
-
+  
   // Filter gates except the selected (deleted) one
   const gatesArray = gates.filter(gate => gate.id !== selectedGateId);
-  console.log('gatesPositions in create_connections.jsx:', gatePositions);
-  console.log('gatesArray in create_connections.jsx:', gatesArray);
+
 
   // Reverse the gatesArray to iterate in reverse order
-  const reversedGatesArray = [...gatesArray].reverse();
-  console.log('reversedGatesArray: ', reversedGatesArray);
-
+  const reversedGatesArray = [...gatesArray];
   // Build a quick list of all outputs
   const allOutputs = [];
   for (const gate of reversedGatesArray) {
@@ -39,6 +36,26 @@ export function CreateConnections({ selectedGateId, setSelectedGateId }) {
       }
     }
   }
+
+  // Build a quick list of all inputs
+  const allInputs = [];
+  for (const gate of reversedGatesArray) {
+    const positions = gatePositions[gate.id];
+    if (positions && Array.isArray(positions.inputPositions)) {
+      for (const input of positions.inputPositions) {
+        allInputs.push({
+          gateID: gate.id,
+          inputName: input.inputName,
+          x: input.x,
+          y: input.y
+        });
+      }
+    }
+  }
+
+  // Combine all input and output positions into a single array
+  const allInputOutputPositions = [...allOutputs, ...allInputs];
+  // Data format: [{ gateID, outputName/inputName, x, y }, ...]
 
   /**
    * 1) Build local wires in memory.
@@ -73,32 +90,30 @@ export function CreateConnections({ selectedGateId, setSelectedGateId }) {
             window.innerWidth,
             window.innerHeight,
             wireTracker,
-            inputPosition.inputName
+            inputPosition.inputName,
+            allInputOutputPositions
           );
 
           if (pathResult && pathResult.screenPath) {
             const { screenPath: pixelCoords, allGridPoints: gridCoords, gridPath: gridPath } = pathResult;
-            console.log("pixelCoords snapshot:", JSON.stringify(pixelCoords));
-            console.log("gridPath snapshot:", JSON.stringify(gridPath));
+      
 
             if (!Array.isArray(pixelCoords) || pixelCoords.some(p => p === undefined)) {
               console.error(`❌ Detected undefined inside pixelCoords BEFORE storing for ${wireKey}:`, pixelCoords);
             }
 
-            console.log('Original screenPath:', pathResult.screenPath);
+  
             const clonedPixelCoords = pixelCoords.map(pair => [...pair]);
             const clonedGridCoords = gridCoords.map(pair => [...pair]);
             const clonedGridPath = gridPath.map(pair => [...pair]);
-            console.log("clonedpixelcoordinates snapshot:", JSON.stringify(clonedPixelCoords));
-            console.log('Cloned gridCoordinates:', JSON.stringify(clonedGridCoords));
-            console.log('Cloned gridPath:', JSON.stringify(clonedGridPath));
+            
 
             wiresObj[wireKey] = {
               pixelCoordinates: clonedPixelCoords,
               gridCoordinates: clonedGridCoords,
               gridPath: clonedGridPath
             };
-            console.log(`✅ Confirmed wiresObj[${wireKey}] after assignment:`, JSON.stringify(wiresObj[wireKey]));
+   
 
 
             if (!wireTracker[inputPosition.inputName]) {
@@ -117,9 +132,9 @@ export function CreateConnections({ selectedGateId, setSelectedGateId }) {
     }
 
     return wiresObj;
-  }, [gates, gatePositions, selectedGateId, allOutputs]);
+  }, [gates, gatePositions, selectedGateId, allInputOutputPositions]);
 
-  console.log('localWires:', JSON.stringify(localWires));
+
   /**
    * 2) Clean up wires if needed.
    */
@@ -130,7 +145,6 @@ export function CreateConnections({ selectedGateId, setSelectedGateId }) {
   /**
    * 3) If cleaned wires differ from context, update context once.
    */
-  console.log('the cleanedwires and connections are: ', cleanedWires, connections);
   useEffect(() => {
     if (!areSame(cleanedWires, connections)) {
       console.log('connections are not the same, therefore setting connetions');
@@ -143,8 +157,7 @@ export function CreateConnections({ selectedGateId, setSelectedGateId }) {
    */
   const lineElements = Object.entries(cleanedWires).map(([wireKey, wireData]) => {
     let { pixelCoordinates } = wireData;
-    console.log('pixelCoordinates:', pixelCoordinates);
-    console.log('processing wirekey:', wireKey)
+
     //pixelCoordinates = simplifyPathCustom(pixelCoordinates);
 
     // Ensure pixelCoordinates are defined and flattened into a single array of numbers

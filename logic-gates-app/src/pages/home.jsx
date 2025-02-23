@@ -93,7 +93,7 @@ function Home() {
       setGates([]) // Keep track of all the logic gate inside the 'gates' variable
       setGatePositions({}); // Clear all wire positions
       setSelectedGateId(null); // Clear selection
-      
+      console.clear();
       //const response = await axios.post('http://127.0.0.1:8000/logicgates/', gateData);
       //console.log("Logic Gate Created: ", response.data);
     } catch (error){

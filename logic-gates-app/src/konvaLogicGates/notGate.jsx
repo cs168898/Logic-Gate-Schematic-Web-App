@@ -4,7 +4,7 @@ import { gridSizeConst } from '../utils/gridSize';
 
 export function NotGate({ gate, selectedGateId, setSelectedGateId, onWirePositionUpdate }){
     const notGatePath = `
-          M 100,50 
+          M 75,50 
           L 0,0
           L 0,100
           Z
@@ -12,15 +12,15 @@ export function NotGate({ gate, selectedGateId, setSelectedGateId, onWirePositio
 
     // Circle properties for the NOT gate bubble
     const circleRadius = 5; // The radius of the circle
-    const circleX = gate.x *gridSizeConst + 105; // X position (a bit outside of the triangle tip)
-    const circleY = gate.y *gridSizeConst + 50;  // Y position (aligned with the middle of the triangle)
+    const circleX = gate.x *gridSizeConst + (gridSizeConst * 4); // X position (a bit outside of the triangle tip)
+    const circleY = gate.y *gridSizeConst + (gridSizeConst * 2.5);  // Y position (aligned with the middle of the triangle)
 
     // Define start and end points for the input wires
     const startX = gate.x * gridSizeConst; // Input wires will start at x = gate.x
     const startY = gate.y;
-    const endX = gate.x*gridSizeConst -20; // This is the edge of the OR gate at x = 0
+    const endX = gate.x*gridSizeConst - gridSizeConst; // This is the edge of the OR gate at x = 0
     const endYTop = gate.y*gridSizeConst; // Top point of the input segment (0, 0)
-    const endYBottom = gate.y*gridSizeConst + 100; // Bottom point of the input segment (0, 100)
+    const endYBottom = gate.y*gridSizeConst + (gridSizeConst*5); // Bottom point of the input segment (0, 100)
     const numInputs = gate.numInputs;
 
     // Calculate interval between input points
@@ -31,12 +31,12 @@ export function NotGate({ gate, selectedGateId, setSelectedGateId, onWirePositio
     const inputPositions = [];
     for (let i = 1; i <= numInputs; i++) {
         const wireY = (Math.floor((endYTop + interval * i)/ gridSizeConst) * gridSizeConst) + gridSizeConst/2; // The top of the gate + the (interval * how many times) 
-        inputPositions.push({inputName: gate.inputs[i-1], x: endX, y: wireY})
+        inputPositions.push({inputName: gate.inputs[i-1], x: endX - (gridSizeConst * 0.5), y: wireY})
         inputWires.push(
         
         <Line
             key={`${gate.id}-w${i}`} // (e.g. GateID - w1) first wire
-            points={[startX , wireY, endX, wireY]} // Coordinates for the line
+            points={[startX , wireY, endX- (gridSizeConst * 0.5), wireY]} // Coordinates for the line
             stroke="black"
             strokeWidth={2}
         />,
@@ -53,12 +53,12 @@ export function NotGate({ gate, selectedGateId, setSelectedGateId, onWirePositio
 
     // Generate output wire
     const outputPosition = [];
-    outputPosition.push({outputName: gate.output, x: circleX + 15, y: circleY}) // set the coordinates of output wire
+    outputPosition.push({outputName: gate.output, x: circleX + (gridSizeConst*1.5), y: circleY}) // set the coordinates of output wire
     const outputwire =(
     <>
     <Line
         key={`${gate.id}-w-output`}
-        points={[ circleX + 5, circleY, circleX + 15 , circleY]} // Coordinates for the line
+        points={[ circleX + 5, circleY, circleX + (gridSizeConst*1.5) , circleY]} // Coordinates for the line
         stroke="black"
         strokeWidth={2}                           
     />
