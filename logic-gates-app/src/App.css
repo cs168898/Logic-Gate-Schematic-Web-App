@@ -2,17 +2,7 @@
   text-align: center;
 }
 
-.App-header {
-  background-color: #282c34;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-  width: 100vw;
-  height: 60px; /* Set a fixed height for the header */
 
-}
 
 body {
   background-size: 40px 40px;
@@ -20,16 +10,84 @@ body {
   width: 100vw;
 }
 
-.sidebar, .user-input, .content-area {
+.content-area {
   position: relative;  /* Relative positioning to layer over the background */
-  z-index: 200;  /* Set to a higher value to stay above the SVG */
+
 }
 
 
-/********** Side bar *************/
+
+/********** Header *************/
+
+.App-header {
+  background-color: #282c34;
+  display: flex;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  width: 100vw;
+  height: 60px; /* Set a fixed height for the header */
+}
+
+.App-header .sidebar-icon{
+  width: 40px;
+  margin: 15px;
+  cursor: pointer;
+  z-index: 11;
+}
+
+.App-header h1{
+  margin: auto;
+}
 
 
-.sidebar{
+
+/********** Sidebar *************/
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -250px; /* Initially hidden */
+  width: 250px;
+  height: 100vh;
+  background: #333;
+  color: white;
+  padding: 20px;
+  transition: left 0.3s ease-in-out;
+  z-index: 11;
+  border-radius: 8px;
+}
+
+/* When sidebar is open, slide in */
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar .close-button{
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  border-radius: 7px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: white;
+  text-align: center;
+  height: 45px;
+  width: 35px;
+}
+
+
+
+.sidebar .close-button:hover{
+  background-color: #636467;
+}
+
+
+
+/********** Tools Window *************/
+
+
+.tools-window{
   background-color: grey;
   
   border: 1px solid grey;
@@ -41,10 +99,10 @@ body {
   border-radius: 10px;
   padding: 10px;
   color: white;
-
+  z-index: 11;
 }
 
-.sidebar-header{
+.tools-window-header{
   border-top: 1px solid black;
   border-bottom: 1px solid black;
   background-color: rgb(54, 54, 54);
@@ -53,7 +111,7 @@ body {
   
 }
 
-.sidebar-tools button{
+.tools-window-inner button{
   background-color: rgb(201, 8, 8);
   color: white;
   border: none;
@@ -63,7 +121,7 @@ body {
 
 }
 
-.sidebar-tools button:hover{
+.tools-window-inner button:hover{
   background-color: white;
   color: var(--theme-primary-color);
 }
@@ -107,7 +165,6 @@ body {
 .konvajs-content {
   position: unset !important;  /* Ensure it's visible */
   border: 2px solid black;  /* Optional, to visually see the area */
-  z-index: 200;
 }
 
 

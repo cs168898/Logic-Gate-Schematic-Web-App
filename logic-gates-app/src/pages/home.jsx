@@ -11,6 +11,7 @@ import LogicGateCanvas from '../utils/LogicGateCanvas';
 import { GatesContext } from '../context/GatesContext';
 import { GatesPositionContext } from '../context/GatesPositionContext';
 
+
 function Home() {
   /***************************** useState Definitions ***************************/
   const [userInput, setuserInput] = useState("")
@@ -111,11 +112,11 @@ function Home() {
         
         <div className="content-overlay">
           
-          <div className="sidebar">
+          <div className="tools-window">
             
             
-            <div className="sidebar-tools">
-              <h2>Sidebar</h2>
+            <div className="tools-window-inner">
+              <h2>Tools</h2>
             
               <button className='clear' onClick={handleClearGates}>Clear All Gates
               </button>
