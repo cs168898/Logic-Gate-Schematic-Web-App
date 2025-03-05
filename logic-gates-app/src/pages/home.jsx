@@ -10,11 +10,17 @@ import { dragAndDrop } from '../utils/dragAndDrop'; // Allows users to drag and 
 import LogicGateCanvas from '../utils/LogicGateCanvas';
 import { GatesContext } from '../context/GatesContext';
 import { GatesPositionContext } from '../context/GatesPositionContext';
+import { listUsers } from '../../services/userService';
 
 
 function Home() {
   /***************************** useState Definitions ***************************/
   const [userInput, setuserInput] = useState("")
+  const [savedUserInput, setSavedUserInput] = useState([]) // this will store the user input from the database
+  const [sessionUserInput, setSessionUserInput] = useState([]) // this will store the current session's JSON data
+
+  const [projectList, setProjectList] = useState([]) // this will store the list of projects from the database
+
   const [parsedUserInput, setParsedUserInput] = useState("")
 
   const { gates, setGates } = useContext(GatesContext);
@@ -23,7 +29,7 @@ function Home() {
 
   const [selectedGateId, setSelectedGateId] = useState(null);
 
-
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   /***************************** End Of useState Definitions ********************/
 
@@ -33,6 +39,20 @@ function Home() {
     // useEffect hook to initialize dragAndDrop on component mount
     useEffect(() => {
       dragAndDrop(); // Initialize the custom drag and drop behavior
+      
+      // fetch the projects to populate the sidebar
+      const fetchProjectList = async () => {
+        try{
+          const response = await fetch('http://localhost:8080/api/logicgates/retrieve_proj_list');
+          const data = await response.json();
+          setProjectList(data);
+          console.log("Loaded Project Data: ", data);
+        } catch(error){
+          console.error("error fetching project:", error)
+        }
+      }
+
+      fetchProjectList();
     }, []); // Run once after component mounts
 
   /***************************** End Of UseEffect Statements ***************************/
@@ -71,7 +91,7 @@ function Home() {
 
 
   // Create the handleSubmit function to send userInput into backend
-  const handleSubmit = async () =>{
+  const handleSubmit = async (savedUserInput) =>{
     try{
       console.clear(); // clear the console of all previous logs
       console.log(`The user input is: ${userInput}`)
@@ -102,12 +122,55 @@ function Home() {
     }
 
   }
+  
+  // Toggle function for sidebar
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const handleSaveProject = async (userInput) => {
+    try{
+
+    } catch {
+
+    }
+  }
+
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    listUsers().then((response) => {
+      setUsers(response.data);
+    }) .catch(error => {
+          console.error(error);
+    })
+
+  }, [])
     
   return (
     <div className="App">
-        <Header />
+        <Header onSidebarToggle={toggleSidebar}/>
       <div className='main-wrapper'>
-  
+        <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
+          <button className='close-button' onClick={toggleSidebar}> X </button>
+          <button className='save-button' > Save Project </button>
+          <h2>Projects</h2>
+          <ul>
+            {
+              users.map(user => 
+                <>
+                <li key={user.id}>{user.username}</li>
+                <li key={user.id}>{user.email}</li>
+                </>
+              )
+            }
+          </ul>
+          <ul>
+            {projectList.map((project) => (
+              <li key={project.id}>{project.name}</li>
+            ))}
+          </ul>
+        </div>
         <Grid />
         
         <div className="content-overlay">

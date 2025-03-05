@@ -33,6 +33,12 @@ body {
   margin: 15px;
   cursor: pointer;
   z-index: 11;
+  padding: 5px;
+}
+
+.App-header .sidebar-icon:hover{
+  background-color: var(--theme-hover-color);
+  border-radius: 8px;
 }
 
 .App-header h1{
@@ -79,7 +85,7 @@ body {
 
 
 .sidebar .close-button:hover{
-  background-color: #636467;
+  background-color: var(--theme-hover-color);
 }
 
 
@@ -263,4 +269,5 @@ body {
 
 :root{
   --theme-primary-color: #282c34;
+  --theme-hover-color: #636467;
 }
