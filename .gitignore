@@ -11,3 +11,13 @@ __pycache__/
 # Ignore IDE settings (e.g., VSCode, PyCharm)
 .vscode/
 .idea/
+
+# Ignore Maven & Gradle build files ( Java springboot )
+target/
+build/
+.gradle/
+.mvn/
+*.jar
+*.war
+*.class
+*.log

@@ -11,7 +11,8 @@ import LogicGateCanvas from '../utils/LogicGateCanvas';
 import { GatesContext } from '../context/GatesContext';
 import { GatesPositionContext } from '../context/GatesPositionContext';
 import { listUsers } from '../../services/userService';
-
+import { UserContext } from '../context/UserContext';
+import { getAllProjects } from '../../services/getAllProjects';
 
 function Home() {
   /***************************** useState Definitions ***************************/
@@ -23,14 +24,17 @@ function Home() {
 
   const [parsedUserInput, setParsedUserInput] = useState("")
 
-  const { gates, setGates } = useContext(GatesContext);
-
-  const { gatePositions, setGatePositions } = useContext(GatesPositionContext);
-
   const [selectedGateId, setSelectedGateId] = useState(null);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+
+  const { gates, setGates } = useContext(GatesContext);
+
+  const { gatePositions, setGatePositions } = useContext(GatesPositionContext);
+
+  const { user , loggedin} = useContext(UserContext)
+    
   /***************************** End Of useState Definitions ********************/
 
 
@@ -135,17 +139,21 @@ function Home() {
 
     }
   }
-
-  const [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    listUsers().then((response) => {
-      setUsers(response.data);
-    }) .catch(error => {
+  
+    useEffect(() => {
+      if (loggedin){
+        getAllProjects(user.id).then((response) => {
+          setProjectList(response.data);
+          console.log('projectList: ', projectList);
+        }).catch(error => {
           console.error(error);
-    })
-
-  }, [])
+        })
+      } else {
+        setProjectList(null);
+      }
+      }, [loggedin, user?.id])
+    
+  
     
   return (
     <div className="App">
@@ -156,19 +164,9 @@ function Home() {
           <button className='save-button' > Save Project </button>
           <h2>Projects</h2>
           <ul>
-            {
-              users.map(user => 
-                <>
-                <li key={user.id}>{user.username}</li>
-                <li key={user.id}>{user.email}</li>
-                </>
-              )
-            }
-          </ul>
-          <ul>
-            {projectList.map((project) => (
-              <li key={project.id}>{project.name}</li>
-            ))}
+            {projectList ? projectList.map((project) => (
+              <li key={project.id}>{project.projectName}</li>
+            )) : null}
           </ul>
         </div>
         <Grid />

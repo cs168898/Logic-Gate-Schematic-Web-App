@@ -9,13 +9,15 @@ import java.util.List;
 import FYP.LogicGates.dto.UserDto;
 
 public interface UserService {
-    UserDto createUser(UserDto userDto);
+    UserDto createUser(UserDto userDto, String password);
     
     UserDto getUserById(Long userId);
 
     List<UserDto> getAllUsers();
 
-    UserDto updateUser(Long userId, UserDto updatedUser); 
+    UserDto updateUser(Long userId, UserDto updatedUser, String password); 
 
     void deleteUser(Long userId);
+
+    UserDto loginUser(String username, String password);
 }

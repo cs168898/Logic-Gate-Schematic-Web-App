@@ -6,6 +6,7 @@ import { faBars } from '@fortawesome/free-solid-svg-icons';  // Import specific 
 import { GatesProvider } from './context/GatesContext';
 import { ConnectionsProvider } from './context/ConnectionsContext';
 import { GatesPositionProvider } from './context/GatesPositionContext';
+import { UserProvider } from './context/UserContext';
 
 import { useEffect } from 'react';
 
@@ -13,13 +14,16 @@ import Grid from './components/background-grid';
 
 import Home from './pages/home';
 
+
 function App() {
   
   return (
     <GatesProvider>
       <GatesPositionProvider>
         <ConnectionsProvider>
-          <Home />
+          <UserProvider>
+            <Home />
+          </UserProvider>
         </ConnectionsProvider>
       </GatesPositionProvider>
     </GatesProvider>

@@ -9,5 +9,6 @@ import FYP.LogicGates.entity.UserDetails; // check if correct import
 
 public interface UserRepository extends JpaRepository<UserDetails, Long>{
 
+    UserDetails findByUsername(String username);
 
 }

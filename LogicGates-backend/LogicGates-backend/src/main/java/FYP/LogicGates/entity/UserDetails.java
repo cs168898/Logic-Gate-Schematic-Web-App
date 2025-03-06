@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -55,7 +57,8 @@ public class UserDetails {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        this.password = encoder.encode(password); // Encrypt password before saving
     }
 
     public String getEmail() {
@@ -65,6 +68,8 @@ public class UserDetails {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    
 
     
 }

@@ -14,16 +14,15 @@ public class UserMapper {
         return new UserDto(
             user.getId(),
             user.getUserName(),
-            user.getPassword(),
             user.getEmail()
         );
     }
 
-    public static UserDetails mapToUser(UserDto userDto){
+    public static UserDetails mapToUser(UserDto userDto, String password){
         return new UserDetails(
             userDto.getId(),
             userDto.getUsername(),
-            userDto.getPassword(),
+            password,
             userDto.getEmail()
         );
     }

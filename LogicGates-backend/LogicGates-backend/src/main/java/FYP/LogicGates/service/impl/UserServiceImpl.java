@@ -7,6 +7,7 @@ package FYP.LogicGates.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import FYP.LogicGates.dto.UserDto;
 import FYP.LogicGates.mapper.UserMapper;
@@ -22,10 +23,16 @@ import lombok.AllArgsConstructor;
 public class UserServiceImpl implements UserService{
 
     private UserRepository userRepository;
-    @Override
-    public UserDto createUser(UserDto userDto) {
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(); // Add password encoder
 
-        UserDetails user = UserMapper.mapToUser(userDto);
+
+
+    @Override
+    public UserDto createUser(UserDto userDto, String password) {
+
+        String hashedPassword = passwordEncoder.encode(password);
+
+        UserDetails user = UserMapper.mapToUser(userDto, hashedPassword);
         UserDetails savedUser = userRepository.save(user);
 
         return UserMapper.mapToUserDto(savedUser);
@@ -47,13 +54,18 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public UserDto updateUser(Long userId, UserDto updatedUser) {
+    public UserDto updateUser(Long userId, UserDto updatedUser, String password) {
         UserDetails user = userRepository.findById(userId).orElseThrow(
             () -> new ResourceNotFoundException("User does not exist with given id: " + userId)
             );
 
             user.setUserName(updatedUser.getUsername());
-            user.setPassword(updatedUser.getPassword());
+
+            if (password != null && !password.isEmpty()) {
+                String hashedPassword = passwordEncoder.encode(password);
+                user.setPassword(hashedPassword);
+            }
+
             user.setEmail(updatedUser.getEmail());
 
             UserDetails updatedUserObj = userRepository.save(user);
@@ -69,6 +81,17 @@ public class UserServiceImpl implements UserService{
 
         userRepository.deleteById(userId);
 
+    }
+
+    @Override
+    public UserDto loginUser(String username, String password) {
+        UserDetails user = userRepository.findByUsername(username);
+
+        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
+            throw new ResourceNotFoundException("Invalid username or password");
+        }
+
+        return UserMapper.mapToUserDto(user);
     }
 
     
