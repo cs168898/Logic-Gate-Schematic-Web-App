@@ -50,6 +50,24 @@ body {
   margin: auto;
 }
 
+.App-header .login-button{
+  background-color: white;
+  color: black;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 10px;
+  width: 6vw;
+  height: 5vh;
+  font-size: medium;
+  margin: 5px;
+}
+
+.App-header .login-button:hover{
+  background-color: var(--button-hover-color);
+}
+
+
 /************* Login Popup ****************/
 
 .popup {
@@ -61,6 +79,7 @@ body {
   height: 100%;
   overflow: auto;
   background-color: rgba(0,0,0,0.4);
+  font-size: medium;
   }
   
   .popup-inner {
@@ -73,6 +92,10 @@ body {
   border-radius: 5px;
   box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
   width: 40%;
+  }
+
+  .popup-inner form{
+    display: block;
   }
 
   .popup-inner-register {
@@ -105,38 +128,60 @@ body {
   }
   
   .popup-inner button[type="submit"],
-  .popup-inner button[type="button"],
-  .popup-inner .close-button {
+  .popup-inner button[type="button"] {
     background-color: white;
     color: black;
     border: none;
     padding: 5px 10px;
     cursor: pointer;
     border-radius: 10px;
+    margin-top: 0;
   }
-  
+
   .popup-inner button[type="submit"]:hover,
-  .popup-inner button[type="button"]:hover {
-    background-color: #dfe7f4;
+  .popup-inner button[type="button"]:hover,
+  .popup-inner .register-button:hover {
+    background-color: var(--button-hover-color);
+    background-color: var(--button-hover-color);
   }
-  
-  .popup-inner button[type="submit"] {
-  margin-top: 20px;
+
+  .popup-inner .close-button {
+    position: absolute;
+    top: 0;
+    left: 28em;
+    color: white;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 10px;
+    background-color: transparent;
   }
-  
-  .popup-inner button[type="button"] {
-  margin-top: 20px;
-  background-color: #f44336;
+
+  .popup-inner .register-button{
+    background-color: white;
+    color: black;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 10px;
+    margin-top: 10px;
   }
-  
-  .popup-inner button[type="button"]:hover {
-  background-color: #da190b;
+
+  .popup-inner-register{
+    display: block;
+    position: inherit;
   }
-  
-  .popup-inner button[type="button"]:disabled {
-  background-color: #bfbfbf;
-  color: #ffffff;
-  cursor: not-allowed;
+
+  .popup-inner-register .close-button{
+    position: absolute;
+    top: 0;
+    left: 13em;
+    color: white;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 10px;
+    background-color: transparent;
   }
 
 
@@ -176,12 +221,23 @@ body {
   width: 35px;
 }
 
-
-
 .sidebar .close-button:hover{
   background-color: var(--theme-hover-color);
 }
 
+.sidebar .save-button{
+  background-color: white;
+  color: black;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.sidebar .save-button:hover{
+  background-color: var(--button-hover-color);
+}
 
 
 /********** Tools Window *************/
@@ -324,7 +380,7 @@ body {
 }
 
 .delete-button:hover{
-  background-color: #dfe7f4;
+  background-color: var(--button-hover-color);
 }
 
 /* Text area for user input */
@@ -365,4 +421,5 @@ body {
 :root{
   --theme-primary-color: #282c34;
   --theme-hover-color: #636467;
+  --button-hover-color: #dfe7f4;
 }

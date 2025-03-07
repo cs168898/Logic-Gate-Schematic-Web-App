@@ -46,7 +46,7 @@ function Register({toggleRegisterPopup}) {
                     </label>
                     <button type="submit">Register</button>
                 </form>
-                <button onClick={toggleRegisterPopup} className="close-button">Close</button>
+                <button onClick={toggleRegisterPopup} className="close-button">x</button>
             </div>
         </div>
     )

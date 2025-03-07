@@ -298,9 +298,9 @@ function Home() {
       <div className='main-wrapper'>
         <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
           <button className='close-button' onClick={toggleSidebar}> X </button>
-          <button className='save-button'  disabled = {!isSuccess} onClick={() => handleSaveProject(
+          {loggedin? <button className='save-button'  disabled = {!isSuccess} onClick={() => handleSaveProject(
                                                   )}>
-                                                   Save Project </button>
+                                                   Save Project </button>: null }
           <h2>Projects</h2>
           <ul>
             {projectList ? projectList.map((project) => (

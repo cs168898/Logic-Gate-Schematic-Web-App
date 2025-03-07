@@ -45,9 +45,11 @@ function Login({ toggle, setLoggedin, setUser }) {
                         <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
                     </label>
                     <button type="submit">Login</button>
+                    
                 </form>
-                <button onClick={toggleRegisterPopup} className="close-button"> Register</button>
-                <button onClick={toggle} className="close-button">Close</button>
+                <button onClick={toggleRegisterPopup} className="register-button"> Register</button>
+                    <button onClick={toggle} className="close-button">x</button>
+                
                 {registerPopup ? <Register toggleRegisterPopup = {toggleRegisterPopup} /> : null}
             </div>
         </div>
