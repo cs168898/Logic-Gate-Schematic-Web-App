@@ -19,6 +19,7 @@ import { jsonbToText } from '../utils/jsonbToText';
 import { SuccessContext } from '../context/SuccessContext';
 import { saveProject } from '../../services/saveProject';
 import { mergeGates } from '../utils/mergeGates';
+import { createProject } from '../../services/createNewProject';
 
 function Home() {
   /***************************** useState Definitions ***************************/
@@ -312,6 +313,27 @@ function Home() {
 
       }
   };
+  const createNewProject = async () => {
+    try{
+      const response = await createProject(nameInput, user?.id)
+      console.log('response: ', response);
+      toggleNamePopup();
+
+      // refresh projectslist
+      setProjectList((prevList) => [...prevList, response.data]);
+      
+    } catch(error) {
+      console.error("error while creating project", error)
+    }
+    
+  }
+
+  const [namePopup, setNamePopup] = useState(false);
+  const [nameInput, setNameInput] = useState("");
+
+  function toggleNamePopup(){
+    setNamePopup(!namePopup);
+  }
   
     
   return (
@@ -320,7 +342,10 @@ function Home() {
       <div className='main-wrapper'>
         <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
           <button className='close-button' onClick={toggleSidebar}> {String.fromCharCode(8592)} </button>
-          <button className='new-project-button'>New Project</button>
+          <button className='new-project-button' onClick={toggleNamePopup}>New Project</button>
+
+          
+          
           {loggedin? <button className='save-button'  disabled = {!isSuccess} onClick={() => handleSaveProject(
                                                   )}>
                                                    Save Current Project </button>: null }
@@ -335,6 +360,23 @@ function Home() {
             </ul>
           </div>
         </div>
+        {namePopup?
+            <div className='new-project-window'>
+              <div className='new-project-window-inner'>
+                <h3>Enter the name of your project</h3>
+                <input 
+                type="text" 
+                placeholder='Name of Project'
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}/>
+                <button className='create-project-button' onClick={createNewProject}>Create Project</button>
+                <button className='close-button' onClick={toggleNamePopup}>x</button>
+              </div>
+              
+            </div>
+            :
+            null
+          }
         <Grid />
         
         <div className="content-overlay">

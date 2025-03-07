@@ -8,17 +8,22 @@ import org.springframework.stereotype.Service;
 
 import FYP.LogicGates.dto.ProjectDto;
 import FYP.LogicGates.entity.Project;
+import FYP.LogicGates.entity.UserDetails;
 import FYP.LogicGates.exception.ResourceNotFoundException;
 import FYP.LogicGates.mapper.ProjectMapper;
 import FYP.LogicGates.repository.ProjectRepository;
 import FYP.LogicGates.service.ProjectService;
 import jakarta.transaction.Transactional;
+import FYP.LogicGates.repository.UserRepository;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
     private ProjectRepository projectRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public List<ProjectDto> getAllProjects(Long userId){
@@ -38,7 +43,16 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectDto createProject(ProjectDto projectDto){
+        UserDetails user = userRepository.findById(projectDto.getUserId()).orElseThrow(
+            () -> new ResourceNotFoundException("User not found with userId: " + projectDto.getUserId())
+        );
+
         Project project = ProjectMapper.mapToProject(projectDto);
+        project.setUser(user);
+        
+        if (project.getProjectJSON() == null || project.getProjectJSON().isEmpty()) {
+            project.setProjectJSON("{}"); // Set default empty JSON object
+        }
         Project savedProject = projectRepository.save(project);
         return ProjectMapper.mapToProjectDto(savedProject);
     }

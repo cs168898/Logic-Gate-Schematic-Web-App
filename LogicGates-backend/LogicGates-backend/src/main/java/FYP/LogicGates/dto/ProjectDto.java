@@ -13,5 +13,6 @@ public class ProjectDto {
     private Long projectId;
     private String projectName;
     private String projectJSON;
+    private Long userId;
     // Add other fields as needed
 }

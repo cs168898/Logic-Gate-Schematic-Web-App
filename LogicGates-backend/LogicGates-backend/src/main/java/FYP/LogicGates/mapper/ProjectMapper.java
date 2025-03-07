@@ -8,8 +8,9 @@ public class ProjectMapper {
         return new ProjectDto(
             project.getProjectId(),
             project.getProjectName(),
-            project.getProjectJSON()
+            project.getProjectJSON(),
             // Map other fields as needed
+            project.getUser().getId()
         );
     }
 
