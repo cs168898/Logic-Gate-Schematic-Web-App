@@ -1,6 +1,6 @@
 // LogicGateCanvas.js
 import React from 'react';
-import { useState, useCallback, useEffect, useContext } from 'react';
+import { useState, useCallback, useEffect, useContext, useRef } from 'react';
 import { Stage, Layer, Rect, Text } from 'react-konva';
 import { AndGate } from '../konvaLogicGates/andGate';
 import { OrGate } from '../konvaLogicGates/orGate';
@@ -11,13 +11,16 @@ import { ConnectionsContext } from '../context/ConnectionsContext';
 import { GatesContext } from '../context/GatesContext';
 import { GatesPositionContext } from '../context/GatesPositionContext';
 
+
 function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
 
   // Access the context of the gates and connections.
   const { gates } = useContext(GatesContext);
   const { connections, setConnections } = useContext(ConnectionsContext);
   const { gatePositions, setGatePositions } = useContext(GatesPositionContext);
+  
 
+  
 
   // Use useCallback to ensure a stable function reference
   const handleWirePositionUpdate = useCallback((gateID, positions) => { // useCallback to ensure that onWirePositionUpdate does not get re-created on every render.

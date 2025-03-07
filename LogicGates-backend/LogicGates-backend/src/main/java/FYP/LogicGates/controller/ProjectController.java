@@ -35,30 +35,30 @@ public class ProjectController {
         return new ResponseEntity<>(projects, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProjectDto> getProjectById(@PathVariable Long id){
-        ProjectDto ProjectDto = projectService.getProjectById(id);
-        return new ResponseEntity<>(ProjectDto, HttpStatus.OK);
+    @GetMapping("/{projectId}")
+    public ResponseEntity<ProjectDto> getProjectById(@PathVariable Long projectId){
+        ProjectDto projectDto = projectService.getProjectById(projectId);
+        return new ResponseEntity<>(projectDto, HttpStatus.OK);
     }
     
     @PostMapping
-    public ResponseEntity<ProjectDto> createProject(@RequestBody ProjectDto ProjectDto) {
+    public ResponseEntity<ProjectDto> createProject(@RequestBody ProjectDto projectDto) {
 
-        ProjectDto createdProject = projectService.createProject(ProjectDto);
+        ProjectDto createdProject = projectService.createProject(projectDto);
         
         return new ResponseEntity<>(createdProject, HttpStatus.OK);
     }
     
-    @PutMapping("/{id}")
-    public ResponseEntity<ProjectDto> updateProject(@PathVariable Long id, @RequestBody ProjectDto ProjectDto) {
-        ProjectDto updatedProject = projectService.updateProject(id, ProjectDto);
+    @PutMapping("/{projectId}")
+    public ResponseEntity<ProjectDto> updateProject(@PathVariable Long projectId, @RequestBody ProjectDto projectDto) {
+        ProjectDto updatedProject = projectService.updateProject(projectId, projectDto);
         
         return new ResponseEntity<>(updatedProject, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
-        public ResponseEntity<Void> deleteProject(@PathVariable Long id){
-            projectService.deleteProject(id);
+    @DeleteMapping("/{projectId}")
+        public ResponseEntity<Void> deleteProject(@PathVariable Long projectId){
+            projectService.deleteProject(projectId);
 
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }

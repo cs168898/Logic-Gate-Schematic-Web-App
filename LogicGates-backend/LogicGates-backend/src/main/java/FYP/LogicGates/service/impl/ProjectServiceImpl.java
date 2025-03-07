@@ -12,6 +12,7 @@ import FYP.LogicGates.exception.ResourceNotFoundException;
 import FYP.LogicGates.mapper.ProjectMapper;
 import FYP.LogicGates.repository.ProjectRepository;
 import FYP.LogicGates.service.ProjectService;
+import jakarta.transaction.Transactional;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -28,9 +29,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectDto getProjectById(Long id) {
-        Project project = projectRepository.findById(id).orElseThrow(
-            () -> new ResourceNotFoundException("Project not found with id: " + id)
+    public ProjectDto getProjectById(Long projectId) {
+        Project project = projectRepository.findByProjectId(projectId).orElseThrow(
+            () -> new ResourceNotFoundException("Project not found with projectId: " + projectId)
         );
         return ProjectMapper.mapToProjectDto(project);
     }
@@ -43,10 +44,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectDto updateProject(Long id, ProjectDto projectDto) {
-        Project existingProject = projectRepository.findById(id).orElseThrow(
-            () -> new ResourceNotFoundException("Project not found with id: " + id)
+    @Transactional
+    public ProjectDto updateProject(Long projectId, ProjectDto projectDto) {
+        Project existingProject = projectRepository.findByProjectId(projectId).orElseThrow(
+            () -> new ResourceNotFoundException("Project not found with projectId: " + projectId)
         );
+
         existingProject.setProjectName(projectDto.getProjectName());
         existingProject.setProjectJSON(projectDto.getProjectJSON());
         Project updatedProject = projectRepository.save(existingProject);
@@ -54,12 +57,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void deleteProject(Long id){
-        Project projectToDelete = projectRepository.findById(id).orElseThrow(
-            () -> new ResourceNotFoundException("Project not found with id: " + id)
+    public void deleteProject(Long projectId){
+        Project projectToDelete = projectRepository.findByProjectId(projectId).orElseThrow(
+            () -> new ResourceNotFoundException("Project not found with projectId: " + projectId)
             );
 
-        projectRepository.deleteById(id);
+        projectRepository.deleteById(projectId);
     }
 
 

@@ -7,8 +7,8 @@ import FYP.LogicGates.entity.Project;
 
 public interface ProjectService {
     List<ProjectDto> getAllProjects(Long userId);
-    ProjectDto getProjectById(Long id);
+    ProjectDto getProjectById(Long projectId);
     ProjectDto createProject(ProjectDto projectDto);
-    ProjectDto updateProject(Long id, ProjectDto projectDto);
-    void deleteProject(Long id);
+    ProjectDto updateProject(Long projectId, ProjectDto projectDto);
+    void deleteProject(Long projectId);
 }

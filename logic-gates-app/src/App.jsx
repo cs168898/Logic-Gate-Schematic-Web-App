@@ -7,6 +7,7 @@ import { GatesProvider } from './context/GatesContext';
 import { ConnectionsProvider } from './context/ConnectionsContext';
 import { GatesPositionProvider } from './context/GatesPositionContext';
 import { UserProvider } from './context/UserContext';
+import { SuccessContext, SuccessProvider } from './context/SuccessContext';
 
 import { useEffect } from 'react';
 
@@ -18,15 +19,17 @@ import Home from './pages/home';
 function App() {
   
   return (
-    <GatesProvider>
-      <GatesPositionProvider>
-        <ConnectionsProvider>
-          <UserProvider>
-            <Home />
-          </UserProvider>
-        </ConnectionsProvider>
-      </GatesPositionProvider>
-    </GatesProvider>
+    <SuccessProvider>
+      <GatesProvider>
+        <GatesPositionProvider>
+          <ConnectionsProvider>
+            <UserProvider>
+              <Home />
+            </UserProvider>
+          </ConnectionsProvider>
+        </GatesPositionProvider>
+      </GatesProvider>
+    </SuccessProvider>
   );
 }
 

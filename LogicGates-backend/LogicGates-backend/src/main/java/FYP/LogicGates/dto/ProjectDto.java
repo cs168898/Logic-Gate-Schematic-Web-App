@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProjectDto {
-    private Long id;
+    private Long projectId;
     private String projectName;
     private String projectJSON;
     // Add other fields as needed

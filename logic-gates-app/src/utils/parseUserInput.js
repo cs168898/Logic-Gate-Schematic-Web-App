@@ -21,6 +21,7 @@
 
 
     export function parseUserInput(inputString, gates){
+
         // Split the input string using commas as delimiters
         const lines = inputString.split(";");
         const gatesArray = []; // Storage to store all the gates declared in this current input
@@ -36,7 +37,7 @@
                 // if any key already exists in parsedData (which means a gate already exists) *Second iteration
                 if (parsedData.hasOwnProperty(cleanedKey) && Object.keys(parsedData).length > 0) {
                     console.log("duplicate entry found, inserting secodn object")
-                    if (isValidGate(parsedData, gatesArray)){ // Check if the gate type is valid
+                    if (isValidGate(parsedData, gatesArray, gates)){ // Check if the gate type is valid
                         console.log("key successfully validated for second object")
                         //Add the first iteration gate we created to the gatesArray before starting with second
                         gatesArray.push({
@@ -61,7 +62,7 @@
       
         // Validate and push the last gate if it exists
         if (Object.keys(parsedData).length > 0) {
-            if (isValidGate(parsedData, gatesArray)) {
+            if (isValidGate(parsedData, gatesArray, gates)) {
                 console.log("key successfully validated")
             gatesArray.push({
                 ...parsedData,
@@ -86,7 +87,7 @@
 
 
     // Helper function to validate gate data before adding it to the array
-    function isValidGate(gateData, gatesArray) {
+    function isValidGate(gateData, gatesArray, existingGates) {
         // Check required fields
         if (
         !gateData.name ||
@@ -96,6 +97,12 @@
         return false;
         }
     
+        // Check if the gate already exists in the existing gates context
+        if (existingGates.some(gate => gate.name === gateData.name)) {
+            console.warn(`Gate with name ${gateData.name} already exists. Skipping.`);
+            return false;
+        }
+
         // Validate gate type
         const gatesList = ["AND", "OR", "NOT"];
         if (!gatesList.includes(gateData.type.toUpperCase())) {
@@ -385,6 +392,7 @@
         }
         return levels;
     }
+
 
       
     /**************************** End Of User Input Functionality *******************************/

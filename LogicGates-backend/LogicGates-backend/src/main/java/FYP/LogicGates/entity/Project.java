@@ -1,5 +1,9 @@
 package FYP.LogicGates.entity;
 
+import org.hibernate.annotations.Type;
+
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +16,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Getter
 @Setter
@@ -22,11 +28,13 @@ import lombok.Setter;
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // auto increment pri key ID
-    private Long id;
+    @Column(name = "projectid")
+    private Long projectId;
 
     @Column(name = "projectname", nullable = false)
     private String projectName;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "projectjson", columnDefinition = "jsonb")
     private String projectJSON;
 

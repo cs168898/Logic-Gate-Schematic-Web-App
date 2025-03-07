@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
 
 // Component Imports
 import Grid from '../components/background-grid';
@@ -13,6 +13,12 @@ import { GatesPositionContext } from '../context/GatesPositionContext';
 import { listUsers } from '../../services/userService';
 import { UserContext } from '../context/UserContext';
 import { getAllProjects } from '../../services/getAllProjects';
+import { getProjectById } from '../../services/getProjectById';
+import { textToJsonb } from '../utils/textToJsonb';
+import { jsonbToText } from '../utils/jsonbToText';
+import { SuccessContext } from '../context/SuccessContext';
+import { saveProject } from '../../services/saveProject';
+import { mergeGates } from '../utils/mergeGates';
 
 function Home() {
   /***************************** useState Definitions ***************************/
@@ -28,12 +34,25 @@ function Home() {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  const [ textToBeSaved, setTextToBeSaved] = useState("");
+
+  const [ inputAreaText, setInputAreaText] = useState("");
+
+  const [cleared, setCleared] = useState(false);
+
+  const [ queuedProjectId , setqueuedProjectId] = useState("");
+
+  const [currentProjectInfo, setCurrentProjectInfo] = useState("");
+
 
   const { gates, setGates } = useContext(GatesContext);
 
   const { gatePositions, setGatePositions } = useContext(GatesPositionContext);
 
   const { user , loggedin} = useContext(UserContext)
+
+  const { isSuccess ,setIsSuccess } = useContext(SuccessContext);
+  
     
   /***************************** End Of useState Definitions ********************/
 
@@ -44,20 +63,88 @@ function Home() {
     useEffect(() => {
       dragAndDrop(); // Initialize the custom drag and drop behavior
       
-      // fetch the projects to populate the sidebar
-      const fetchProjectList = async () => {
-        try{
-          const response = await fetch('http://localhost:8080/api/logicgates/retrieve_proj_list');
-          const data = await response.json();
-          setProjectList(data);
-          console.log("Loaded Project Data: ", data);
-        } catch(error){
-          console.error("error fetching project:", error)
-        }
-      }
-
-      fetchProjectList();
     }, []); // Run once after component mounts
+
+    useEffect(() => {
+      if (loggedin){
+        getAllProjects(user.id).then((response) => {
+          setProjectList(response.data);
+          console.log(response)
+          console.log('projectList: ', projectList);
+        }).catch(error => {
+          console.error(error);
+        })
+      } else {
+        setProjectList(null);
+      }
+      }, [loggedin, user?.id])
+
+      
+    // this is to store the previous gates information into a variable for check later on
+    const prevGatesRef = useRef();
+    const isFirstRun = useRef(true);
+
+    // Use useEffect to monitor changes in the gates state
+    useEffect(() => {
+      if (isFirstRun.current) {
+        isFirstRun.current = false;
+        prevGatesRef.current = gates;
+        console.log('issuccess first run')
+        console.log('prevGatesRef.current =', prevGatesRef.current)
+        return;
+      }
+  
+      // check if the current gates created matches the previous gates , if it doesnt, means it was successful
+      if (prevGatesRef.current && JSON.stringify(prevGatesRef.current) !== JSON.stringify(gates)) {
+        setIsSuccess(true);
+        console.log('subsequent gate changes, setissuccess set to true')
+        console.log('prevGatesRef.current =', prevGatesRef.current)
+        prevGatesRef.current = gates; // Update the previous state of the gates
+        
+
+      } else {
+        setIsSuccess(false);
+        console.log('subsequent gate changes, setissuccess set to false')
+        console.log('prevGatesRef.current =', prevGatesRef.current)
+      }
+  
+    }, [gates]);
+
+    useEffect(() => {
+      if (cleared && queuedProjectId) {
+        (async () => {
+          try {
+            const response = await getProjectById(queuedProjectId);
+            const rawText = response.data.projectJSON;
+            const processedText = jsonbToText(rawText);
+            
+            if (response.data){
+              let projectData = response.data
+              setCurrentProjectInfo(projectData);
+              setuserInput(processedText);
+              setInputAreaText(processedText);
+              handleSubmit(processedText);
+            }
+            console.log('loaded project successfully', response)
+            console.log('currentprojectinfo: ', JSON.stringify(currentProjectInfo) )
+            console.log('currentprojectinfo after awhile: ', currentProjectInfo)
+            console.log('currenprojectinfo.id: ', JSON.stringify(currentProjectInfo.id))
+            console.log()
+          } catch (error) {
+            console.error("error loading project:", error);
+          } finally {
+            setCleared(false);
+          }
+        })();
+      }
+    }, [cleared, queuedProjectId]);
+
+  // Ensure textToBeSaved is updated correctly before saving
+  // useEffect(() => {
+  //   if (isSuccess) {
+  //     setTextToBeSaved((prevText) => {return mergeGates(prevText, inputAreaText)});
+  //   }
+  // }, [isSuccess, userInput]);
 
   /***************************** End Of UseEffect Statements ***************************/
   
@@ -85,6 +172,37 @@ function Home() {
         console.log("Updated gatePositions after deletion:", rest);
         return rest;
       });
+
+      // Check if the gates have successfully changed
+      
+      // Remove the gate's text from textToBeSaved
+      setTextToBeSaved((prevText) => {
+        const gateToDelete = gates.find((gate) => gate.id === selectedGateId);
+        if (!gateToDelete || !gateToDelete.name) {
+          return prevText; // If no matching gate, return old text
+        }
+      
+        try {
+          // 1) Parse current text into an array of gate objects
+          const prevJsonString = textToJsonb(prevText);
+          let prevArray = JSON.parse(prevJsonString); // Now we have a JS array
+      
+          // 2) Remove the gate whose "name" matches gateToDelete.name
+          const updatedArray = prevArray.filter((g) => g.name !== gateToDelete.name);
+          console.log('updatedArray: ',updatedArray)
+          // 3) Convert updated array back to text
+          const updatedJsonString = JSON.stringify(updatedArray, null, 2);
+          console.log('updatedJsonString', updatedJsonString)
+          const updatedText = jsonbToText(updatedJsonString);
+          console.log('updatedText: ', updatedText)
+          return updatedText.trim();
+      
+        } catch (error) {
+          console.error("Error removing gate from text:", error);
+          return prevText; // In case of parse errors, revert
+        }
+      });
+      
   
       setSelectedGateId(null); // Clear selection
     }
@@ -93,13 +211,14 @@ function Home() {
 /***************************** End Of Event Handlers ***************************/
 
 
-
   // Create the handleSubmit function to send userInput into backend
-  const handleSubmit = async (savedUserInput) =>{
+  const handleSubmit = async (userInput) =>{
     try{
-      console.clear(); // clear the console of all previous logs
-      console.log(`The user input is: ${userInput}`)
-      const gateData = parseUserInput(userInput, gates); // Parse user input before sending it to backend
+      console.log('handlesubmit called')
+
+      setTextToBeSaved((prevText) => {return mergeGates(prevText, userInput)});
+
+      const gateData = parseUserInput(userInput, gates); // Parse user input before sending it to LogicGateCanvas
       console.log("Gate Data: ", gateData)
       setGates([...gates, ...gateData]) // Keep track of all the logic gate inside the 'gates' variable
       
@@ -118,7 +237,11 @@ function Home() {
       setGates([]) // Keep track of all the logic gate inside the 'gates' variable
       setGatePositions({}); // Clear all wire positions
       setSelectedGateId(null); // Clear selection
-      console.clear();
+      setuserInput('');
+      setTextToBeSaved(''); // Clear the text to be saved
+      // Trigger an update in the next render
+      setCleared(true);   // Now the "cleared" flag flips in the next re-render
+
       //const response = await axios.post('http://127.0.0.1:8000/logicgates/', gateData);
       //console.log("Logic Gate Created: ", response.data);
     } catch (error){
@@ -132,27 +255,41 @@ function Home() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const handleSaveProject = async (userInput) => {
-    try{
-
-    } catch {
-
-    }
-  }
   
-    useEffect(() => {
-      if (loggedin){
-        getAllProjects(user.id).then((response) => {
-          setProjectList(response.data);
-          console.log('projectList: ', projectList);
-        }).catch(error => {
-          console.error(error);
-        })
-      } else {
-        setProjectList(null);
-      }
-      }, [loggedin, user?.id])
+  async function loadProject(id) {
+    setqueuedProjectId(id);  
+    await handleClearGates();
+    isFirstRun.current = true;
+  }
     
+  async function handleSaveProject(){
+
+    const latestProjectInfo = currentProjectInfo; 
+    
+    if (!latestProjectInfo || !latestProjectInfo.projectId) {
+    console.error("Project info is not ready yet.");
+    alert("Project info is missing. Please try again.");
+    return;
+    }
+
+    try{
+      console.log('current project id: ', latestProjectInfo.projectId);
+      console.log('current project name: ', latestProjectInfo.projectName);
+
+      console.log('textToBeSaved: ', textToBeSaved)
+
+      const jsonbText = textToJsonb(textToBeSaved)
+      console.log('jsonbText = ', jsonbText)
+      const response = await saveProject(latestProjectInfo.projectId, latestProjectInfo.projectName, jsonbText);
+      console.log('response', response);
+      alert('project successfully saved');
+      setIsSuccess(false);
+      } catch (error){
+      console.error('error saving project: ', error)
+      alert('proejct failed to save');
+
+      }
+  };
   
     
   return (
@@ -161,11 +298,13 @@ function Home() {
       <div className='main-wrapper'>
         <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
           <button className='close-button' onClick={toggleSidebar}> X </button>
-          <button className='save-button' > Save Project </button>
+          <button className='save-button'  disabled = {!isSuccess} onClick={() => handleSaveProject(
+                                                  )}>
+                                                   Save Project </button>
           <h2>Projects</h2>
           <ul>
             {projectList ? projectList.map((project) => (
-              <li key={project.id}>{project.projectName}</li>
+              <button onClick={() => loadProject(project.projectId)} key={project.projectId}>{project.projectName}</button>
             )) : null}
           </ul>
         </div>
@@ -197,12 +336,12 @@ function Home() {
                 id="user-input"
                 name="user-input"
                 placeholder='-Enter your logic here-'
-                value={userInput}
-                onChange={(e) => setuserInput(e.target.value)}
                 autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck="false"
+                value = {inputAreaText}
+                onChange={(e) => setInputAreaText(e.target.value)}
               ></textarea>
               <div className="button-wrapper">
-                <button className="create-button" onClick={handleSubmit}>
+                <button className="create-button" onClick={() => handleSubmit(inputAreaText)}>
                   Create Gate
                 </button>
                 <button className="delete-button" onClick={handleDeleteGate} disabled={selectedGateId === null}>
