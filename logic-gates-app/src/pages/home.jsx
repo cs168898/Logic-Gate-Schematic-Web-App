@@ -76,6 +76,7 @@ function Home() {
         })
       } else {
         setProjectList(null);
+        handleClearGates2();
       }
       }, [loggedin, user?.id])
 
@@ -249,6 +250,27 @@ function Home() {
     }
 
   }
+
+  const handleClearGates2 = async () =>{
+    try{
+      
+
+      setGates([]) // Keep track of all the logic gate inside the 'gates' variable
+      setGatePositions({}); // Clear all wire positions
+      setSelectedGateId(null); // Clear selection
+      setuserInput('');
+      setTextToBeSaved(''); // Clear the text to be saved
+      setInputAreaText('')
+      // Trigger an update in the next render
+      
+
+      //const response = await axios.post('http://127.0.0.1:8000/logicgates/', gateData);
+      //console.log("Logic Gate Created: ", response.data);
+    } catch (error){
+      console.error("Error: ", error.message) // Log the error if there are errors that happened in the backend
+    }
+
+  }
   
   // Toggle function for sidebar
   const toggleSidebar = () => {
@@ -297,16 +319,21 @@ function Home() {
         <Header onSidebarToggle={toggleSidebar}/>
       <div className='main-wrapper'>
         <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
-          <button className='close-button' onClick={toggleSidebar}> X </button>
+          <button className='close-button' onClick={toggleSidebar}> {String.fromCharCode(8592)} </button>
+          <button className='new-project-button'>New Project</button>
           {loggedin? <button className='save-button'  disabled = {!isSuccess} onClick={() => handleSaveProject(
                                                   )}>
-                                                   Save Project </button>: null }
+                                                   Save Current Project </button>: null }
+          
           <h2>Projects</h2>
-          <ul>
-            {projectList ? projectList.map((project) => (
-              <button onClick={() => loadProject(project.projectId)} key={project.projectId}>{project.projectName}</button>
-            )) : null}
-          </ul>
+          <div className='project-list'>
+            <ul>
+              {projectList ? projectList.map((project) => (
+                <button className='project-button' 
+                onClick={() => loadProject(project.projectId)} key={project.projectId}>{project.projectName}</button>
+              )) : null}
+            </ul>
+          </div>
         </div>
         <Grid />
         
@@ -318,7 +345,7 @@ function Home() {
             <div className="tools-window-inner">
               <h2>Tools</h2>
             
-              <button className='clear' onClick={handleClearGates}>Clear All Gates
+              <button className='clear' onClick={handleClearGates2}>Clear All Gates
               </button>
 
             </div>

@@ -31,7 +31,7 @@ function Header({ onSidebarToggle }) {
       
 
       <h1 className="Header">Logic Gates Schematic</h1>
-      <p> {loggedin ? user.username : ''}</p>
+      <h2> {loggedin ? 'Welcome,' + user.username : ''}</h2>
       <button className="login-button" onClick={loggedin ? logOut: togglePop}>{loggedin? 'Logout' : 'Login'}</button>
       {seen ? <Login toggle={togglePop} setLoggedin={setLoggedin} setUser={setUser} /> : null}
 

@@ -30,7 +30,7 @@ function Register({toggleRegisterPopup}) {
     return (
         <div className="popup">
             <div className="popup-inner-register">
-                <h2>Login</h2>
+                <h2>Register</h2>
                 <form onSubmit={handleRegister}>
                     <label>
                         Username:

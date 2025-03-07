@@ -48,6 +48,13 @@ body {
 
 .App-header h1{
   margin: auto;
+  width: 70%;
+}
+
+.App-header h2{
+  font-size: large;
+  margin: auto 0 auto auto;
+  width: auto;
 }
 
 .App-header .login-button{
@@ -57,10 +64,11 @@ body {
   padding: 5px 10px;
   cursor: pointer;
   border-radius: 10px;
-  width: 6vw;
-  height: 5vh;
+  min-width: 6vw;
+  width: auto;
+  height: 2.5em;
   font-size: medium;
-  margin: 5px;
+  margin: auto 1em auto 2em;
 }
 
 .App-header .login-button:hover{
@@ -84,14 +92,14 @@ body {
   
   .popup-inner {
   background-color: var(--theme-primary-color);
-  position: absolute;
+  position: relative;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
-  width: 40%;
+  width: 25%;
   }
 
   .popup-inner form{
@@ -145,16 +153,22 @@ body {
     background-color: var(--button-hover-color);
   }
 
+  .popup-inner h2{
+    font-size: x-large;
+    margin-bottom: 10px;
+  }
+
   .popup-inner .close-button {
     position: absolute;
     top: 0;
-    left: 28em;
+    left: 445px;
     color: white;
     border: none;
     padding: 5px;
     cursor: pointer;
     border-radius: 10px;
     background-color: transparent;
+    font-size: x-large;
   }
 
   .popup-inner .register-button{
@@ -175,7 +189,7 @@ body {
   .popup-inner-register .close-button{
     position: absolute;
     top: 0;
-    left: 13em;
+    left: 205px;
     color: white;
     border: none;
     padding: 5px;
@@ -225,6 +239,20 @@ body {
   background-color: var(--theme-hover-color);
 }
 
+.sidebar .new-project-button{
+  background-color: white;
+  color: black;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.sidebar .new-project-button:hover{
+  background-color: var(--button-hover-color);
+}
+
 .sidebar .save-button{
   background-color: white;
   color: black;
@@ -235,10 +263,49 @@ body {
   margin-top: 10px;
 }
 
+
 .sidebar .save-button:hover{
   background-color: var(--button-hover-color);
 }
 
+.sidebar .save-button:disabled{
+  border: 1px solid black;
+  background-color: transparent;
+}
+
+.sidebar .save-button:hover:disabled{
+  background-color: transparent;
+  cursor: not-allowed;
+}
+
+
+.sidebar h2{
+  font-size: medium;
+  text-align: start;
+  margin-top: 10px;
+}
+
+.sidebar .project-list{
+  display: flex;
+}
+
+.sidebar .project-list ul{
+  padding: 0;
+}
+
+.sidebar .project-button{
+  background-color: transparent;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  width: 100%;
+  padding: 10px;
+  font-size: large;
+}
+
+.sidebar .project-button:hover{
+  background-color: grey;
+}
 
 /********** Tools Window *************/
 
