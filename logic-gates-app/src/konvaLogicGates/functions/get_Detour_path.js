@@ -29,16 +29,12 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight, wir
                             inputRow, inputCol,
                             allInputOutputPositions);
 
-  console.log("Cost Grid total :", costGrid);
   // 2) Use pixel coordinates directly for start and end.
   const startX = output.x;
   const startY = output.y;
   const endX   = input.x;
   const endY   = input.y;
-  console.log("Start pixel:", startX, startY);
-  console.log("Start grid:", Math.floor(startX / gridSizeConst), Math.floor(startY / gridSizeConst));
-  console.log("End pixel:", endX, endY);
-  console.log('End grid:', Math.floor(endX / gridSizeConst), Math.floor(endY / gridSizeConst));
+
 
 
   // 3) A* search
@@ -97,7 +93,6 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight, wir
   // screenPath[screenPath.length - 2] = [input.x, screenPath[screenPath.length - 2][1]]; // input wire
   // }
 
-  console.log("screenPath before fixLastBend:", screenPath);
   // 5b) Force the very first point to be exactly the output pin.
   if (screenPath.length > 0) {
     screenPath[0] = [output.x, output.y];
@@ -116,11 +111,9 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight, wir
     return [row, col];
   });
 
-  console.log(`about to exit getDetourPath, all grid points = ${allGridPoints}`)
   if (!screenPath){
     console.log("screenPath is null")
   }
-  console.log('screenPath= ', screenPath)
   return {screenPath, allGridPoints, gridPath};
 }
 
@@ -290,7 +283,6 @@ function aStarPathPixel(startX, startY, endX, endY, costGrid, boardWidth, boardH
       const newG = gScore[nodeKey(x, y)] + costGrid[row][col] + 1 + penalty + extraTurn;
       
       if (newG < gScore[neighborKey]) {
-        console.log(`costgrid = ${costGrid[row][col]}`)
         gScore[neighborKey] = newG;
         parent.set(neighborKey, nodeKey(x, y));
         const fVal = newG + heuristic(nxCentered, nyCentered, endX, endY);
@@ -334,7 +326,6 @@ function setGridCosts(costGrid, gates, wireTracker, endDestinationKey,
     if (gate.x == null || gate.y == null) continue;
     const gateLeft   = gate.x;
     const gateTop    = gate.y;
-    console.log(`gate x and y ${gate.x}, ${gate.y}`)
     const gateRight  = gateLeft + Math.ceil(100 / gridSizeConst);
     const gateBottom = gateTop  + Math.ceil(100 / gridSizeConst);
 
@@ -408,7 +399,7 @@ function setGridCosts(costGrid, gates, wireTracker, endDestinationKey,
               // Ensure indices are within grid bounds
               if (r >= 0 && r < rows && c >= 0 && c < cols) {
                   costGrid[r][c] = Number.POSITIVE_INFINITY;
-                  console.log('Grid set to Infinity:', c, r);
+                  
               }
           }
       }

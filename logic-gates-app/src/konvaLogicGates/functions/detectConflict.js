@@ -29,9 +29,9 @@ export function detectConflict(gridCoords, wireTracker, pixelCoords, endDestinat
     const conflictCells = [];
     gridCoords.forEach(([row, col], i) => {
       if (cellWireMap.has(`${row},${col}`)) {
-        console.log(`CONFLICT DETECTED at ${row}, ${col} of index ${i}` );
+
         conflictCells.push({ row, col, index: i });
-        console.log('conflictCells = ', conflictCells)
+
       }
     });
 

@@ -22,6 +22,7 @@
 
     export function parseUserInput(inputString, gates){
 
+        console.log('PARSEUSERINPUT ACTIVATED')
         // Split the input string using commas as delimiters
         const lines = inputString.split(";");
         const gatesArray = []; // Storage to store all the gates declared in this current input
@@ -63,7 +64,6 @@
         // Validate and push the last gate if it exists
         if (Object.keys(parsedData).length > 0) {
             if (isValidGate(parsedData, gatesArray, gates)) {
-                console.log("key successfully validated")
             gatesArray.push({
                 ...parsedData,
                 id: gates.length + gatesArray.length, // Assign unique ID based on existing gates + new gates
@@ -79,6 +79,7 @@
         // then build the positioning of each gate.
         const levelledGatesArrays = collectGateLevel(gatesArray)    // collectGateLevel returns an object with the arrays of level
         const sortedlevelledGates = sortGates(levelledGatesArrays)
+        console.log('sortedlevelledGates', sortedlevelledGates);
         positionGates(sortedlevelledGates, gatesArray)
         const flattenedGatesArray = Object.values(levelledGatesArrays).flat();
         console.log("Flattened Gates Array:", JSON.stringify(flattenedGatesArray, null, 2));
@@ -112,7 +113,6 @@
         // Validate number of inputs
         const inputs = gateData.input.split(",").map((input) => input.trim());
         const numInputs = inputs.length;
-        console.log(` The Gate Type and num inputs= ${ numInputs}`)
         if (gateData.type.toUpperCase() === "NOT" && numInputs > 1) {
             console.error(`NOT gate should not contain more than 1 input`);
             alert("NOT gate should not contain more than 1 input");
@@ -126,7 +126,6 @@
               uniqueOutput = `OUT_${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
             } while (gatesArray.some((gate) => gate.output === uniqueOutput));
             gateData.output = uniqueOutput;
-            console.log(`Generated unique output for gate ${gateData.name}: ${uniqueOutput}`);
         }
 
         // Update gateData with parsed inputs and number of inputs if all checks pass
@@ -156,7 +155,6 @@
             allInputs.filter(input => !allOutputs.has(input)) // if the input is not inside the all outputs array, then it is external
         );
 
-        console.log("Detected External Inputs:", Array.from(externalInputs));
         
         // Step 3: Initialize outputs with external inputs
         for (const input of externalInputs) {
@@ -171,12 +169,10 @@
           for (let i = unplaced.length - 1; i >= 0; i--) {
             const gate = unplaced[i];
             const inputs = gate.input.split(",").map(input => input.trim());
-            console.log(`Gate: ${gate.name}, Inputs: ${inputs}, Resolved Outputs: ${Array.from(outputs)}`);
 
             // Check if this gate can be placed:
             //   => "placeable" if all inputs are already in the outputs set
             const canPlace = !inputs.some(input => !outputs.has(input));
-            console.log(`Can place gate ${gate.name}?`, canPlace);
 
             if (canPlace) {
               currentLevel.push(gate);
@@ -320,7 +316,6 @@
                     if (!addedGates.has(gate.id)) {
                         if (prioritizedQueue[prevIndex]) {
                             // If the index already exists in the current level, insert at specific index
-                            console.log(`Inserting gate ${gate.name} into prioritizedQueue at index ${prevIndex}...`);
                             prioritizedQueue.splice(prevIndex, 0 , gate); // insert gate at specific index and push everything else back
                         } else {
                             // If the index does not exist, just push it to the array normally
@@ -338,7 +333,6 @@
                     } else{
                         console.log(`gate has already been added to array ${gate}`)
                     }
-                    console.log(`Prioritized Queue1 after processing ${gate.name}:`, JSON.stringify(prioritizedQueue, null, 2));
 
                 } else if(matchingInputCount >= 2 && gate.type.toUpperCase() !== 'NOT'){
                     console.log(`else if loop activated`)
@@ -355,8 +349,6 @@
                     
                     const [matchingInput] = inputs.splice(matchingInputIndex, 1);   //put the index of the matchingInput as the first
                     gate.inputs = [matchingInput, ...inputs]; // update gate input order
-                    console.log(`the matchingInput is: ${matchingInput}`)
-                    console.log(`the gate.input is : ${gate.input}`)
 
                     // add the gate to the prioritized queue
                     // THIS IS TO SORT THE GATES POSITION
@@ -369,7 +361,6 @@
                     // Add the gate to the tracking set
                     addedGates.add(gate.id);
 
-                    console.log(`Prioritized Queue2 after processing ${gate.name}:`, JSON.stringify(prioritizedQueue, null, 2));
 
                 } else{
                     if (!addedGates.has(gate.id)) {
@@ -380,7 +371,6 @@
                     } else{
                         console.log(`gate has already been added to array ${gate}`)
                     }
-                    console.log(`Remaining Gates after processing ${gate.name}:`, JSON.stringify(remainingGates, null, 2));
                 }
 
             }
@@ -388,7 +378,6 @@
             const cleanedPrioritizedQueue = prioritizedQueue.filter(Boolean);
 
             levels[levelKeys[i]] = [...cleanedPrioritizedQueue, ...remainingGates];
-            console.log("Final sorted levels:", JSON.stringify(levels, null, 2));
         }
         return levels;
     }

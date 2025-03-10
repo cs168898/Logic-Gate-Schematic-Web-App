@@ -29,16 +29,12 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight, wir
                             inputRow, inputCol,
                             allInputOutputPositions);
 
-  console.log("Cost Grid:", costGrid);
   // 2) Use pixel coordinates directly for start and end.
   const startX = output.x;
   const startY = output.y;
   const endX   = input.x;
   const endY   = input.y;
-  console.log("Start pixel:", startX, startY);
-  console.log("Start grid:", Math.floor(startX / gridSizeConst), Math.floor(startY / gridSizeConst));
-  console.log("End pixel:", endX, endY);
-  console.log('End grid:', Math.floor(endX / gridSizeConst), Math.floor(endY / gridSizeConst));
+ 
 
 
   // 3) A* search
@@ -95,7 +91,6 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight, wir
   // screenPath[screenPath.length - 2] = [input.x, screenPath[screenPath.length - 2][1]]; // input wire
   // }
 
-  console.log("screenPath before fixLastBend:", screenPath);
   // 5b) Force the very first point to be exactly the output pin.
   if (screenPath.length > 0) {
     screenPath[0] = [output.x, output.y];
@@ -114,11 +109,10 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight, wir
     return [row, col];
   });
 
-  console.log(`about to exit getDetourPath, all grid points = ${allGridPoints}`)
+
   if (!screenPath){
     console.log("screenPath is null")
   }
-  console.log('screenPath= ', screenPath)
   return {screenPath, allGridPoints, gridPath};
 }
 
@@ -344,7 +338,6 @@ for (const gate of allInputOutputPositions) {
   let c = Math.floor(gate.y / gridSizeConst); // ✅ column corresponds to X
   if (r >= 0 && r < rows && c >= 0 && c < cols) {
     costGrid[r][c] = Number.POSITIVE_INFINITY;
-    console.log('grids that are set to infinity: ', r, c)
   }
 }
 

@@ -1,5 +1,4 @@
 export function cleanUpWires(connections) {
-  console.log("Connections before cleanup:", JSON.stringify(connections));
   // Create a shallow copy of the connections
   const updatedConnections = { ...connections };
 
@@ -7,7 +6,6 @@ export function cleanUpWires(connections) {
   const uniqueEndDestinationKeys = new Set(
     Object.keys(connections).map((key) => key.split("-").pop())
   );
-  console.log("Unique endDestinationKeys:", uniqueEndDestinationKeys);
 
   // Process each destination separately
   uniqueEndDestinationKeys.forEach((endDestinationKey) => {
@@ -21,7 +19,6 @@ export function cleanUpWires(connections) {
         pixelCoords: pixelCoordinates || []
       }));
 
-    console.log(`Wires for destination "${endDestinationKey}":`, JSON.stringify(wires));
     
     // Array to hold reference wires (which should not be trimmed)
     const referenceWires = [];
@@ -29,10 +26,8 @@ export function cleanUpWires(connections) {
     // Process each wire in order
     wires.forEach((wire) => {
       let { wireKey, gridCoords: currGridCoords, pixelCoords: currPixelCoords } = wire;
-      console.log("currPixelCoords snapshot:", JSON.stringify(currPixelCoords));
       // If this wire is already a reference, skip further processing.
       if (updatedConnections[wireKey].isReference) {
-        console.log(`Skipping trimming for already referenced wire "${wireKey}".`);
         return;
       }
 
@@ -45,17 +40,9 @@ export function cleanUpWires(connections) {
           const [currRow, currCol] = currGridCoords[k];
 
           // Find a matching coordinate in the reference wire's grid coordinates
-          console.log('refGridCoords =', refGridCoords)
-          console.log('currRow =', currRow)
-          console.log('currCol =', currCol)
           const matchIndex = findLastIndex(refGridCoords, ([r, c]) => r === currRow && c === currCol);
-          console.log('matchindex:', matchIndex)
           if (matchIndex > 0 && matchIndex < refGridCoords.length - 1 ) {
-            console.log(
-              `Trimming "${wireKey}" at grid coordinate index ${k} due to conflict with reference wire "${refWire.wireKey}"`
-            );
             
-            console.log('currentGridCoords=', currGridCoords)
             // Trim both grid and pixel coordinates from index k onward.
             if (k >= 1 && k < currGridCoords.length) {
               currGridCoords = currGridCoords.slice(k);
@@ -64,11 +51,9 @@ export function cleanUpWires(connections) {
             // Update the corresponding connection: gridPath remain as an array of pairs,
             // and pixelCoordinates are converted back into the flattened format.
             updatedConnections[wireKey].gridPath = currGridCoords;
-            console.log('currpixelcoords =', currPixelCoords)
             
             updatedConnections[wireKey].pixelCoordinates = currPixelCoords;
 
-            console.log('updatedConnections[wireKey].pixelCoordinates =', updatedConnections[wireKey].pixelCoordinates)
             break; // Once a conflict is found and processed, exit the inner loop.
           }
         }
@@ -83,14 +68,12 @@ export function cleanUpWires(connections) {
           gridCoords: currGridCoords,
           pixelCoords: currPixelCoords,
         });
-        console.log(`Wire "${wireKey}" has become (or remained) a reference wire.`);
       } else {
         console.log(`Wire "${wireKey}" is too short after trimming, ignoring.`);
       }
     });
   });
 
-  console.log("Connections after cleanup:", updatedConnections);
   return updatedConnections;
 }
 
@@ -105,7 +88,6 @@ function findLastIndex(array, predicate) {
 
 // Helper: Convert flattened pixelCoordinates into an array of [x, y] pairs.
 function convertFlattenedToPairs(flatArray) {
-  console.log("convertFlattenedToPairs received:", JSON.stringify(flatArray));
   const pairs = [];
   for (let i = 0; i < flatArray.length; i += 2) {
     pairs.push([flatArray[i], flatArray[i + 1]]);

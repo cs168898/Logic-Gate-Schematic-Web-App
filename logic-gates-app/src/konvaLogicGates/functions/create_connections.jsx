@@ -82,7 +82,7 @@ export function CreateConnections({ selectedGateId, setSelectedGateId }) {
           gate.id !== selectedGateId
         ) {
           const wireKey = `wire-${+matchingOutput.gateID + 1}-${+gate.id + 1}-${inputPosition.inputName}`;
-          console.log('wireKey:', wireKey);
+
           const pathResult = getDetourPath(
             { x: matchingOutput.x, y: matchingOutput.y },
             { x: inputPosition.x, y: inputPosition.y },

@@ -18,7 +18,6 @@ function Login({ toggle, setLoggedin, setUser }) {
         loginUser(username, password)
             .then(response => {
                 // successful login
-                console.log('login successful', response.data);
                 setLoggedin(true);
                 setUser(response.data);
                 toggle();

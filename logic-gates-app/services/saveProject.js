@@ -3,8 +3,6 @@ import axios from 'axios';
 const REST_API_BASE_URL = 'http://localhost:8080/api/projects';
 
 export const  saveProject = (projectId, projectName, projectJSON) => {
-    console.log("Saving project to URL:", `${REST_API_BASE_URL}/${projectId}`);
-    console.log("Saving project with data:", { projectId, projectName, projectJSON });
     return axios.put(`${REST_API_BASE_URL}/${projectId}`, {
         projectId,
         projectName,

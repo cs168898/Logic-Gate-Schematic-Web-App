@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState, useRef } from 'react';
 
 // Component Imports
-import Grid from '../components/background-grid';
+
 import Header from '../components/header';
 
 // Utilities (functions) Imports
@@ -20,6 +20,7 @@ import { SuccessContext } from '../context/SuccessContext';
 import { saveProject } from '../../services/saveProject';
 import { mergeGates } from '../utils/mergeGates';
 import { createProject } from '../../services/createNewProject';
+import handleDownload from '../konvaLogicGates/functions/downloadTextFile';
 
 function Home() {
   /***************************** useState Definitions ***************************/
@@ -44,6 +45,9 @@ function Home() {
   const [ queuedProjectId , setqueuedProjectId] = useState("");
 
   const [currentProjectInfo, setCurrentProjectInfo] = useState("");
+
+  const [namePopup, setNamePopup] = useState(false);
+  const [nameInput, setNameInput] = useState("");
 
 
   const { gates, setGates } = useContext(GatesContext);
@@ -76,8 +80,12 @@ function Home() {
           console.error(error);
         })
       } else {
+        // if user is logged out
         setProjectList(null);
         handleClearGates2();
+        setCurrentProjectInfo("");
+        setSelectedProjectId("");
+        setIsSuccess(false);
       }
       }, [loggedin, user?.id])
 
@@ -171,7 +179,6 @@ function Home() {
       // Remove the gate's positions from gatePositions
       setGatePositions((prev) => {
         const { [selectedGateId]: _, ...rest } = prev; // Update the gatePositions state with the key selectedGateId to '_' which is a placeholder variable (not used).
-        console.log("Updated gatePositions after deletion:", rest);
         return rest;
       });
 
@@ -278,8 +285,11 @@ function Home() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  
+  const [selectedProjectId, setSelectedProjectId] = useState(null)
+
   async function loadProject(id) {
+    setSelectedProjectId(id);
+    prevGatesRef.current = null;
     setqueuedProjectId(id);  
     await handleClearGates();
     isFirstRun.current = true;
@@ -315,24 +325,37 @@ function Home() {
   };
   const createNewProject = async () => {
     try{
-      const response = await createProject(nameInput, user?.id)
-      console.log('response: ', response);
-      toggleNamePopup();
+      if (!loggedin){
+        alert('Log in first');
+      } else {
+        const response = await createProject(nameInput, user?.id)
+        console.log('response: ', response);
+        toggleNamePopup();
+  
+        // refresh projectslist
+        setProjectList((prevList) => [...prevList, response.data]);
+      }
+     
 
-      // refresh projectslist
-      setProjectList((prevList) => [...prevList, response.data]);
-      
     } catch(error) {
       console.error("error while creating project", error)
     }
     
   }
 
-  const [namePopup, setNamePopup] = useState(false);
-  const [nameInput, setNameInput] = useState("");
+  
 
   function toggleNamePopup(){
     setNamePopup(!namePopup);
+  }
+
+  const [openProjectOptions, setOpenProjectOptions] = useState(null);
+  function toggleProjectOptions(id) {
+    setOpenProjectOptions((prevId) => (prevId === id ? null : id));
+  }
+
+  const editProjectName = async () => {
+
   }
   
     
@@ -354,8 +377,33 @@ function Home() {
           <div className='project-list'>
             <ul>
               {projectList ? projectList.map((project) => (
-                <button className='project-button' 
-                onClick={() => loadProject(project.projectId)} key={project.projectId}>{project.projectName}</button>
+                <div key={project.projectId} className="project-container">
+                  <button
+                    className={selectedProjectId == project.projectId ? 'project-button selected' : 'project-button'}
+                    onClick={() => loadProject(project.projectId)} 
+                  >
+                    {project.projectName}
+                  </button>
+
+                  <button 
+                  className='project-button-options'
+                  onClick={() => toggleProjectOptions(project.projectId)}
+                  
+                  >
+                  ...
+                  </button>
+
+                  {openProjectOptions == project.projectId &&(
+                    <div className='project-options'>
+                      <div className='project-options-inner'>
+                        <button>Edit Name</button>
+                        <button>Delete</button>
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+                
               )) : null}
             </ul>
           </div>
@@ -377,7 +425,6 @@ function Home() {
             :
             null
           }
-        <Grid />
         
         <div className="content-overlay">
           
@@ -385,8 +432,8 @@ function Home() {
             
             
             <div className="tools-window-inner">
-              <h2>Tools</h2>
-            
+              
+            <button className='download-netlist' onClick={() => handleDownload(textToBeSaved)}>Download Netlist</button>
               <button className='clear' onClick={handleClearGates2}>Clear All Gates
               </button>
 

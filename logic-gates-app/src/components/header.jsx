@@ -19,7 +19,6 @@ function Header({ onSidebarToggle }) {
     // Clear any authentication tokens or session data here
     setLoggedin(false);
     setUser(null);
-    console.log('Logged out successfully');
   }
 
   return (

@@ -105,18 +105,6 @@ body {
   .popup-inner form{
     display: block;
   }
-
-  .popup-inner-register {
-    background-color: var(--theme-primary-color);
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
-    width: auto;
-  }
   
   .popup-inner h2 {
   margin-top: 0;
@@ -170,7 +158,19 @@ body {
     background-color: transparent;
     font-size: x-large;
   }
+  /****************** Register popup *********************/
 
+  .popup-inner-register {
+    background-color: var(--theme-primary-color);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+    width: auto;
+  }
   .popup-inner .register-button{
     background-color: white;
     color: black;
@@ -211,7 +211,7 @@ body {
   background: #333;
   color: white;
   padding: 20px;
-  transition: left 0.3s ease-in-out;
+  transition: left 0.2s ease-in-out;
   z-index: 11;
   border-radius: 8px;
 }
@@ -341,10 +341,6 @@ body {
   margin-top: 10px;
 }
 
-.sidebar .project-list{
-  display: flex;
-}
-
 .sidebar .project-list ul{
   padding: 0;
 }
@@ -359,8 +355,57 @@ body {
   font-size: large;
 }
 
-.sidebar .project-button:hover{
+.sidebar .project-button.selected{
   background-color: grey;
+}
+
+.sidebar .project-button:hover{
+  background-color: rgb(80, 80, 80);
+}
+
+.sidebar .project-button-options{
+  position: absolute;
+  background-color: transparent;
+  border: none;
+  color: white;
+  right: 20px;
+  padding: 10px;
+}
+
+.sidebar .project-button-options:hover{
+  background-color: grey;
+  border-radius: 8px;
+}
+
+.sidebar .project-options{
+  position: relative;
+  left: 180px;
+  top: -15px;
+  min-width: 40%;
+  display: block;
+}
+
+.sidebar .project-options-inner{
+  position: absolute;
+  color: white;
+  background-color: var(--theme-primary-color);
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #333;
+  z-index: 1;
+}
+
+.sidebar .project-options-inner button{
+  background-color: transparent;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  width: 100%;
+  padding: 10px;
+  font-size: medium;
+}
+.sidebar .project-options-inner button:hover{
+  background-color: #474e5d;
 }
 
 /********** Tools Window *************/
@@ -379,18 +424,13 @@ body {
   padding: 10px;
   color: white;
   z-index: 11;
+  display: block;
+  font-size: small;
 }
 
-.tools-window-header{
-  border-top: 1px solid black;
-  border-bottom: 1px solid black;
-  background-color: rgb(54, 54, 54);
-  color: white;
-  font-size: medium;
-  
-}
 
-.tools-window-inner button{
+
+.tools-window-inner .clear{
   background-color: rgb(201, 8, 8);
   color: white;
   border: none;
@@ -401,8 +441,23 @@ body {
 }
 
 .tools-window-inner button:hover{
-  background-color: white;
+  background-color: var(--button-hover-color);
   color: var(--theme-primary-color);
+}
+
+.tools-window-inner{
+  display: block;
+  width: 7em;
+}
+
+.tools-window-inner .download-netlist{
+  background-color: white;
+  color: black; 
+  border: none;
+  padding: 5px 5px;
+  cursor: pointer;
+  border-radius: 10px;
+  margin-bottom: 10px;
 }
 
 
@@ -413,8 +468,7 @@ body {
   z-index: 1; /* Lower value so other elements are above it */
   width: 100vw;
   height: 100vh;
-  pointer-events: none; /* Allow mouse events to pass through the SVG */
-  z-index: -1;
+  z-index: 1;
 }
 
 .content-overlay {
@@ -424,7 +478,7 @@ body {
   width: 100%;
   height: 100%;
    /* Higher value so it's on top of the SVG */
-   z-index: 0;
+   z-index: 1;
 }
 
 .content-area{
@@ -458,7 +512,7 @@ body {
   width: auto;
   min-width: 500px;
   height: auto;
-  left: 40vw;  /* Start closer to the left */
+  left: 40%;  /* Start closer to the left */
   top: 70vh;   /* Start closer to the top */
   border-radius: 10px;
   padding-top: 30px;
