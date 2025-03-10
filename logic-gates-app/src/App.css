@@ -499,6 +499,7 @@ body {
 .konvajs-content {
   position: unset !important;  /* Ensure it's visible */
   border: 2px solid black;  /* Optional, to visually see the area */
+  
 }
 
 

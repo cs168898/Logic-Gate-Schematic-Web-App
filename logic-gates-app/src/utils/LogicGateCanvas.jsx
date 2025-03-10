@@ -21,6 +21,12 @@ function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
   const { connections, setConnections } = useContext(ConnectionsContext);
   const { gatePositions, setGatePositions } = useContext(GatesPositionContext);
   const gridSize = gridSizeConst
+  const [stageScale, setStageScale] = useState(1);
+
+  const stageRef = useRef(null);
+  const scaleBy = 1.1; // Define the zoom scale factor
+  const minScale = 0.7;  // Prevent zooming out too much
+  const maxScale = 2;  // Allow zooming in up to this limit
 
   // Use useCallback to ensure a stable function reference
   const handleWirePositionUpdate = useCallback((gateID, positions) => { // useCallback to ensure that onWirePositionUpdate does not get re-created on every render.
@@ -50,10 +56,60 @@ function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
     stage.position({ x: newX, y: newY });
   };
 
+  
+
+  
+  // zoom function
+  function zoomStage(event) {
+    event.evt.preventDefault();
+    if (!stageRef.current) return;
+
+    const stage = stageRef.current;
+    const oldScale = stage.scaleX();
+    const pointerPos = stage.getPointerPosition();
+    if (!pointerPos) return;
+
+    // Determine zoom direction
+    const zoomIn = event.evt.deltaY < 0;
+    let newScale = zoomIn ? oldScale * scaleBy : oldScale / scaleBy;
+
+    // zoom limits
+    newScale = Math.max(minScale, Math.min(maxScale, newScale));
+    setStageScale(newScale);
+
+    // Adjust position to keep zoom centered on cursor
+    const mousePointTo = {
+      x: (pointerPos.x - stage.x()) / oldScale,
+      y: (pointerPos.y - stage.y()) / oldScale,
+    };
+
+    const stageBox = stage.getClientRect();
+    const stageWidth = stageBox.width;
+    const stageHeight = stageBox.height;
+    const boardWidth = stageWidth * newScale;
+    const boardHeight = stageHeight * newScale;
+
+    let newPos = {
+      x: pointerPos.x - mousePointTo.x * newScale,
+      y: pointerPos.y - mousePointTo.y * newScale,
+    };
+
+    newPos.x = Math.max(Math.min(newPos.x, 0), -(boardWidth - window.innerWidth));
+    newPos.y = Math.max(Math.min(newPos.y, 0), -(boardHeight - window.innerHeight));
+
+    
+
+    stage.scale({ x: newScale, y: newScale });
+    stage.position(newPos);
+    setStagePos(newPos);
+    stage.batchDraw();
+  }
+
 
   return (
   
     <Stage 
+    ref={stageRef}
     width={window.innerWidth} 
     height={window.innerHeight} 
     className='konvajs-container'
@@ -65,9 +121,14 @@ function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
     }}
     draggable = {true}
     onDragMove={handleDragMove}
+    onWheel={zoomStage}
+    scaleX={stageScale}
+    scaleY={stageScale}
   >   
       <Layer>
-      <Grid width={window.innerWidth} height={window.innerHeight} gridSize={gridSize} offsetX={stagePos.x} offsetY={stagePos.y} />
+      <Grid width={window.innerWidth} height={window.innerHeight} 
+      gridSize={gridSize} offsetX={stagePos.x} 
+      offsetY={stagePos.y} scale = {stageScale} />
       </Layer>
 
       <Layer>
