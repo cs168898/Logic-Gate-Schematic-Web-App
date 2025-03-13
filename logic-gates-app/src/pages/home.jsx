@@ -174,7 +174,14 @@ function Home() {
   const handleDeleteGate = () => {
     if (selectedGateId !== null) {
       // Remove the gate from gates
-      setGates((prev) => prev.filter((gate) => gate.id !== selectedGateId));
+      setGates((prev) => {
+        const updatedGates = Object.keys(prev).reduce((acc, levelKey) => {
+            acc[levelKey] = prev[levelKey].filter((gate) => gate.id !== selectedGateId);
+            return acc;
+        }, {});
+    
+        return updatedGates;
+      });
   
       // Remove the gate's positions from gatePositions
       setGatePositions((prev) => {
@@ -186,7 +193,9 @@ function Home() {
       
       // Remove the gate's text from textToBeSaved
       setTextToBeSaved((prevText) => {
-        const gateToDelete = gates.find((gate) => gate.id === selectedGateId);
+        const allGates = Object.values(gates).flat(); // Convert gates object into a single array
+
+        const gateToDelete = allGates.find((gate) => gate.id === selectedGateId);
         if (!gateToDelete || !gateToDelete.name) {
           return prevText; // If no matching gate, return old text
         }
@@ -218,6 +227,30 @@ function Home() {
   };
 
 /***************************** End Of Event Handlers ***************************/
+  function mergeUniqueGates(prevGates, newGateData) {
+    console.log("Previous Gates:", prevGates);
+    console.log("New Gates Being Added:", newGateData);
+
+    // Clone the previous gates structure to avoid mutation
+    const updatedGates = { ...prevGates };
+
+    Object.entries(newGateData).forEach(([level, newGates]) => {
+        if (!updatedGates[level]) {
+            updatedGates[level] = []; // Create level if it doesn't exist
+        }
+
+        // Filter out duplicates: keep only gates that do not exist in prevGates[level]
+        const uniqueNewGates = newGates.filter(newGate =>
+          !prevGates[level]?.some(prevGate => prevGate.id === newGate.id)
+        );
+
+        // Merge only unique gates
+        updatedGates[level] = [...updatedGates[level], ...uniqueNewGates];
+    });
+
+    console.log("Final Updated Gates (Duplicates Removed):", updatedGates);
+    return updatedGates; // Return updated gates without duplicates
+  }
 
 
   // Create the handleSubmit function to send userInput into backend
@@ -225,11 +258,24 @@ function Home() {
     try{
       console.log('handlesubmit called')
 
-      setTextToBeSaved((prevText) => {return mergeGates(prevText, userInput)});
 
-      const gateData = parseUserInput(userInput, gates); // Parse user input before sending it to LogicGateCanvas
-      console.log("Gate Data: ", gateData)
-      setGates([...gates, ...gateData]) // Keep track of all the logic gate inside the 'gates' variable
+      setTextToBeSaved((prevText) => {return mergeGates(prevText, userInput)});
+      
+      setGates(prevGates => {
+        const newGateData = parseUserInput(userInput, prevGates, isFirstRun); // Get new gates in object format
+        console.log("Gate Data: ", JSON.stringify(newGateData));
+
+        console.log("Previous Gates:", prevGates);
+        console.log("New Gates Being Added:", newGateData);
+    
+        // Merge the new levels into the existing structure
+        const updatedGates = mergeUniqueGates(prevGates, newGateData);
+        
+        console.log("Final Updated Gates:", updatedGates);
+        return updatedGates; // Return the whole object
+      });
+    
+     
       
       //const response = await axios.post('http://127.0.0.1:8000/logicgates/', gateData);
       //console.log("Logic Gate Created: ", response.data);
@@ -475,6 +521,8 @@ function Home() {
 }
 
 export default Home;
+
+
 
 /////////////////////////////   NOTES ////////////////////////////
 

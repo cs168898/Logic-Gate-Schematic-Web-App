@@ -16,7 +16,8 @@ export function CreateConnections({ selectedGateId, setSelectedGateId }) {
   const { gatePositions } = useContext(GatesPositionContext);
   
   // Filter gates except the selected (deleted) one
-  const gatesArray = gates.filter(gate => gate.id !== selectedGateId);
+  const gatesArray = Object.values(gates).flat().filter(gate => gate.id !== selectedGateId);
+  const gatesflat = Object.values(gates).flat()
 
 
   // Reverse the gatesArray to iterate in reverse order
@@ -86,7 +87,7 @@ export function CreateConnections({ selectedGateId, setSelectedGateId }) {
           const pathResult = getDetourPath(
             { x: matchingOutput.x, y: matchingOutput.y },
             { x: inputPosition.x, y: inputPosition.y },
-            gates,
+            gatesflat,
             window.innerWidth,
             window.innerHeight,
             wireTracker,

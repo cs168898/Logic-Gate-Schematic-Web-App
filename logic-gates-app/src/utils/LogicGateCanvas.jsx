@@ -105,6 +105,11 @@ function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
     stage.batchDraw();
   }
 
+  useEffect(() => {
+    console.log("gates in logicgatecanvas", gates)
+  }, [gates])
+
+  
 
   return (
   
@@ -132,7 +137,7 @@ function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
       </Layer>
 
       <Layer>
-        {gates.map((gate) => (
+        {Object.values(gates).flat().map((gate) => (
             <React.Fragment key={gate.id}>
               {/* Render gate shape based on type */}
               {gate.type.toUpperCase() === "AND" && (
