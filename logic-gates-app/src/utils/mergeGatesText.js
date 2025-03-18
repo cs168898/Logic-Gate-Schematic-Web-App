@@ -2,7 +2,7 @@ import { textToJsonb } from './textToJsonb';
 import { jsonbToText } from './jsonbToText';
 
 // This example merges gates from "newText" into the existing text "prevText."
-export function mergeGates(prevText, newText) {
+export function mergeGatesText(prevText, newText) {
   // Step 1: Convert existing text to array
   let prevArray = [];
   try {

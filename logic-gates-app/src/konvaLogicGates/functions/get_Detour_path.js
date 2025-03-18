@@ -6,6 +6,7 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight, wir
   // col = x
   // NOTICE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+    console.log('get detour path called')
   const yValuesSet = new Set();
   
   // 1) Build costGrid array

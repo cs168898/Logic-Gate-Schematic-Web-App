@@ -75,12 +75,10 @@ export function sortGates(levels){
                     gate.sorted = true;
                     // Add the gate to the tracking set
                     addedGates.add(gate.id);
-                } else{
-                    console.log(`gate has already been added to array ${gate}`)
                 }
 
             } else if(matchingInputCount >= 2 && gate.type.toUpperCase() !== 'NOT'){
-                console.log(`else if loop activated`)
+                
                 // if 2 inputs match the previous level output
                 // move the matching input to the front of the inputs array
                 // THIS IS TO SORT THE INPUT PINS
@@ -88,7 +86,7 @@ export function sortGates(levels){
                 // Check if the gate is already sorted to avoid re-sorting the input pins
                 if (gate.sorted) {
                     remainingGates.push(gate);
-                    console.log(`the gate: ${gate} has been sorted therefore skipping sorting for input pins`)
+                    
                     continue;
                 }
                 
@@ -101,7 +99,7 @@ export function sortGates(levels){
 
                 // Mark the gate as sorted
                 gate.sorted = true;
-                console.log(`the gate: ${gate} has been marked as sorted`)
+                
 
                 // Add the gate to the tracking set
                 addedGates.add(gate.id);
@@ -113,8 +111,6 @@ export function sortGates(levels){
                     gate.sorted = true;
                     addedGates.add(gate.id);
                     remainingGates.push(gate);
-                } else{
-                    console.log(`gate has already been added to array ${gate}`)
                 }
             }
 
@@ -123,7 +119,7 @@ export function sortGates(levels){
         const cleanedPrioritizedQueue = prioritizedQueue.filter(Boolean);
 
         levels[levelKeys[i]] = [...cleanedPrioritizedQueue, ...remainingGates];
-        console.log('levels:', levels)
+        
     }
     return levels;
 }

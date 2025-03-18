@@ -5,7 +5,7 @@ export function collectGateLevel(gatesArray) {
 
     const unplaced = [...gatesArray]; // copy the gatesArray so we can modify the array without touching original
     const levels = {};          // Will store gates by level, e.g., levels.level1 = [...]
-    const outputs = new Set();  // Tracks outputs that are already "resolved"
+    const CurrentOutputs = new Set();  // Tracks outputs that are already "resolved"
     let levelIndex = 1;         // Label levels as level1, level2, etc.
 
     // Step 1: get all outputs from the gates
@@ -23,7 +23,8 @@ export function collectGateLevel(gatesArray) {
     
     // Step 3: Initialize outputs with external inputs
     for (const input of externalInputs) {
-        outputs.add(input);
+      CurrentOutputs.add(input);
+      console.log('external inputs: ', input)
     }
 
     // Continue until we've assigned every gate or cannot proceed
@@ -37,12 +38,12 @@ export function collectGateLevel(gatesArray) {
 
         // Check if this gate can be placed:
         //   => "placeable" if all inputs are already in the outputs set
-        const canPlace = !inputs.some(input => !outputs.has(input));
+        const canPlace = !inputs.some(input => !CurrentOutputs.has(input));
 
         if (canPlace) {
           currentLevel.push(gate);
           unplaced.splice(i, 1);  // Remove from the unplaced list
-          outputs.add(gate.output); // Add its output to resolved signals
+          CurrentOutputs.add(gate.output); // Add its output to resolved signals
         }
         
       }

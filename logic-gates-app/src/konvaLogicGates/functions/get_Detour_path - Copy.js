@@ -109,10 +109,6 @@ export function getDetourPath(output, input, gates, boardWidth, boardHeight, wir
     return [row, col];
   });
 
-
-  if (!screenPath){
-    console.log("screenPath is null")
-  }
   return {screenPath, allGridPoints, gridPath};
 }
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useMemo } from 'react';
+import React, { useEffect, useContext, useMemo, useRef } from 'react';
 import { gridSizeConst } from '../../utils/gridSize';
 import { Layer, Line } from 'react-konva';
 import { getDetourPath } from './get_Detour_path';
@@ -10,7 +10,7 @@ import { GatesPositionContext } from '../../context/GatesPositionContext';
 /**
  * Creates the wires for all gates except the selected/deleted gate.
  */
-export function CreateConnections({ selectedGateId, setSelectedGateId }) {
+export function CreateConnections({ selectedGateId, setSelectedGateId, width, height }) {
   const { gates } = useContext(GatesContext);
   const { connections, setConnections } = useContext(ConnectionsContext);
   const { gatePositions } = useContext(GatesPositionContext);
@@ -19,12 +19,17 @@ export function CreateConnections({ selectedGateId, setSelectedGateId }) {
   const gatesArray = Object.values(gates).flat().filter(gate => gate.id !== selectedGateId);
   const gatesflat = Object.values(gates).flat()
 
+  const stageSizeRef = useRef({ width, height });
 
-  // Reverse the gatesArray to iterate in reverse order
+  useEffect(() => {
+    stageSizeRef.current = { width, height }; // ✅ Update only when necessary
+  }, [width, height]);
+
+  //  Clone the gates array
   const reversedGatesArray = [...gatesArray];
   // Build a quick list of all outputs
   const allOutputs = [];
-  for (const gate of reversedGatesArray) {
+  for (const gate of gatesArray) {
     const positions = gatePositions[gate.id];
     if (positions && Array.isArray(positions.outputPosition)) {
       for (const output of positions.outputPosition) {
@@ -40,7 +45,7 @@ export function CreateConnections({ selectedGateId, setSelectedGateId }) {
 
   // Build a quick list of all inputs
   const allInputs = [];
-  for (const gate of reversedGatesArray) {
+  for (const gate of gatesArray) {
     const positions = gatePositions[gate.id];
     if (positions && Array.isArray(positions.inputPositions)) {
       for (const input of positions.inputPositions) {
@@ -65,7 +70,7 @@ export function CreateConnections({ selectedGateId, setSelectedGateId }) {
     const wireTracker = {};
     const wiresObj = {};
 
-    for (const gate of reversedGatesArray) {
+    for (const gate of gatesArray) {
       const positions = gatePositions[gate.id];
       if (!positions) continue;
 
@@ -88,8 +93,7 @@ export function CreateConnections({ selectedGateId, setSelectedGateId }) {
             { x: matchingOutput.x, y: matchingOutput.y },
             { x: inputPosition.x, y: inputPosition.y },
             gatesflat,
-            window.innerWidth,
-            window.innerHeight,
+            stageSizeRef.current.width, stageSizeRef.current.height,
             wireTracker,
             inputPosition.inputName,
             allInputOutputPositions
@@ -148,7 +152,7 @@ export function CreateConnections({ selectedGateId, setSelectedGateId }) {
    */
   useEffect(() => {
     if (!areSame(cleanedWires, connections)) {
-      console.log('connections are not the same, therefore setting connetions');
+      
       setConnections(cleanedWires);
     }
   }, [cleanedWires]);

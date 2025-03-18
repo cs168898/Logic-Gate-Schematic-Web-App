@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,9 +39,15 @@ public class UserController {
 
     // Build Add User REST API
     @PostMapping("/register")
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto UserDto, @RequestParam String password){
-        UserDto savedUser = UserService.createUser(UserDto, password);
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED); 
+    public ResponseEntity<?> createUser(@RequestBody UserDto UserDto, @RequestParam String password){
+        try{
+            UserDto savedUser = UserService.createUser(UserDto, password);
+            return new ResponseEntity<>(savedUser, HttpStatus.CREATED); 
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+        
+        
     }
 
     // Build Get User REST API
@@ -59,7 +66,7 @@ public class UserController {
     }
 
     // Build Update User REST API
-    @PutMapping("{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<UserDto> updateUser(@PathVariable("id") Long userId, 
                                               @RequestBody UserDto updatedUser,
                                               @RequestParam(required = false) String password){
@@ -68,7 +75,7 @@ public class UserController {
     }
 
     // Build Delete User REST API
-    @DeleteMapping("{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable("id") Long userId){
         UserService.deleteUser(userId);
         return ResponseEntity.ok("Employee Deleted Successfully");
@@ -81,6 +88,20 @@ public class UserController {
         return ResponseEntity.ok(userDto);
     }   
     
+    @GetMapping("/exists/check-username")
+    public ResponseEntity<?> checkUsername(@RequestParam(required = true) String username) {
+        try {
+            boolean exists = UserService.existByUsername(username);
+            return ResponseEntity.ok(exists);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/exists/check-email")
+    public boolean checkEmail(@RequestParam(required = true) String email) {
+        return UserService.existByEmail(email);
+    }
     
 }
 

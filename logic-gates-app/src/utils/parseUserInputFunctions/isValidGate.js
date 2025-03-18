@@ -23,7 +23,7 @@ import { showToast } from "../showToast";
 
 
     if (!gateToBeProcessed.input) {
-        showToast(`${gateToBeProcessed.name} input is invalid.`);
+        showToast(`${gateToBeProcessed.name} input is missing.`);
         return false;
     }
 
@@ -33,7 +33,6 @@ import { showToast } from "../showToast";
     .find(existingGate => existingGate.name === gateToBeProcessed.name);
 
     if (duplicateNameGate) {
-        showToast(`ERROR: ${gateToBeProcessed.name} already exists`);
         return false;
     }
 
@@ -42,7 +41,7 @@ import { showToast } from "../showToast";
     .find(existingGate => existingGate.output === gateToBeProcessed.output);
 
     if (duplicateOutputGate) {
-        showToast(`ERROR: ${gateToBeProcessed.name} has the same output as ${duplicateOutputGate.name}`);
+        showToast(`ERROR: ${gateToBeProcessed.name} has the same output as ${duplicateOutputGate.name}, skipping this gate`);
         return false;
     }
     

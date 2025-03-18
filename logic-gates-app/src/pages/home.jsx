@@ -18,15 +18,15 @@ import { textToJsonb } from '../utils/textToJsonb';
 import { jsonbToText } from '../utils/jsonbToText';
 import { SuccessContext } from '../context/SuccessContext';
 import { saveProject } from '../../services/saveProject';
-import { mergeGates } from '../utils/mergeGates';
+import { mergeGatesText } from '../utils/mergeGatesText';
 import { createProject } from '../../services/createNewProject';
 import handleDownload from '../konvaLogicGates/functions/downloadTextFile';
+import DOMPurify from 'dompurify'
 
 function Home() {
   /***************************** useState Definitions ***************************/
   const [userInput, setuserInput] = useState("")
-  const [savedUserInput, setSavedUserInput] = useState([]) // this will store the user input from the database
-  const [sessionUserInput, setSessionUserInput] = useState([]) // this will store the current session's JSON data
+  
 
   const [projectList, setProjectList] = useState([]) // this will store the list of projects from the database
 
@@ -48,6 +48,8 @@ function Home() {
 
   const [namePopup, setNamePopup] = useState(false);
   const [nameInput, setNameInput] = useState("");
+
+  
 
 
   const { gates, setGates } = useContext(GatesContext);
@@ -74,8 +76,6 @@ function Home() {
       if (loggedin){
         getAllProjects(user.id).then((response) => {
           setProjectList(response.data);
-          console.log(response)
-          console.log('projectList: ', projectList);
         }).catch(error => {
           console.error(error);
         })
@@ -94,28 +94,24 @@ function Home() {
     const prevGatesRef = useRef();
     const isFirstRun = useRef(true);
 
+    const [isfirstParse, setIsfirstParse] = useState(true);
     // Use useEffect to monitor changes in the gates state
     useEffect(() => {
       if (isFirstRun.current) {
         isFirstRun.current = false;
         prevGatesRef.current = gates;
-        console.log('issuccess first run')
-        console.log('prevGatesRef.current =', prevGatesRef.current)
+
         return;
       }
   
       // check if the current gates created matches the previous gates , if it doesnt, means it was successful
       if (prevGatesRef.current && JSON.stringify(prevGatesRef.current) !== JSON.stringify(gates)) {
         setIsSuccess(true);
-        console.log('subsequent gate changes, setissuccess set to true')
-        console.log('prevGatesRef.current =', prevGatesRef.current)
         prevGatesRef.current = gates; // Update the previous state of the gates
         
 
       } else {
         setIsSuccess(false);
-        console.log('subsequent gate changes, setissuccess set to false')
-        console.log('prevGatesRef.current =', prevGatesRef.current)
       }
   
     }, [gates]);
@@ -131,15 +127,10 @@ function Home() {
             if (response.data){
               let projectData = response.data
               setCurrentProjectInfo(projectData);
-              setuserInput(processedText);
-              setInputAreaText(processedText);
-              handleSubmit(processedText);
+              setuserInput(DOMPurify.sanitize(processedText));
+              setInputAreaText(DOMPurify.sanitize(processedText));
+              handleSubmit(DOMPurify.sanitize(processedText));
             }
-            console.log('loaded project successfully', response)
-            console.log('currentprojectinfo: ', JSON.stringify(currentProjectInfo) )
-            console.log('currentprojectinfo after awhile: ', currentProjectInfo)
-            console.log('currenprojectinfo.id: ', JSON.stringify(currentProjectInfo.id))
-            console.log()
           } catch (error) {
             console.error("error loading project:", error);
           } finally {
@@ -207,12 +198,9 @@ function Home() {
       
           // 2) Remove the gate whose "name" matches gateToDelete.name
           const updatedArray = prevArray.filter((g) => g.name !== gateToDelete.name);
-          console.log('updatedArray: ',updatedArray)
           // 3) Convert updated array back to text
           const updatedJsonString = JSON.stringify(updatedArray, null, 2);
-          console.log('updatedJsonString', updatedJsonString)
           const updatedText = jsonbToText(updatedJsonString);
-          console.log('updatedText: ', updatedText)
           return updatedText.trim();
       
         } catch (error) {
@@ -228,8 +216,6 @@ function Home() {
 
 /***************************** End Of Event Handlers ***************************/
   function mergeUniqueGates(prevGates, newGateData) {
-    console.log("Previous Gates:", prevGates);
-    console.log("New Gates Being Added:", newGateData);
 
     // Clone the previous gates structure to avoid mutation
     const updatedGates = { ...prevGates };
@@ -248,7 +234,6 @@ function Home() {
         updatedGates[level] = [...updatedGates[level], ...uniqueNewGates];
     });
 
-    console.log("Final Updated Gates (Duplicates Removed):", updatedGates);
     return updatedGates; // Return updated gates without duplicates
   }
 
@@ -256,29 +241,20 @@ function Home() {
   // Create the handleSubmit function to send userInput into backend
   const handleSubmit = async (userInput) =>{
     try{
-      console.log('handlesubmit called')
 
 
-      setTextToBeSaved((prevText) => {return mergeGates(prevText, userInput)});
+      setTextToBeSaved((prevText) => {return mergeGatesText(prevText, userInput)});
       
       setGates(prevGates => {
-        const newGateData = parseUserInput(userInput, prevGates, isFirstRun); // Get new gates in object format
-        console.log("Gate Data: ", JSON.stringify(newGateData));
-
-        console.log("Previous Gates:", prevGates);
-        console.log("New Gates Being Added:", newGateData);
+        const newGateData = parseUserInput(userInput, prevGates, isfirstParse, setIsfirstParse); // Get new gates in object format
     
         // Merge the new levels into the existing structure
         const updatedGates = mergeUniqueGates(prevGates, newGateData);
-        
-        console.log("Final Updated Gates:", updatedGates);
+
         return updatedGates; // Return the whole object
       });
     
      
-      
-      //const response = await axios.post('http://127.0.0.1:8000/logicgates/', gateData);
-      //console.log("Logic Gate Created: ", response.data);
     } catch (error){
       console.error("Error: ", error.message) // Log the error if there are errors that happened in the backend
     }
@@ -296,9 +272,7 @@ function Home() {
       setTextToBeSaved(''); // Clear the text to be saved
       // Trigger an update in the next render
       setCleared(true);   // Now the "cleared" flag flips in the next re-render
-
-      //const response = await axios.post('http://127.0.0.1:8000/logicgates/', gateData);
-      //console.log("Logic Gate Created: ", response.data);
+      setIsfirstParse(true);
     } catch (error){
       console.error("Error: ", error.message) // Log the error if there are errors that happened in the backend
     }
@@ -315,11 +289,9 @@ function Home() {
       setuserInput('');
       setTextToBeSaved(''); // Clear the text to be saved
       setInputAreaText('')
-      // Trigger an update in the next render
+      setIsfirstParse(true);
+    
       
-
-      //const response = await axios.post('http://127.0.0.1:8000/logicgates/', gateData);
-      //console.log("Logic Gate Created: ", response.data);
     } catch (error){
       console.error("Error: ", error.message) // Log the error if there are errors that happened in the backend
     }
@@ -352,19 +324,11 @@ function Home() {
     }
 
     try{
-      console.log('current project id: ', latestProjectInfo.projectId);
-      console.log('current project name: ', latestProjectInfo.projectName);
-
-      console.log('textToBeSaved: ', textToBeSaved)
-
       const jsonbText = textToJsonb(textToBeSaved)
-      console.log('jsonbText = ', jsonbText)
       const response = await saveProject(latestProjectInfo.projectId, latestProjectInfo.projectName, jsonbText);
-      console.log('response', response);
       alert('project successfully saved');
       setIsSuccess(false);
       } catch (error){
-      console.error('error saving project: ', error)
       alert('proejct failed to save');
 
       }
@@ -374,9 +338,10 @@ function Home() {
       if (!loggedin){
         alert('Log in first');
       } else {
-        const response = await createProject(nameInput, user?.id)
-        console.log('response: ', response);
-        toggleNamePopup();
+        toggleNamePopup(); // close the name popup window
+        const response = await createProject(DOMPurify.sanitize(nameInput), user?.id)
+
+        
   
         // refresh projectslist
         setProjectList((prevList) => [...prevList, response.data]);
@@ -500,7 +465,8 @@ function Home() {
                 placeholder='-Enter your logic here-'
                 autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck="false"
                 value = {inputAreaText}
-                onChange={(e) => setInputAreaText(e.target.value)}
+                onChange={(e) => setInputAreaText(DOMPurify.sanitize(e.target.value))}
+                maxLength={4000}
               ></textarea>
               <div className="button-wrapper">
                 <button className="create-button" onClick={() => handleSubmit(inputAreaText)}>

@@ -22,11 +22,18 @@ function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
   const { gatePositions, setGatePositions } = useContext(GatesPositionContext);
   const gridSize = gridSizeConst
   const [stageScale, setStageScale] = useState(1);
+  const resizeTimeoutRef = useRef(null);
 
   const stageRef = useRef(null);
   const scaleBy = 1.1; // Define the zoom scale factor
   const minScale = 0.7;  // Prevent zooming out too much
   const maxScale = 2;  // Allow zooming in up to this limit
+
+  const [stageDimensions, setStageDimensions] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
+  
 
   // Use useCallback to ensure a stable function reference
   const handleWirePositionUpdate = useCallback((gateID, positions) => { // useCallback to ensure that onWirePositionUpdate does not get re-created on every render.
@@ -54,6 +61,8 @@ function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
 
     // Force the stage to stay within the constrained area
     stage.position({ x: newX, y: newY });
+
+    
   };
 
   
@@ -103,13 +112,15 @@ function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
     stage.position(newPos);
     setStagePos(newPos);
     stage.batchDraw();
+    // ✅ Debounce the update
+    clearTimeout(resizeTimeoutRef.current);
+    resizeTimeoutRef.current = setTimeout(() => setStageDimensions({
+      width: stageWidth * newScale,
+      height: stageHeight * newScale
+    }), 1000);
+
+    
   }
-
-  useEffect(() => {
-    console.log("gates in logicgatecanvas", gates)
-  }, [gates])
-
-  
 
   return (
   
@@ -173,6 +184,8 @@ function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
           <CreateConnections
             selectedGateId={selectedGateId}
             setSelectedGateId={setSelectedGateId}
+            width={stageDimensions.width}
+            height={stageDimensions.height}
           /> 
       </Layer>
     </Stage>

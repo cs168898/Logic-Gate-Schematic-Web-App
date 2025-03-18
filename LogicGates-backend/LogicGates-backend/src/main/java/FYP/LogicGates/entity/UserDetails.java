@@ -24,7 +24,7 @@ public class UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // auto increment pri key ID
-    private Long id;
+    private Long userid;
 
     @Column(name = "username", nullable = false)
     private String username;
@@ -37,11 +37,11 @@ public class UserDetails {
 
     // Getters and Setters
     public Long getId() {
-        return id;
+        return userid;
     }
 
     public void setId(Long id) {
-        this.id = id;
+        this.userid = id;
     }
 
     public String getUserName() {

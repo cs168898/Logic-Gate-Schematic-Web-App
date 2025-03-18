@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { loginUser } from '../../services/userLogin';
 import Register from "./register";
+import DOMPurify from 'dompurify'
 
 function Login({ toggle, setLoggedin, setUser }) {
     const [username, setUsername] = useState('');
@@ -29,6 +30,8 @@ function Login({ toggle, setLoggedin, setUser }) {
         
     }
 
+    const sanitizeInput = (input) => input.replace(/[^a-zA-Z0-9_-]/g, "");  // Only allow letters, numbers, _ and -
+
 
     return (
         <div className="popup">
@@ -37,11 +40,11 @@ function Login({ toggle, setLoggedin, setUser }) {
                 <form onSubmit={handleLogin}>
                     <label>
                         Username:
-                        <input type="text" value={username} onChange={e => setUsername(e.target.value)} />
+                        <input type="text" value={username} maxLength={25} onChange={e => setUsername(sanitizeInput(e.target.value))} />
                     </label>
                     <label>
                         Password:
-                        <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
+                        <input type="password" value={password} maxLength={100} onChange={e => setPassword(e.target.value)} />
                     </label>
                     <button type="submit">Login</button>
                     

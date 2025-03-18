@@ -7,6 +7,7 @@ package FYP.LogicGates.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import FYP.LogicGates.dto.UserDto;
@@ -29,9 +30,24 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserDto createUser(UserDto userDto, String password) {
+        // Check if username already exists
+        if (userRepository.existsByUsername(userDto.getUsername().trim().toLowerCase())) {
+            throw new IllegalArgumentException("Username already exists!");
+        }
 
+        // Check if email already exists
+        if (userRepository.existsByEmail(userDto.getEmail().trim().toLowerCase())) {
+            throw new IllegalArgumentException("Email already exists!");
+        }
+
+        // Normalize username and email
+        userDto.setUsername(userDto.getUsername().trim().toLowerCase());
+        userDto.setEmail(userDto.getEmail().trim().toLowerCase());
+
+        // Hash the password
         String hashedPassword = passwordEncoder.encode(password);
 
+        // Map DTO to entity and save
         UserDetails user = UserMapper.mapToUser(userDto, hashedPassword);
         UserDetails savedUser = userRepository.save(user);
 
@@ -95,4 +111,15 @@ public class UserServiceImpl implements UserService{
     }
 
     
+    @Override
+    public Boolean existByUsername(String username) {
+        System.out.println("Checking username: " + username);
+        return userRepository.existsByUsername(username.trim().toLowerCase());
+    }
+
+    @Override
+    public Boolean existByEmail(String email) {
+        System.out.println("Checking email: " + email);
+        return userRepository.existsByEmail(email.trim().toLowerCase());
+    }
 }

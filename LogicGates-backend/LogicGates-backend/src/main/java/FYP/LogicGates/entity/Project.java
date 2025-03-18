@@ -39,7 +39,7 @@ public class Project {
     private String projectJSON;
 
     @ManyToOne
-    @JoinColumn(name = "userid", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "userid", referencedColumnName = "userid", nullable = false)
     private UserDetails user;
 
 }

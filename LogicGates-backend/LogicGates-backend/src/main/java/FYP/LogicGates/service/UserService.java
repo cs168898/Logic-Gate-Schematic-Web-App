@@ -20,4 +20,8 @@ public interface UserService {
     void deleteUser(Long userId);
 
     UserDto loginUser(String username, String password);
+
+    Boolean existByUsername(String username);
+
+    Boolean existByEmail(String email);
 }

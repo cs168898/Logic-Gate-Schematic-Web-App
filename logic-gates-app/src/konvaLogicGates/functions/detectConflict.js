@@ -61,9 +61,7 @@ export function detectConflict(gridCoords, wireTracker, pixelCoords, endDestinat
         // compare the conflict cell with the *next* cell in that wirepath
         // as the next path should also have the same X or Y axis if its in a straight line
         const [nextRow, nextCol] = wirePath[conflictIndex + 1] // but what if there is no next index
-        if (!nextRow || !nextCol){
-            console.log(`nextRow variable and nextCol variable not found`)
-        }
+        
         let direction;
         if (row === nextRow && col !== nextCol){
           direction = 'horizontal';
@@ -109,8 +107,6 @@ export function detectConflict(gridCoords, wireTracker, pixelCoords, endDestinat
         }
       }
     }
-    // convert it back into pixels for pixelCoords
-    console.log(`pixelCoords and gridCoords`, pixelCoords, gridCoords);
     return [pixelCoords, gridCoords];
   }
 
