@@ -12,6 +12,7 @@ import { ConnectionsContext } from '../context/ConnectionsContext';
 import { GatesContext } from '../context/GatesContext';
 import { GatesPositionContext } from '../context/GatesPositionContext';
 import { gridSizeConst } from './gridSize';
+import { debounce } from 'lodash';
 
 
 function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
@@ -33,6 +34,39 @@ function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
     width: window.innerWidth,
     height: window.innerHeight
   });
+
+  // Calculate the rightmost and downward-most gate positions
+  const calculateStageDimensions = useCallback(() => {
+    const allGates = Object.values(gates).flat();
+    if (allGates.length === 0) {
+      return { width: window.innerWidth, height: window.innerHeight }; // Default dimensions
+    }
+
+    const rightmostX = Math.max(...allGates.map((gate) => gate.x * gridSizeConst)) + gridSizeConst * 5; // Add padding
+    const downwardMostY = Math.max(...allGates.map((gate) => gate.y * gridSizeConst)) + gridSizeConst * 5; // Add padding
+
+    return {
+      width: Math.max(rightmostX, window.innerWidth), // Ensure it doesn't shrink below the viewport
+      height: Math.max(downwardMostY, window.innerHeight),
+    };
+  }, [gates]);
+
+  // Update stage dimensions when gates change
+  useEffect(() => {
+    setStageDimensions(calculateStageDimensions());
+  }, [gates, calculateStageDimensions]);
+
+  const updateStageDimensions = debounce(() => {
+    setStageDimensions({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+  }, 200);
+  
+  useEffect(() => {
+    window.addEventListener('resize', updateStageDimensions);
+    return () => window.removeEventListener('resize', updateStageDimensions);
+  }, []);
   
 
   // Use useCallback to ensure a stable function reference
@@ -84,7 +118,7 @@ function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
 
     // zoom limits
     newScale = Math.max(minScale, Math.min(maxScale, newScale));
-    setStageScale(newScale);
+    
 
     // Adjust position to keep zoom centered on cursor
     const mousePointTo = {
@@ -106,18 +140,13 @@ function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
     newPos.x = Math.max(Math.min(newPos.x, 0), -(boardWidth - window.innerWidth));
     newPos.y = Math.max(Math.min(newPos.y, 0), -(boardHeight - window.innerHeight));
 
-    
+    setStageScale(newScale);
+    setStagePos(newPos);
 
     stage.scale({ x: newScale, y: newScale });
     stage.position(newPos);
-    setStagePos(newPos);
     stage.batchDraw();
-    // ✅ Debounce the update
-    clearTimeout(resizeTimeoutRef.current);
-    resizeTimeoutRef.current = setTimeout(() => setStageDimensions({
-      width: stageWidth * newScale,
-      height: stageHeight * newScale
-    }), 1000);
+
 
     
   }
