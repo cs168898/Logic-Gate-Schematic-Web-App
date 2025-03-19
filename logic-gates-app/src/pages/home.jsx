@@ -237,23 +237,27 @@ function Home() {
     return updatedGates; // Return updated gates without duplicates
   }
 
+  useEffect(() => {
+    // function to merge existing gates with new user input
+    setTextToBeSaved((prevText) => {return mergeGatesText(prevText, userInput, gates)});
+    console.log('textToBeSaved = ', textToBeSaved)
+  }, [gates])
 
   // Create the handleSubmit function to send userInput into backend
   const handleSubmit = async (userInput) =>{
     try{
+      console.log('isFirstParse in handleSubmit: ', isfirstParse)
 
-
-      setTextToBeSaved((prevText) => {return mergeGatesText(prevText, userInput)});
-      
       setGates(prevGates => {
         const newGateData = parseUserInput(userInput, prevGates, isfirstParse, setIsfirstParse); // Get new gates in object format
     
         // Merge the new levels into the existing structure
         const updatedGates = mergeUniqueGates(prevGates, newGateData);
-
+        console.log('updatedGates: ', updatedGates)
         return updatedGates; // Return the whole object
       });
-    
+
+      setuserInput(userInput);
      
     } catch (error){
       console.error("Error: ", error.message) // Log the error if there are errors that happened in the backend
@@ -273,6 +277,7 @@ function Home() {
       // Trigger an update in the next render
       setCleared(true);   // Now the "cleared" flag flips in the next re-render
       setIsfirstParse(true);
+      console.log('isFirstParse handleClearGates1', isfirstParse)
     } catch (error){
       console.error("Error: ", error.message) // Log the error if there are errors that happened in the backend
     }
@@ -288,9 +293,8 @@ function Home() {
       setSelectedGateId(null); // Clear selection
       setuserInput('');
       setTextToBeSaved(''); // Clear the text to be saved
-      setInputAreaText('')
       setIsfirstParse(true);
-    
+      console.log('isFirstParse handleClearGates2', isfirstParse)
       
     } catch (error){
       console.error("Error: ", error.message) // Log the error if there are errors that happened in the backend

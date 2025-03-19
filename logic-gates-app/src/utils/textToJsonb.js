@@ -37,6 +37,8 @@ export function textToJsonb(text) {
       } else if (!isNaN(rawValue)) {
         // e.g. "200" → number 200
         currentGate[key] = Number(rawValue);
+      } else if(key == 'input'){
+        currentGate[key] = [rawValue]
       } else {
         // Otherwise store as string
         currentGate[key] = rawValue;

@@ -1,3 +1,4 @@
+import { faL } from "@fortawesome/free-solid-svg-icons";
 import { showToast } from "../showToast";
  
  // Helper function to validate gate data before adding it to the array
@@ -36,15 +37,31 @@ import { showToast } from "../showToast";
         return false;
     }
 
+    // find for duplicate output in existing gates
     const duplicateOutputGate = Object.values(existingGates)
     .flat()
-    .find(existingGate => existingGate.output === gateToBeProcessed.output);
+    .find(existingGate => existingGate.output == gateToBeProcessed.output);
 
-    if (duplicateOutputGate) {
-        showToast(`ERROR: ${gateToBeProcessed.name} has the same output as ${duplicateOutputGate.name}, skipping this gate`);
+    // find for duplicate output in current user input
+    const allParsedOutputs = new Set(gatesArray.flatMap(g => g.output))
+    if (allParsedOutputs.has(gateToBeProcessed.output)){
+        showToast(`ERROR: Circular dependency detected! Output ${gateToBeProcessed.output} is already a required input.`)
         return false;
     }
     
+    if (duplicateOutputGate) {
+        showToast(`ERROR: ${gateToBeProcessed.name} has the same output as ${duplicateOutputGate.name}, Circular dependency detected`);
+        return false;
+    }
+
+
+    //   // ✅ Check for circular dependencies: If output exists as an input, reject
+    // const allParsedInputs = new Set(gatesArray.flatMap(g => g.inputs));
+    
+    // if (allParsedInputs.has(gateToBeProcessed.output)) {
+    //     showToast(`ERROR: Circular dependency detected! Output ${gateToBeProcessed.output} is already a required input.`);
+    //     return false;
+    // }
 
     
 

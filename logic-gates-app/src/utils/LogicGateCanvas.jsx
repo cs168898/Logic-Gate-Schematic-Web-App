@@ -22,11 +22,11 @@ function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
   const { connections, setConnections } = useContext(ConnectionsContext);
   const { gatePositions, setGatePositions } = useContext(GatesPositionContext);
   const gridSize = gridSizeConst
-  const [stageScale, setStageScale] = useState(1);
+  const [stageScale, setStageScale] = useState(0.8);
   const resizeTimeoutRef = useRef(null);
 
   const stageRef = useRef(null);
-  const scaleBy = 1.1; // Define the zoom scale factor
+  const scaleBy = 1.12; // Define the zoom scale factor
   const minScale = 0.7;  // Prevent zooming out too much
   const maxScale = 2;  // Allow zooming in up to this limit
 
@@ -150,13 +150,14 @@ function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
 
     
   }
+  
 
   return (
   
     <Stage 
     ref={stageRef}
-    width={window.innerWidth} 
-    height={window.innerHeight} 
+    width={stageDimensions.width} 
+    height={stageDimensions.height} 
     className='konvajs-container'
     onClick={(e) => {
       // Check if the click is on the stage itself (not on any shape)

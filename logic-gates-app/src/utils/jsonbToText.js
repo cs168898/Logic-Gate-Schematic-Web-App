@@ -15,7 +15,7 @@ export function jsonbToText(input) {
     }
 
     // Define the desired key order
-    const keyOrder = ["name", "type", "input", "output", "x", "y"];
+    const keyOrder = ["name", "type", "input", "output","level", "x", "y"];
 
     // Function to reorder keys based on the predefined order
     function reorderKeys(obj, keyOrder) {

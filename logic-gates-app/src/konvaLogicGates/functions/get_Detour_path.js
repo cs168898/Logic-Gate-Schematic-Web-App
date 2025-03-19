@@ -180,19 +180,21 @@ function aStarPathPixel(startX, startY, endX, endY, costGrid, boardWidth, boardH
   if (endX > startX + gridSizeConst * gridApart){
     if (endY < startY) {
       // Heavily encourage Up by using a bigger negative penalty for Y starting below and ending ontop
+      // Heavily discourage moving backwards ( left )
       directions = [
         [0, -step, -1.4],  // Up gets -1.0
         [step, 0,  0],     // Right
         [0, step, 0],  // Down
-        [-step, 0,  0]     // Left
+        [-step, 0,  1]     // Left
       ];
     } else{
       // Heavily encourage Down by using a bigger negative penalty for Y starting above and ending below
+      // Heavily discourage moving backwards ( left )
       directions = [
         [0, -step, 0],  // Up gets -1.0
         [step, 0,  0],     // Right
         [0, step, -1.4],  // Down
-        [-step, 0,  0]     // Left
+        [-step, 0,  1]     // Left
       ];
     }
   } else{
@@ -213,6 +215,7 @@ function aStarPathPixel(startX, startY, endX, endY, costGrid, boardWidth, boardH
 
   const parent = new Map();
   const openSet = [];
+  const gScore = {};
   
   function nodeKey(x, y) {
     return `${x},${y}`;
@@ -226,7 +229,7 @@ function aStarPathPixel(startX, startY, endX, endY, costGrid, boardWidth, boardH
     dir: null
   });
 
-  const gScore = {};
+  
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       gScore[nodeKey(c * step + step / 2, r * step + step / 2)] = Number.POSITIVE_INFINITY;
@@ -278,6 +281,7 @@ function aStarPathPixel(startX, startY, endX, endY, costGrid, boardWidth, boardH
            // Determine the direction we are moving in this step
       const newDir = directionFromDxDy(dx, dy);
       // If we changed direction compared to currentDir, add turnCost
+      // this is to discourage random turns
       const isTurning = currentDir && (currentDir !== newDir);
       const extraTurn = isTurning ? turnCost : 0;
 

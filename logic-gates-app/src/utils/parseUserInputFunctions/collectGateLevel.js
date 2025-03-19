@@ -3,7 +3,8 @@
 
 export function collectGateLevel(gatesArray) {
 
-    const unplaced = [...gatesArray]; // copy the gatesArray so we can modify the array without touching original
+    
+    const unplacedGates = [...gatesArray]; // copy the gatesArray so we can modify the array without touching original
     const levels = {};          // Will store gates by level, e.g., levels.level1 = [...]
     const CurrentOutputs = new Set();  // Tracks outputs that are already "resolved"
     let levelIndex = 1;         // Label levels as level1, level2, etc.
@@ -28,37 +29,83 @@ export function collectGateLevel(gatesArray) {
     }
 
     // Continue until we've assigned every gate or cannot proceed
-    while (unplaced.length > 0) {
+    while (unplacedGates.length > 0) {
+      console.log("Before processing level", levelIndex, "CurrentOutputs:", [...CurrentOutputs]);
       const currentLevel = [];
   
       // Iterate backward so we can remove gates without messing up indices
-      for (let i = unplaced.length - 1; i >= 0; i--) {
-        const gate = unplaced[i];
+      // how this process works is that we iterate backwards then check if the current gate's inputs is included 
+      // inside the currentOutput variable, if it is not, skip it until we find a gate that 
+      // all its inputs is inside the currentOutput variable
+      // then update the currentoutput variable to store the new outputs available
+      // then repeat.
+      for (let i = unplacedGates.length - 1; i >= 0; i--) {
+        const gate = unplacedGates[i];
         const inputs = gate.input.split(",").map(input => input.trim());
+
+        // if they already have a level assigned to them, and it is not null
+        if (gate.level && gate.level !== null){
+          //if gate level exists add it directly
+          if (!levels[`level${gate.level}`]){
+            // initialize the level if it dne
+            levels[`level${gate.level}`] = []
+          }
+
+          levels[`level${gate.level}`].push(gate)
+          CurrentOutputs.add(gate.output.trim());
+          unplacedGates.splice(i, 1);
+          console.log("Placing gate from predefined level:", gate.name);
+          console.log("Adding output to CurrentOutputs:", gate.output);
+          
+          continue;
+        }
 
         // Check if this gate can be placed:
         //   => "placeable" if all inputs are already in the outputs set
-        const canPlace = !inputs.some(input => !CurrentOutputs.has(input));
+        const canPlace = !inputs.some(input => !CurrentOutputs.has(input.trim()));
 
         if (canPlace) {
+          gate.level = levelIndex;  // assign their gate level attribute
           currentLevel.push(gate);
-          unplaced.splice(i, 1);  // Remove from the unplaced list
           CurrentOutputs.add(gate.output); // Add its output to resolved signals
+          unplacedGates.splice(i, 1);  // Remove from the unplacedGates list
+          console.log("Adding output to CurrentOutputs:", gate.output);
+          console.log('CAN place this gate: ', gate)
+          console.log('inputs = ', inputs)
+          console.log('currentOutputs: ', CurrentOutputs)
+          console.log('canPlace = ', canPlace);
+        } else {
+          //if cannot place
+          console.log('CANNOT place this gate: ', gate)
+          console.log('inputs = ', inputs)
+          console.log('currentOutputs: ', CurrentOutputs)
+          console.log('canPlace = ', canPlace);
+          
         }
         
       }
   
-      // If we couldn't place *any* gate, we have an infinite-loop or unresolved-dependency scenario
-      if (currentLevel.length === 0) {
-        console.warn(
-          "Unresolved dependencies or circular references detected. Potential infinite loop:",
-          unplaced
-        );
-        break; // Stop processing further
-      }
+      // check If we couldn't place *any* gate, we have an infinite-loop or unresolved-dependency scenario
+      // if (currentLevel.length === 0) {
+      //   console.warn(
+      //     "Unresolved dependencies or circular references detected. Potential infinite loop:",
+      //     unplacedGates
+      //   );
+      //   break; // Stop processing further
+      // }
   
-      // Store all gates placed in this pass as the next level
-      levels[`level${levelIndex}`] = currentLevel;
+      
+        
+      if (!levels[`level${levelIndex}`]){
+        // if the level does not exist yet create a new array
+        levels[`level${levelIndex}`] = [];
+      }
+      // combine the arrays of the existing gates with the current level
+      levels[`level${levelIndex}`].push(...currentLevel);
+
+      
+
+      
       levelIndex++;
     }
 

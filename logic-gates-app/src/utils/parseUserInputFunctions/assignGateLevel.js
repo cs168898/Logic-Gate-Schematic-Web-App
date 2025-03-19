@@ -1,7 +1,21 @@
 export function assignGateLevel(existingGates, gatesToBeProcessed) {
-
-
+    function isEmpty(obj) {
+        return Object.keys(obj).length === 0;
+    }
+    
     let levelledGatesObj = JSON.parse(JSON.stringify(existingGates));
+    let highestLevelForThisRun = null;
+
+    // iterate in reverse and find the first array that is non empty
+    // then the highest level is adding one to that level
+    for(let i = Object.keys(levelledGatesObj).length ; i > 0 ;  i--){
+        if (!isEmpty(levelledGatesObj)){
+            highestLevelForThisRun = i + 1
+            break;
+        }
+    }
+    console.log('the highest level for this run: ', highestLevelForThisRun)
+     
 
     // Get the highest existing ID
     let maxId = Object.values(existingGates)
@@ -9,7 +23,14 @@ export function assignGateLevel(existingGates, gatesToBeProcessed) {
         .reduce((max, gate) => Math.max(max, gate.id), 0); // Find the highest existing ID
 
     gatesToBeProcessed.forEach(gate => {
-        const levelKey = `level${gate.level}`;
+        let levelKey = ''
+        if(!gate.level){
+            // if level key is not declared, 
+            // assign their level to the highest level
+            gate.level = highestLevelForThisRun
+        } 
+
+        levelKey = `level${gate.level}`
         
 
         if (!levelledGatesObj[levelKey]) {
