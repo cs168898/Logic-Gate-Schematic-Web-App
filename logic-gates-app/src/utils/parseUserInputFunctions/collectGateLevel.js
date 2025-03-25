@@ -77,15 +77,18 @@ export function collectGateLevel(gatesArray) {
           console.log('inputs = ', inputs)
           console.log('currentOutputs: ', CurrentOutputs)
           console.log('canPlace = ', canPlace);
-        } else if (gate.isCircular){
-          circularGates.push(gate);
-          unplacedGates.splice(i, 1);
-        } else{
-          // Mark as unresolvable and skip
-          showToast("Skipping unplaceable gate:", gate.name);
-          gate.unresolvable = true;
-          unplacedGates.splice(i, 1);
-        }
+        } 
+        // else if (gate.isCircular){
+        //   circularGates.push(gate);
+        //   unplacedGates.splice(i, 1);
+        // } 
+        
+        // else{
+        //   // Mark as unresolvable and skip
+        //   showToast("Skipping unplaceable gate:", gate.name);
+        //   gate.unresolvable = true;
+        //   unplacedGates.splice(i, 1);
+        // }
         
       }
   

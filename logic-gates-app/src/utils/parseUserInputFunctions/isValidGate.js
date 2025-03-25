@@ -46,12 +46,14 @@ import { showToast } from "../showToast";
     const allParsedOutputs = new Set(gatesArray.flatMap(g => g.output))
     if (allParsedOutputs.has(gateToBeProcessed.output)){
         showToast(`Circular dependency detected! Output ${gateToBeProcessed.output} is already a required input.`)
-        gateToBeProcessed.isCircular = true;
+        // gateToBeProcessed.isCircular = true;
+        return false;
     }
 
     if (duplicateOutputGate) {
         showToast(`ERROR: ${gateToBeProcessed.name} has the same output as ${duplicateOutputGate.name}, Circular dependency detected`);
-        gateToBeProcessed.isCircular = true;
+        // gateToBeProcessed.isCircular = true;
+        return false;
     }
 
 
