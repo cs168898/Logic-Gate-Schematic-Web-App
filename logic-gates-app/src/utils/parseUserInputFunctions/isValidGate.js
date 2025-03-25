@@ -45,13 +45,13 @@ import { showToast } from "../showToast";
     // find for duplicate output in current user input
     const allParsedOutputs = new Set(gatesArray.flatMap(g => g.output))
     if (allParsedOutputs.has(gateToBeProcessed.output)){
-        showToast(`ERROR: Circular dependency detected! Output ${gateToBeProcessed.output} is already a required input.`)
-        return false;
+        showToast(`Circular dependency detected! Output ${gateToBeProcessed.output} is already a required input.`)
+        gateToBeProcessed.isCircular = true;
     }
-    
+
     if (duplicateOutputGate) {
         showToast(`ERROR: ${gateToBeProcessed.name} has the same output as ${duplicateOutputGate.name}, Circular dependency detected`);
-        return false;
+        gateToBeProcessed.isCircular = true;
     }
 
 

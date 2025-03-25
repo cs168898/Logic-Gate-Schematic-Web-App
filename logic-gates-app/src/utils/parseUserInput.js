@@ -107,7 +107,7 @@ import { showToast } from "./showToast";
         
 
         
-        const sortedlevelledGates = sortGates(levelledGatesObj) // sort the gates position and input pins position in the level
+        const sortedlevelledGates = sortGates(cleanedGates) // sort the gates position and input pins position in the level
         
 
         //create a function to remove duplicate gates
@@ -116,7 +116,7 @@ import { showToast } from "./showToast";
 
         
         
-        const combinedGatesArray = positionGates(cleanedGates, gatesArray, gates)
+        const combinedGatesArray = positionGates(sortedlevelledGates, gatesArray, gates)
 
         
         const flattenedGatesWithLevels = Object.entries(combinedGatesArray)

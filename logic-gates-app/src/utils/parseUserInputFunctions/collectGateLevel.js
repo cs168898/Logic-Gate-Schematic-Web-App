@@ -1,3 +1,4 @@
+import { showToast } from "../showToast";
 
 
 
@@ -7,6 +8,8 @@ export function collectGateLevel(gatesArray) {
     const unplacedGates = [...gatesArray]; // copy the gatesArray so we can modify the array without touching original
     const levels = {};          // Will store gates by level, e.g., levels.level1 = [...]
     const CurrentOutputs = new Set();  // Tracks outputs that are already "resolved"
+    const circularGates = [];
+
     let levelIndex = 1;         // Label levels as level1, level2, etc.
 
     // Step 1: get all outputs from the gates
@@ -44,7 +47,7 @@ export function collectGateLevel(gatesArray) {
         const inputs = gate.input.split(",").map(input => input.trim());
 
         // if they already have a level assigned to them, and it is not null
-        if (gate.level && gate.level !== null){
+        if (gate.level){
           //if gate level exists add it directly
           if (!levels[`level${gate.level}`]){
             // initialize the level if it dne
@@ -74,13 +77,14 @@ export function collectGateLevel(gatesArray) {
           console.log('inputs = ', inputs)
           console.log('currentOutputs: ', CurrentOutputs)
           console.log('canPlace = ', canPlace);
-        } else {
-          //if cannot place
-          console.log('CANNOT place this gate: ', gate)
-          console.log('inputs = ', inputs)
-          console.log('currentOutputs: ', CurrentOutputs)
-          console.log('canPlace = ', canPlace);
-          
+        } else if (gate.isCircular){
+          circularGates.push(gate);
+          unplacedGates.splice(i, 1);
+        } else{
+          // Mark as unresolvable and skip
+          showToast("Skipping unplaceable gate:", gate.name);
+          gate.unresolvable = true;
+          unplacedGates.splice(i, 1);
         }
         
       }
@@ -94,7 +98,10 @@ export function collectGateLevel(gatesArray) {
       //   break; // Stop processing further
       // }
   
-      
+      if (currentLevel.length === 0 && circularGates.length === 0) {
+        showToast("Unresolved dependencies or infinite loop detected.");
+        break;
+      }
         
       if (!levels[`level${levelIndex}`]){
         // if the level does not exist yet create a new array
@@ -109,11 +116,19 @@ export function collectGateLevel(gatesArray) {
       levelIndex++;
     }
 
+    // Process circular gates
+    circularGates.forEach(gate => {
+      gate.level = levelIndex;
+      levels[`level${levelIndex}`] = levels[`level${levelIndex}`] || [];
+      levels[`level${levelIndex}`].push(gate);
+    });
+
     for (const levelKey in levels) {
         if (Array.isArray(levels[levelKey])) { // check if it levelkey exist as an array
             levels[levelKey].reverse(); // Reverse the array in-place
         }
     }
+    
     
     return levels;
   }

@@ -11,15 +11,17 @@ public class LogicGate {
     private String type;
     private List<String> input;
     private String output;
+    private String level;
 
     // Constructors, Getters, and Setters
     public LogicGate() {}
 
-    public LogicGate(String name, String type, List<String> input, String output) {
+    public LogicGate(String name, String type, List<String> input, String output, String level) {
         this.name = name;
         this.type = type;
         this.input = input;
         this.output = output;
+        this.level = level;
     }
 
     public String getName() { return name; }
@@ -33,4 +35,7 @@ public class LogicGate {
 
     public String getOutput() { return output; }
     public void setOutput(String output) { this.output = output; }
+
+    public String getLevel() { return level; }
+    public void setLevel(String level) { this.level = level; }
 }

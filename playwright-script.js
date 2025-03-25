@@ -1,5 +1,8 @@
 import { chromium } from 'playwright';
 import fs from 'fs/promises';
+
+dotenv.config({ path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development' });
+
 function formatLogicGates(jsonArray) {
     try {
         // Ensure input is an array (handles single object case)
@@ -12,7 +15,8 @@ function formatLogicGates(jsonArray) {
             `name: ${gate.name};
             type: ${gate.type.toUpperCase()};
             input: ${Array.isArray(gate.input) ? gate.input.join(",") : gate.input || ""};
-            output: ${gate.output ? gate.output : ""};`
+            ${gate.output ? `output: ${gate.output};`: ""}
+            ${gate.level? `level:${gate.level};` : ""}`
             ).join("\n\n"); // Separate multiple gates with a blank line
 
     } catch (error) {
@@ -49,8 +53,8 @@ function formatLogicGates(jsonArray) {
         const browser = await chromium.launch({ headless: true });
         const context = await browser.newContext();
         const page = await context.newPage();
-
-        await page.goto("http://localhost:3000");
+        const frontendURL = process.env.VITE_FRONTEND_URL || 'http://localhost:3000';
+        await page.goto(frontendURL);
 
         // await page.evaluate(() => {
         //     const canvas = document.querySelectorAll(".konvajs-content canvas");
@@ -71,7 +75,7 @@ function formatLogicGates(jsonArray) {
         await page.click(".create-button");
         
 
-        await page.locator(".content-overlay").scrollIntoViewIfNeeded();
+        await page.locator(".konvajs-container");
         await page.waitForTimeout(1000); // Wait to stabilize rendering
           
 

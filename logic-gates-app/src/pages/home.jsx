@@ -243,6 +243,14 @@ function Home() {
     console.log('textToBeSaved = ', textToBeSaved)
   }, [gates])
 
+  // if there is nothing on the canvas, set the firstParse back to true
+  // this is to use the collectGateLevel function again.
+  useEffect(() => {
+    if(Object.keys(gates).length == 0){
+      setIsfirstParse(true)
+    }
+  }, [gates])
+
   // Create the handleSubmit function to send userInput into backend
   const handleSubmit = async (userInput) =>{
     try{

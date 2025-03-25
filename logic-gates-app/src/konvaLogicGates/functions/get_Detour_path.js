@@ -239,7 +239,7 @@ function aStarPathPixel(startX, startY, endX, endY, costGrid, boardWidth, boardH
 
   while (openSet.length > 0) {
     openSet.sort((a, b) => a.f - b.f);
-    const current = openSet.shift();
+    const current = openSet.shift(); // remove and return the first element in the array
     const { x, y, dir: currentDir } = current;
 
     if (Math.abs(x - endX) <= step / 2 && Math.abs(y - endY) <= step / 2) {
