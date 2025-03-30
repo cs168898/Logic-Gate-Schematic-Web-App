@@ -102,7 +102,7 @@ export function collectGateLevel(gatesArray) {
       // }
   
       if (currentLevel.length === 0 && circularGates.length === 0) {
-        showToast("Unresolved dependencies or infinite loop detected.");
+        // showToast("Unresolved dependencies or infinite loop detected.");
         break;
       }
         
