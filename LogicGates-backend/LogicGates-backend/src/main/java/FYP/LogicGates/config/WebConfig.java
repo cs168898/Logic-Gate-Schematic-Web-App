@@ -16,6 +16,7 @@ public class WebConfig {
                 registry.addMapping("/**")
                         .allowedOrigins(
                             "http://localhost:3000",             // local dev
+                            "http://localhost:8080",
                             "https://logic-gate-schematic-web-app.onrender.com", // production domain
                             "https://fyp-fsm.web.app"         // fallback Render domain
                             

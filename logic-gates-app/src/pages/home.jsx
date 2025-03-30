@@ -20,6 +20,7 @@ import { SuccessContext } from '../context/SuccessContext';
 import { saveProject } from '../../services/saveProject';
 import { mergeGatesText } from '../utils/mergeGatesText';
 import { createProject } from '../../services/createNewProject';
+import { deleteProject } from '../../services/deleteProjects';
 import handleDownload from '../konvaLogicGates/functions/downloadTextFile';
 import DOMPurify from 'dompurify'
 import { showToast } from '../utils/showToast';
@@ -86,7 +87,7 @@ function Home() {
         setProjectList(null);
         handleClearGates2();
         setCurrentProjectInfo("");
-        setSelectedProjectId("");
+        setLoadedProjectId("");
         setIsSuccess(false);
       }
       }, [loggedin, user?.id])
@@ -283,7 +284,8 @@ function Home() {
   
   const handleClearGates = async () =>{
     try{
-      
+      // This is the Clear Gates for Loading Projects
+
       setSpinnerVisible(true); // show spinner
       await new Promise(resolve => setTimeout(resolve, 0)); // allow React to render it
       setGates([]) // Keep track of all the logic gate inside the 'gates' variable
@@ -305,7 +307,7 @@ function Home() {
 
   const handleClearGates2 = async () =>{
     try{
-      
+       // This is the Clear Gates for the button
 
       setGates([]) // Keep track of all the logic gate inside the 'gates' variable
       setGatePositions({}); // Clear all wire positions
@@ -326,14 +328,15 @@ function Home() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const [selectedProjectId, setSelectedProjectId] = useState(null)
+  const [loadedProjectId, setLoadedProjectId] = useState(null)
 
   async function loadProject(id) {
-    setSelectedProjectId(id);
+    setLoadedProjectId(id);
     prevGatesRef.current = null;
     setqueuedProjectId(id);  
     await handleClearGates();
     isFirstRun.current = true;
+    setIsSuccess(false);
   }
     
   async function handleSaveProject(){
@@ -393,18 +396,61 @@ function Home() {
     setNamePopup(!namePopup);
   }
 
+  const projectOptionsRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        projectOptionsRef.current &&
+        !projectOptionsRef.current.contains(event.target)
+      ) {
+        // if it selects anything outside the window, set it to null
+        setOpenProjectOptions(null);
+      }
+    }
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const [openProjectOptions, setOpenProjectOptions] = useState(null);
   function toggleProjectOptions(id) {
     setOpenProjectOptions((prevId) => (prevId === id ? null : id));
-  }
-
-  function toggleSpinner(){
-    setSpinnerVisible(!spinnerVisible);
-  }
-
-  const deleteProject = async () => {
+    
     
   }
+
+  const [selectedProjectId, setSelectedProjectId] = useState("")
+
+  const handleDeleteProject = async () => {
+    try{
+      setSpinnerVisible(true); // show spinner
+      await new Promise(resolve => setTimeout(resolve, 0)); // allow React to render it
+
+      const response = deleteProject(selectedProjectId)
+      console.log('deleted response = ', response)
+      // refresh projectslist
+      setProjectList((prevList) =>
+        prevList.filter((project) => project.projectId !== selectedProjectId)
+      );
+
+      if (selectedProjectId == loadedProjectId){
+        await handleClearGates();
+        setLoadedProjectId(null);
+      }
+
+    } catch (error){
+      showToast('Error: ', error)
+    } finally{
+      setSpinnerVisible(false);
+    }
+  }
+
+  useEffect(() => {
+    console.log('selectedprojectId=', selectedProjectId)
+  }, [selectedProjectId])
   
     
   return (
@@ -427,7 +473,7 @@ function Home() {
               {projectList ? projectList.map((project) => (
                 <div key={project.projectId} className="project-container">
                   <button
-                    className={selectedProjectId == project.projectId ? 'project-button selected' : 'project-button'}
+                    className={loadedProjectId == project.projectId ? 'project-button selected' : 'project-button'}
                     onClick={() => loadProject(project.projectId)} 
                   >
                     {project.projectName}
@@ -435,17 +481,22 @@ function Home() {
 
                   <button 
                   className='project-button-options'
-                  onClick={() => toggleProjectOptions(project.projectId)}
+                  onClick={() => {
+                    toggleProjectOptions(project.projectId);
+                    setSelectedProjectId(project.projectId)
+                    
+                  }}
                   
                   >
                   ...
                   </button>
 
                   {openProjectOptions == project.projectId && isSidebarOpen &&(
-                    <div className='project-options'>
+                    <div className='project-options' ref={projectOptionsRef}>
                       <div className='project-options-inner'>
                         <button>Edit Name</button>
-                        <button>Delete</button>
+                        <button
+                        onClick={handleDeleteProject}>Delete</button>
                       </div>
                     </div>
                   )}
