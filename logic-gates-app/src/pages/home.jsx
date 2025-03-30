@@ -22,6 +22,7 @@ import { mergeGatesText } from '../utils/mergeGatesText';
 import { createProject } from '../../services/createNewProject';
 import handleDownload from '../konvaLogicGates/functions/downloadTextFile';
 import DOMPurify from 'dompurify'
+import { showToast } from '../utils/showToast';
 
 function Home() {
   /***************************** useState Definitions ***************************/
@@ -49,6 +50,7 @@ function Home() {
   const [namePopup, setNamePopup] = useState(false);
   const [nameInput, setNameInput] = useState("");
 
+  const [spinnerVisible, setSpinnerVisible] = useState(false)
   
 
 
@@ -97,6 +99,7 @@ function Home() {
     const [isfirstParse, setIsfirstParse] = useState(true);
     // Use useEffect to monitor changes in the gates state
     useEffect(() => {
+      
       if (isFirstRun.current) {
         isFirstRun.current = false;
         prevGatesRef.current = gates;
@@ -113,7 +116,7 @@ function Home() {
       } else {
         setIsSuccess(false);
       }
-  
+      
     }, [gates]);
 
     useEffect(() => {
@@ -254,6 +257,9 @@ function Home() {
   // Create the handleSubmit function to send userInput into backend
   const handleSubmit = async (userInput) =>{
     try{
+      setSpinnerVisible(true); // show spinner
+      await new Promise(resolve => setTimeout(resolve, 0)); // allow React to render it
+
       console.log('isFirstParse in handleSubmit: ', isfirstParse)
 
       setGates(prevGates => {
@@ -269,6 +275,8 @@ function Home() {
      
     } catch (error){
       console.error("Error: ", error.message) // Log the error if there are errors that happened in the backend
+    } finally{
+      setSpinnerVisible(false); // show spinner
     }
 
   }
@@ -276,7 +284,8 @@ function Home() {
   const handleClearGates = async () =>{
     try{
       
-
+      setSpinnerVisible(true); // show spinner
+      await new Promise(resolve => setTimeout(resolve, 0)); // allow React to render it
       setGates([]) // Keep track of all the logic gate inside the 'gates' variable
       setGatePositions({}); // Clear all wire positions
       setSelectedGateId(null); // Clear selection
@@ -288,6 +297,8 @@ function Home() {
       console.log('isFirstParse handleClearGates1', isfirstParse)
     } catch (error){
       console.error("Error: ", error.message) // Log the error if there are errors that happened in the backend
+    } finally{
+      setSpinnerVisible(false);
     }
 
   }
@@ -327,6 +338,9 @@ function Home() {
     
   async function handleSaveProject(){
 
+    setSpinnerVisible(true); // show spinner
+    await new Promise(resolve => setTimeout(resolve, 0)); // allow React to render it
+
     const latestProjectInfo = currentProjectInfo; 
     
     if (!latestProjectInfo || !latestProjectInfo.projectId) {
@@ -338,17 +352,22 @@ function Home() {
     try{
       const jsonbText = textToJsonb(textToBeSaved)
       const response = await saveProject(latestProjectInfo.projectId, latestProjectInfo.projectName, jsonbText);
-      alert('project successfully saved');
+      showToast('Project Successfully Saved', 'success');
       setIsSuccess(false);
-      } catch (error){
-      alert('proejct failed to save');
+    } catch (error){
+      showToast('Project Failed to Save');
 
-      }
+    }
+    setSpinnerVisible(false);
+    
   };
   const createNewProject = async () => {
     try{
+      setSpinnerVisible(true); // show spinner
+      await new Promise(resolve => setTimeout(resolve, 0)); // allow React to render it
+
       if (!loggedin){
-        alert('Log in first');
+        showToast('Log in first');
       } else {
         toggleNamePopup(); // close the name popup window
         const response = await createProject(DOMPurify.sanitize(nameInput), user?.id)
@@ -361,7 +380,9 @@ function Home() {
      
 
     } catch(error) {
-      console.error("error while creating project", error)
+      showToast("error while creating project", error)
+    } finally{
+      setSpinnerVisible(false);
     }
     
   }
@@ -377,8 +398,12 @@ function Home() {
     setOpenProjectOptions((prevId) => (prevId === id ? null : id));
   }
 
-  const editProjectName = async () => {
+  function toggleSpinner(){
+    setSpinnerVisible(!spinnerVisible);
+  }
 
+  const deleteProject = async () => {
+    
   }
   
     
@@ -416,7 +441,7 @@ function Home() {
                   ...
                   </button>
 
-                  {openProjectOptions == project.projectId &&(
+                  {openProjectOptions == project.projectId && isSidebarOpen &&(
                     <div className='project-options'>
                       <div className='project-options-inner'>
                         <button>Edit Name</button>
@@ -462,11 +487,14 @@ function Home() {
 
             </div>
           </div>
-
-          <LogicGateCanvas
-            setSelectedGateId={handleSelectGate}
-            selectedGateId={selectedGateId}
-          />
+          <div className='spinner-wrapper'>
+            {spinnerVisible && <div className='spinner'></div>}
+            <LogicGateCanvas
+              setSelectedGateId={handleSelectGate}
+              selectedGateId={selectedGateId}
+            />
+          </div>
+          
           
           <div className="user-input">
             <div className="textarea-button-container">

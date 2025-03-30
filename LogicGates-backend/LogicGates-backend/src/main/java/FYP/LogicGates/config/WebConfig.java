@@ -13,11 +13,12 @@ public class WebConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**")
+                registry.addMapping("/**")
                         .allowedOrigins(
                             "http://localhost:3000",             // local dev
-                            "https://lgstt.com",                 // production domain
-                            "https://logic-gates-frontend.onrender.com" // fallback Render domain
+                            "https://logic-gate-schematic-web-app.onrender.com", // production domain
+                            "https://fyp-fsm.web.app"         // fallback Render domain
+                            
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")

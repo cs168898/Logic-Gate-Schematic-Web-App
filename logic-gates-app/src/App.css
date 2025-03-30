@@ -489,6 +489,25 @@ body {
   
 }
 
+.spinner{
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(0, 0, 0, 0.156);
+  border-top: 4px solid var(--theme-primary-color);
+  border-radius: 50%;
+  z-index: 999;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .konvajs-container {
   position: relative;
   z-index: 1;

@@ -2,6 +2,7 @@ node_modules/
 
 # Ignore virtual environment
 venv/
+.env
 
 # Ignore Python bytecode files
 __pycache__/
@@ -16,7 +17,6 @@ __pycache__/
 target/
 build/
 .gradle/
-.mvn/
 *.jar
 *.war
 *.class
