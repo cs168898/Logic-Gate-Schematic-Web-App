@@ -308,7 +308,8 @@ function Home() {
   const handleClearGates2 = async () =>{
     try{
        // This is the Clear Gates for the button
-
+      setSpinnerVisible(true); // show spinner
+      await new Promise(resolve => setTimeout(resolve, 0)); // allow React to render it
       setGates([]) // Keep track of all the logic gate inside the 'gates' variable
       setGatePositions({}); // Clear all wire positions
       setSelectedGateId(null); // Clear selection
@@ -319,6 +320,8 @@ function Home() {
       
     } catch (error){
       console.error("Error: ", error.message) // Log the error if there are errors that happened in the backend
+    } finally{
+      setSpinnerVisible(false);
     }
 
   }

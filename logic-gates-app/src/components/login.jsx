@@ -1,13 +1,19 @@
 import { useState } from "react"
 import { loginUser } from '../../services/userLogin';
 import Register from "./register";
+import ForgetPassword from "./forgotPassword";
 import DOMPurify from 'dompurify'
+import { showToast } from "../utils/showToast";
 
 function Login({ toggle, setLoggedin, setUser }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [registerPopup, setRegisterPopup] = useState(false);
+    const [forgetPasswordPopup, setForgetPasswordPopup] = useState(false);
 
+    function toggleForgetPasswordPopup(){
+        setForgetPasswordPopup(!forgetPasswordPopup);
+    }
 
     function toggleRegisterPopup(){
         setRegisterPopup(!registerPopup);
@@ -24,7 +30,7 @@ function Login({ toggle, setLoggedin, setUser }) {
                 toggle();
             }).catch(error => {
                 console.error('cant log in: ', error);
-                alert('invalid username or password')
+                showToast('Invalid username or password')
             })
         // Code to handle login goes here
         
@@ -36,6 +42,7 @@ function Login({ toggle, setLoggedin, setUser }) {
     return (
         <div className="popup">
             <div className="popup-inner">
+                <button onClick={toggle} className="close-button">x</button>
                 <h2>Login</h2>
                 <form onSubmit={handleLogin}>
                     <label>
@@ -49,10 +56,15 @@ function Login({ toggle, setLoggedin, setUser }) {
                     <button type="submit">Login</button>
                     
                 </form>
-                <button onClick={toggleRegisterPopup} className="register-button"> Register</button>
-                    <button onClick={toggle} className="close-button">x</button>
+                <div className="button-group">
+                    <button onClick={toggleRegisterPopup} className="register-button"> Register</button>
+                    
+                    {registerPopup ? <Register toggleRegisterPopup = {toggleRegisterPopup} /> : null}
+
+                    <button onClick={toggleForgetPasswordPopup} className="forget-password-button"> Forgot Password? </button>
+                    {forgetPasswordPopup && <ForgetPassword toggleForgetPassword = {toggleForgetPasswordPopup}/>}
+                </div>
                 
-                {registerPopup ? <Register toggleRegisterPopup = {toggleRegisterPopup} /> : null}
             </div>
         </div>
     )

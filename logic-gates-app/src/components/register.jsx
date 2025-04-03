@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { registerUser } from "../../services/userRegister"
 import DOMPurify from 'dompurify'
 import { showToast } from "../utils/showToast"
@@ -9,7 +9,8 @@ function Register({toggleRegisterPopup}) {
     const [username, setUsername] = useState('')
     const [email , setEmail] = useState('')
     const [password, setPassword] = useState('')
-    
+    const [confirmPassword, setConfirmPassword] = useState('')
+    const [isPasswordDiff, setIsPasswordDiff] = useState(false)
 
 
     const handleEmailChange = (e) => {
@@ -97,6 +98,14 @@ function Register({toggleRegisterPopup}) {
         }
     };
 
+    useEffect(() => {
+        if(password !== confirmPassword){
+            setIsPasswordDiff(true)
+        } else {
+            setIsPasswordDiff(false)
+        }
+    }, [confirmPassword])
+
 
     return (
         <div className="popup">
@@ -115,7 +124,17 @@ function Register({toggleRegisterPopup}) {
                         Password:
                         <input type="password" value={password} maxLength={100} onChange={e => setPassword(e.target.value)} />
                     </label>
-                    <button type="submit">Register</button>
+                    <label>
+                        Confirm Password:
+                        <input type="password" value={confirmPassword} 
+                        maxLength={100} 
+                        onChange={e => 
+                            {setConfirmPassword(e.target.value)
+                            passwordConfirmation()
+                        }} />
+                        {isPasswordDiff ? <span className="password-validation"> Password must be the same </span> : null}
+                    </label>
+                    <button type="submit" disabled = {isPasswordDiff}> Register </button>
                 </form>
                 <button onClick={toggleRegisterPopup} className="close-button">x</button>
             </div>

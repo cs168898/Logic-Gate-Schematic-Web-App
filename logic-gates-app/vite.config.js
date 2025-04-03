@@ -8,5 +8,8 @@ export default defineConfig({
   },
   server: {
     port: 3000
-  }
+  },
+  build: {
+    outDir: 'dist', // Ensure this matches the folder specified in firebase.json
+  },
 });

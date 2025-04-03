@@ -135,9 +135,28 @@ body {
     margin-top: 0;
   }
 
+  .popup-inner .button-group{
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+  }
+
+  .popup-inner .register-button,
+  .popup-inner .forget-password-button{
+    background-color: white;
+    color: black;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 10px;
+    margin-top: 10px;
+    width: auto;
+  }
+
   .popup-inner button[type="submit"]:hover,
   .popup-inner button[type="button"]:hover,
-  .popup-inner .register-button:hover {
+  .popup-inner .register-button:hover,
+  .popup-inner .forget-password-button:hover {
     background-color: var(--button-hover-color);
     background-color: var(--button-hover-color);
   }
@@ -150,7 +169,7 @@ body {
   .popup-inner .close-button {
     position: absolute;
     top: 0;
-    left: 445px;
+    left: 22vw;
     color: white;
     border: none;
     padding: 5px;
@@ -172,15 +191,7 @@ body {
     box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
     width: auto;
   }
-  .popup-inner .register-button{
-    background-color: white;
-    color: black;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    border-radius: 10px;
-    margin-top: 10px;
-  }
+  
 
   .popup-inner-register{
     display: block;
@@ -190,7 +201,7 @@ body {
   .popup-inner-register .close-button{
     position: absolute;
     top: 0;
-    left: 205px;
+    left: 17.5vw;
     color: white;
     border: none;
     padding: 5px;
@@ -199,6 +210,53 @@ body {
     background-color: transparent;
   }
 
+  @media screen and (min-width: 1440px){
+    .popup-inner-register{
+      width: 20vw;
+    }
+  }
+
+/********** ForgetPassword *************/
+
+.popup-inner-forget-password {
+  background-color: var(--theme-primary-color);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+  width: auto;
+}
+
+
+.popup-inner-forget-password{
+  display: block;
+  position: inherit;
+}
+
+.popup-inner-forget-password .close-button{
+  position: absolute;
+  top: 0;
+  left: 18.5vw;
+  color: white;
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 10px;
+  background-color: transparent;
+}
+
+.popup-inner-forget-password p{
+  margin-top: 20px;
+}
+
+@media screen and (min-width: 1440px){
+  .popup-inner-forget-password{
+    width: 20vw;
+  }
+}
 
 
 /********** Sidebar *************/
