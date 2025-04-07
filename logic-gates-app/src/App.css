@@ -16,6 +16,76 @@ body {
 }
 
 
+/********** Landing Page *************/
+
+.landing-page{
+  background-color: white;
+  z-index: 99;
+  position:absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.landing-page .logo{
+  position: absolute;
+  top: 30%;
+  font-size: 4.5em;
+  font-weight: bold;
+}
+
+.landing-page .how-to-use button{
+  background-color: white;
+  color: var(--theme-primary-color);
+  width: 200px;
+  height: 50px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.landing-page .how-to-use button:hover{
+  background-color: var(--button-hover-color);
+}
+
+.landing-page .go-to-app button{
+  background-color: var(--theme-primary-color);
+  color: white;
+  width: 200px;
+  height: 50px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.landing-page .go-to-app button:hover{
+  background-color: var(--button-hover-color);
+  color: black;
+}
+
+.landing-page .go-to-app,
+.landing-page .how-to-use{
+  height: 20vh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  margin-top: 50px;
+}
+
+.landing-page.slide-up {
+  transition: all 0.7s ease-in-out;
+  transform: translateY(-100%);
+  opacity: 100;
+  padding: 0;
+  margin: 0;
+  pointer-events: none;
+}
+
+.landing-page .dont-show{
+  position: absolute;
+  top: 60%;
+}
+
 
 /********** Header *************/
 
@@ -580,6 +650,46 @@ body {
   
 }
 
+.cookie-popup {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  max-width: 300px;
+  background-color: var(--theme-primary-color);
+  color: white;
+  padding: 16px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  z-index: 9;
+  font-size: 14px;
+  animation: slideIn 0.5s ease-in-out;
+}
+
+.cookie-popup button {
+  background-color: white;
+  color: black;
+  padding: 6px 12px;
+  border: none;
+  margin-top: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cookie-popup button:hover {
+  background-color: var(--button-hover-color);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
 
 /*************** User Input Box **************/
@@ -671,6 +781,19 @@ body {
   color: white;
 }
 
+@media screen and (min-width: 1440px){
+  .popup-inner-register{
+    width: 20vw;
+  }
+
+  .user-input{
+    top: 60%;
+  }
+
+  .tools-window{
+    top: 60%;
+  }
+}
 
 /* CSS GLOBAL VARIABLES */
 

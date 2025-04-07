@@ -21,9 +21,14 @@ import { saveProject } from '../../services/saveProject';
 import { mergeGatesText } from '../utils/mergeGatesText';
 import { createProject } from '../../services/createNewProject';
 import { deleteProject } from '../../services/deleteProjects';
+import CookiePopup from '../components/cookie-popup';
+import { showToast } from '../utils/showToast';
+import LandingPage from '../components/landing-page';
 import handleDownload from '../konvaLogicGates/functions/downloadTextFile';
 import DOMPurify from 'dompurify'
-import { showToast } from '../utils/showToast';
+import Cookies from 'js-cookie';
+import { faL } from '@fortawesome/free-solid-svg-icons';
+
 
 function Home() {
   /***************************** useState Definitions ***************************/
@@ -52,8 +57,12 @@ function Home() {
   const [nameInput, setNameInput] = useState("");
 
   const [spinnerVisible, setSpinnerVisible] = useState(false)
-  
 
+  const [showLandingPage, setShowLandingPage] = useState(true)
+  
+  /***************************** End Of useState Definitions ********************/
+
+  /***************************** useContext Statements ***************************/
 
   const { gates, setGates } = useContext(GatesContext);
 
@@ -64,7 +73,7 @@ function Home() {
   const { isSuccess ,setIsSuccess } = useContext(SuccessContext);
   
     
-  /***************************** End Of useState Definitions ********************/
+  /***************************** End of useContext Statements ***************************/
 
 
   /***************************** useEffect Statements ***************************/
@@ -454,10 +463,61 @@ function Home() {
   useEffect(() => {
     console.log('selectedprojectId=', selectedProjectId)
   }, [selectedProjectId])
+
+  const toggleLandingPage = () => {
+
+    setShowLandingPage(!showLandingPage);
+
+  }
+
+  const [landingPageChecked, setLandingPageChecked] = useState(false); // new state
+
+
+  useEffect(() => {
+    const hideLanding = Cookies.get('hideLandingPage');
+    const hideCookiePopup = Cookies.get('hideCookiesPopup');
+    const isAutomation = navigator.webdriver;
+
+    if (isAutomation) {
+      // skip landing page for Playwright
+      setShowLandingPage(false);
+      setshowCookiePopup(false); // optional
+    } else {
+      setShowLandingPage(hideLanding !== 'true');
+      setshowCookiePopup(Cookies.get('hideCookiesPopup') !== 'true');
+    }
+
+
+    if (hideLanding === 'true') {
+      setShowLandingPage(false);
+    } else {
+      setShowLandingPage(true);
+    }
+
+    if(hideCookiePopup === 'true'){
+      setshowCookiePopup(false);
+    } else {
+      setshowCookiePopup(true);
+    }
+    setLandingPageChecked(true); // done checking
+
+
+  }, []);
+
+  const [showCookiePopup, setshowCookiePopup] = useState(true)
+
+  const toggleCookiePopup = () =>{
+    setshowCookiePopup(!showCookiePopup);
+  }
   
-    
+  if (!landingPageChecked) return null;
+
   return (
     <div className="App">
+
+    {landingPageChecked && showLandingPage && (
+      <LandingPage toggleLandingPage={toggleLandingPage} />
+    )}
         <Header onSidebarToggle={toggleSidebar}/>
       <div className='main-wrapper'>
         <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
@@ -576,6 +636,7 @@ function Home() {
           
         </div> {/*content overlay container*/}
       </div>
+      { showCookiePopup && landingPageChecked && !showLandingPage && <CookiePopup toggleCookiePopup={toggleCookiePopup}/>}
     </div>
   );
 }

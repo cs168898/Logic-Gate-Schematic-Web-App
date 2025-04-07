@@ -77,7 +77,7 @@ function formatLogicGates(jsonArray) {
                 console.error("Frontend error:", msg.text());
             }
         });
-        const frontendURL = process.env.VITE_FRONTEND_URL || 'http://localhost:3000';
+        const frontendURL = process.env.VITE_FRONTEND_URL || 'http://localhost:3000/';
         await page.goto(frontendURL, { waitUntil: 'networkidle' });
 
         // await page.evaluate(() => {
@@ -92,11 +92,15 @@ function formatLogicGates(jsonArray) {
         // Hide the textarea and tools window
         await page.locator('.user-input').evaluate(el => el.style.opacity = '0');
         await page.locator('.tools-window').evaluate(el => el.style.opacity = '0');
+        await page.locator('.landing-page').evaluate(el => {
+            el.style.opacity = '0';
+            el.style.pointerEvents = 'none'; // important!
+          });
 
         await page.evaluate(() => {
             const container = document.querySelector('.konvajs-container');
             if (container) {
-                container.style.transform = 'scale(0.8)';
+                container.style.transform = 'scale(1)';
                 container.style.transformOrigin = 'top left';
                 container.style.width = 'auto'; // 100% / 0.6
                 container.style.height = 'auto';
