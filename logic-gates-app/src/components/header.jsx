@@ -7,7 +7,7 @@ import Login from './login';
 import { UserContext } from '../context/UserContext';
 
 
-function Header({ onSidebarToggle }) {
+function Header({ onSidebarToggle, toggleHowToUse }) {
   const [seen, setSeen] = useState(false);
   const {  user, setUser, loggedin, setLoggedin  } = useContext(UserContext);
 
@@ -21,6 +21,10 @@ function Header({ onSidebarToggle }) {
     setUser(null);
   }
 
+  const handleToggleHowToUse = () => {
+    toggleHowToUse();
+  }
+
   return (
     <header className="App-header">
       <FontAwesomeIcon icon={faBars}
@@ -28,6 +32,9 @@ function Header({ onSidebarToggle }) {
        id='sidebar-icon' 
        onClick={onSidebarToggle}/>
       
+      
+      <button className="how-to-use-button" onClick={handleToggleHowToUse}>How to use?</button>
+        
 
       <h1 className="Header"></h1>
       <h2> {loggedin ? 'Welcome,' + user.username : ''}</h2>

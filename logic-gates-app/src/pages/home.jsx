@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, useRef } from 'react';
+import { useContext, useEffect, useState, useRef, useTransition } from 'react';
 
 // Component Imports
 
@@ -23,6 +23,7 @@ import { createProject } from '../../services/createNewProject';
 import { deleteProject } from '../../services/deleteProjects';
 import CookiePopup from '../components/cookie-popup';
 import { showToast } from '../utils/showToast';
+import HowToUse from '../components/how-to-use';
 import LandingPage from '../components/landing-page';
 import handleDownload from '../konvaLogicGates/functions/downloadTextFile';
 import DOMPurify from 'dompurify'
@@ -59,6 +60,8 @@ function Home() {
   const [spinnerVisible, setSpinnerVisible] = useState(false)
 
   const [showLandingPage, setShowLandingPage] = useState(true)
+
+  const [showHowToUse, setshowHowToUse] = useState(false)
   
   /***************************** End Of useState Definitions ********************/
 
@@ -509,23 +512,34 @@ function Home() {
   const toggleCookiePopup = () =>{
     setshowCookiePopup(!showCookiePopup);
   }
+
+  const toggleHowToUse = () => {
+    setshowHowToUse(!showHowToUse)
+  }
   
   if (!landingPageChecked) return null;
+
+  
 
   return (
     <div className="App">
 
     {landingPageChecked && showLandingPage && (
-      <LandingPage toggleLandingPage={toggleLandingPage} />
+      <LandingPage 
+      toggleLandingPage={toggleLandingPage}
+      toggleHowToUse={toggleHowToUse}
+       />
     )}
-        <Header onSidebarToggle={toggleSidebar}/>
+    {showHowToUse && <HowToUse toggleHowToUse={toggleHowToUse}/>}
+        <Header onSidebarToggle={toggleSidebar} toggleHowToUse={toggleHowToUse} />
       <div className='main-wrapper'>
+        
         <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
-          <button className='close-button' onClick={toggleSidebar}> {String.fromCharCode(8592)} </button>
-          <button className='new-project-button' onClick={toggleNamePopup}>New Project</button>
 
-          
-          
+          <button className='close-button' onClick={toggleSidebar}> {String.fromCharCode(8592)} </button>
+
+          {loggedin && <button className='new-project-button' onClick={toggleNamePopup}>New Project</button>}
+
           {loggedin? <button className='save-button'  disabled = {!isSuccess} onClick={() => handleSaveProject(
                                                   )}>
                                                    Save Current Project </button>: null }
@@ -545,7 +559,7 @@ function Home() {
                   <button 
                   className='project-button-options'
                   onClick={() => {
-                    toggleProjectOptions(project.projectId);
+                    toggleProjectOptions(project.projectId)
                     setSelectedProjectId(project.projectId)
                     
                   }}
@@ -589,18 +603,21 @@ function Home() {
           }
         
         <div className="content-overlay">
-          
-          <div className="tools-window">
+          {landingPageChecked && !showLandingPage &&
+            <div className="tools-window">
             
             
-            <div className="tools-window-inner">
-              
-            <button className='download-netlist' onClick={() => handleDownload(textToBeSaved)}>Download Netlist</button>
-              <button className='clear' onClick={handleClearGates2}>Clear All Gates
-              </button>
+              <div className="tools-window-inner">
+                
+              <button className='download-netlist' onClick={() => handleDownload(textToBeSaved)}>Download Netlist</button>
+                <button className='clear' onClick={handleClearGates2}>Clear All Gates
+                </button>
 
+              </div>
             </div>
-          </div>
+          
+          }
+          
           <div className='spinner-wrapper'>
             {spinnerVisible && <div className='spinner'></div>}
             <LogicGateCanvas
@@ -609,29 +626,31 @@ function Home() {
             />
           </div>
           
-          
-          <div className="user-input">
-            <div className="textarea-button-container">
-              <textarea
-                className='user-input2'
-                id="user-input"
-                name="user-input"
-                placeholder='-Enter your logic here-'
-                autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck="false"
-                value = {inputAreaText}
-                onChange={(e) => setInputAreaText(DOMPurify.sanitize(e.target.value))}
-                maxLength={4000}
-              ></textarea>
-              <div className="button-wrapper">
-                <button className="create-button" onClick={() => handleSubmit(inputAreaText)}>
-                  Create Gate
-                </button>
-                <button className="delete-button" onClick={handleDeleteGate} disabled={selectedGateId === null}>
-                  Delete Gate
-                </button>
+          {landingPageChecked && !showLandingPage &&
+            <div className="user-input">
+              <div className="textarea-button-container">
+                <textarea
+                  className='user-input2'
+                  id="user-input"
+                  name="user-input"
+                  placeholder='-Enter your logic here-'
+                  autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck="false"
+                  value = {inputAreaText}
+                  onChange={(e) => setInputAreaText(DOMPurify.sanitize(e.target.value))}
+                  maxLength={4000}
+                ></textarea>
+                <div className="button-wrapper">
+                  <button className="create-button" onClick={() => handleSubmit(inputAreaText)}>
+                    Create Gate
+                  </button>
+                  <button className="delete-button" onClick={handleDeleteGate} disabled={selectedGateId === null}>
+                    Delete Gate
+                  </button>
+                </div>
               </div>
-            </div>
-          </div> {/*user-input*/}
+            </div> // user input
+          }
+          
           
           
         </div> {/*content overlay container*/}

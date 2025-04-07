@@ -15,6 +15,118 @@ body {
 
 }
 
+/********** How To Use Page *************/
+/* 
+.how-to-use-popup{
+  position: absolute;
+  padding: 10px;
+  top: 30%;
+  left: 40%;
+  width: 500px;
+  height: 500px;
+  z-index: 999;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+  overflow-y: auto;
+} */
+
+.how-to-use-popup {
+  position: fixed;
+  right: 20px;
+  top: 80px;
+  background: var(--theme-primary-color);
+  padding: 24px;
+  max-width: 500px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  font-family: sans-serif;
+  z-index: 1000;
+  overflow-y: auto;
+  max-height: 70vh;
+  color: white;
+  animation: fadeIn 3s ease forwards;
+  scrollbar-width: thin;
+  scrollbar-color: white var(--theme-primary-color);
+}
+
+.how-to-use-popup::-webkit-scrollbar{
+  background-color: var(--theme-primary-color);
+  padding: 5px;
+  background-clip: content-box;
+  width: 8px; /* ✅ set width */
+  
+}
+
+.how-to-use-popup::-webkit-scrollbar-thumb{
+  background-color: white;
+  border-radius: 8px;
+}
+
+/* Optional fade animation */
+@keyframes fadeIn {
+  0% { opacity: 0; transform: scale(0.95); }
+  10% { opacity: 1; transform: scale(1); }
+  90% { opacity: 1; }
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    
+  }
+  10% {
+    opacity: 1;
+    
+  }
+  90% {
+    opacity: 1;
+    
+  }
+  100% {
+    opacity: 0;
+    
+  }
+}
+
+.how-to-use-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(36, 36, 36, 0.6);
+  z-index: 999;
+  animation: fadeInOut 3s ease forwards;
+}
+
+.how-to-use-popup li{
+  border-top: 1px solid grey;
+  padding: 10px 0 10px 0;
+}
+
+.how-to-use-popup h2 {
+  margin-top: 0;
+}
+
+.how-to-use-popup pre {
+  background-color: #353b45;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.how-to-use-popup .close-button{
+  position: absolute;
+  top: 10px;
+  right: 20px;
+}
+
+.how-to-use-popup .close-button:hover{
+  cursor: pointer;
+}
+
+/********** End of How To Use Page *************/
 
 /********** Landing Page *************/
 
@@ -24,9 +136,17 @@ body {
   position:absolute;
   width: 100%;
   height: 100%;
+}
+.landing-page-inner{
+  background-color: white;
+  z-index: 99;
+  position:absolute;
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  animation: slideIn 0.7s ease-in-out;
 }
 
 .landing-page .logo{
@@ -86,6 +206,10 @@ body {
   top: 60%;
 }
 
+.landing-page .dont-show input{
+  margin-right: 5px;
+}
+
 
 /********** Header *************/
 
@@ -126,6 +250,21 @@ body {
   font-size: large;
   margin: auto 0 auto auto;
   width: auto;
+}
+
+.App-header .how-to-use-button{
+  background-color: transparent;
+  border: none;
+  margin: auto 0 auto 0;
+  color: white;
+  font-size: medium;
+  min-width: 4vw;
+  width: auto;
+  height: 1.5em;
+}
+
+.App-header .how-to-use-button:hover{
+  text-decoration: underline;
 }
 
 .App-header .login-button{
@@ -542,10 +681,9 @@ body {
 
 .tools-window{
   background-color: grey;
-  
   border: 1px solid grey;
   position: absolute;
-  top: 80vh;
+  bottom: 20%;
   left: 10vw;
   box-shadow: 5px 5px 5px #0004;
   border-top: 25px solid var(--theme-primary-color);
@@ -555,6 +693,7 @@ body {
   z-index: 11;
   display: block;
   font-size: small;
+  animation: slideIn 0.3s ease-in-out;
 }
 
 
@@ -702,9 +841,11 @@ body {
   min-width: 500px;
   height: auto;
   left: 40%;  /* Start closer to the left */
-  top: 70vh;   /* Start closer to the top */
+  bottom: 20%;   /* Start closer to the top */
   border-radius: 10px;
   padding-top: 30px;
+  box-shadow: 5px 5px 5px #0004;
+  animation: slideIn 0.3s ease-in-out;
 }
 
 .textarea-button-container{
@@ -781,17 +922,20 @@ body {
   color: white;
 }
 
-@media screen and (min-width: 1440px){
+@media screen and (max-width: 1024px){
   .popup-inner-register{
-    width: 20vw;
+    width: 20%;
   }
 
   .user-input{
-    top: 60%;
+    bottom: 10vh;
   }
 
   .tools-window{
-    top: 60%;
+    bottom: 20%;
+    width: auto;
+    height: auto;
+    max-height: 25vh;
   }
 }
 
