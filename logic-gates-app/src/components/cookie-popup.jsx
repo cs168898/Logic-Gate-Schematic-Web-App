@@ -15,7 +15,7 @@ function CookiePopup({ toggleCookiePopup }) {
     <>
     <div className='cookie-popup'>
         <p>
-            This website uses cookies to enhance the user experience. By using this website, you consent to cookies being used.
+            This website uses cookies to enhance the user experience. By using this website, you consent to <strong>necessary</strong> cookies being used.
         </p>
         <button onClick={handleButtonClick}>Got it</button>
     </div>

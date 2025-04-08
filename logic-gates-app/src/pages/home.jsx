@@ -62,6 +62,8 @@ function Home() {
   const [showLandingPage, setShowLandingPage] = useState(true)
 
   const [showHowToUse, setshowHowToUse] = useState(false)
+
+  const isHeadless = navigator.webdriver;
   
   /***************************** End Of useState Definitions ********************/
 
@@ -479,14 +481,14 @@ function Home() {
   useEffect(() => {
     const hideLanding = Cookies.get('hideLandingPage');
     const hideCookiePopup = Cookies.get('hideCookiesPopup');
-    const isAutomation = navigator.webdriver;
+    const shouldShowLanding = hideLanding !== 'true';
 
-    if (isAutomation) {
+    if (isHeadless) {
       // skip landing page for Playwright
       setShowLandingPage(false);
       setshowCookiePopup(false); // optional
     } else {
-      setShowLandingPage(hideLanding !== 'true');
+      setShowLandingPage(shouldShowLanding);
       setshowCookiePopup(Cookies.get('hideCookiesPopup') !== 'true');
     }
 
@@ -520,6 +522,7 @@ function Home() {
   if (!landingPageChecked) return null;
 
   
+  const shouldRender = landingPageChecked && !showLandingPage
 
   return (
     <div className="App">
@@ -603,7 +606,7 @@ function Home() {
           }
         
         <div className="content-overlay">
-          {landingPageChecked && !showLandingPage &&
+          {(shouldRender || isHeadless) && 
             <div className="tools-window">
             
             
@@ -626,7 +629,7 @@ function Home() {
             />
           </div>
           
-          {landingPageChecked && !showLandingPage &&
+          {(shouldRender || isHeadless) &&
             <div className="user-input">
               <div className="textarea-button-container">
                 <textarea
