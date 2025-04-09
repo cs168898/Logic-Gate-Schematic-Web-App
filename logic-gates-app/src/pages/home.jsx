@@ -670,15 +670,7 @@ export default Home;
 /////////////////////////////   NOTES ////////////////////////////
 
 {/*
-    1. Create the grid background with tracking capability to allow the user to insert logic gates
-    in specific grid region. DONE
-    
-    2. Create the parsing logic from user input.
-
-    3. Display the location of the logic gates through the parsing logic.
-
-    4. Create stimulation of logic flow.
-
-    5. Create additional logic gates.
+    Created by Samuel Yew
+    LinkedIn: https://www.linkedin.com/in/samuelyew/
     
 */}

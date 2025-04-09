@@ -156,6 +156,10 @@ body {
   font-weight: bold;
 }
 
+.landing-page button:hover:active{
+  padding: 3px 0 0 3px;
+}
+
 .landing-page .how-to-use button{
   background-color: white;
   color: var(--theme-primary-color);

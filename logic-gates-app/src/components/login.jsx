@@ -30,7 +30,7 @@ function Login({ toggle, setLoggedin, setUser }) {
                 toggle();
             }).catch(error => {
                 console.error('cant log in: ', error);
-                showToast('Invalid username or password')
+                showToast('Invalid username or password, please ensure your email is verified')
             })
         // Code to handle login goes here
         

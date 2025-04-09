@@ -62,7 +62,7 @@ function Register({toggleRegisterPopup}) {
         registerUser(username, email, password)
             .then(response => {
                 // successful login
-                showToast('Registeration successful', 'success');
+                showToast('Registeration successful, please verify your account in your email', 'success');
                 
 
                 toggleRegisterPopup();
