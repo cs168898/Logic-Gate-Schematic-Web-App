@@ -4,16 +4,22 @@
 
 package FYP.LogicGates.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import FYP.LogicGates.dto.UserDto;
 import FYP.LogicGates.mapper.UserMapper;
+import FYP.LogicGates.repository.TokenRepository;
 import FYP.LogicGates.repository.UserRepository;
+import FYP.LogicGates.service.MailService;
 import FYP.LogicGates.service.UserService;
+import FYP.LogicGates.entity.Token;
 import FYP.LogicGates.entity.UserDetails;
 import FYP.LogicGates.exception.ResourceNotFoundException;
 import lombok.AllArgsConstructor;
@@ -22,10 +28,24 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService{
+    @Autowired
+    private MailService mailService;
+
+    @Autowired
+    private TokenRepository tokenRepository;
 
     private UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(); // Add password encoder
 
+    private String createAndStoreVerificationToken(Long userId) {
+        String token = UUID.randomUUID().toString();
+        LocalDateTime expiry = LocalDateTime.now().plusMinutes(30); // 30 minutes or your preferred time
+
+        Token tokenEntity = new Token(userId, token, expiry);
+        tokenRepository.save(tokenEntity);
+
+        return token;
+    }
 
 
     @Override
@@ -50,6 +70,17 @@ public class UserServiceImpl implements UserService{
         // Map DTO to entity and save
         UserDetails user = UserMapper.mapToUser(userDto, hashedPassword);
         UserDetails savedUser = userRepository.save(user);
+        String frontEndUrl;
+        String env = System.getenv("ENVIRONMENT"); // e.g., "local" or "production"
+        if ("production".equals(env)) {
+            frontEndUrl = "https://logic-gate-schematic-web-app.onrender.com/verify?token=";  // your production path
+        } else {
+            frontEndUrl = "http://localhost:3000/verify?token=";
+        }
+        // Generate verification token and send mail
+        String token = createAndStoreVerificationToken(savedUser.getUserid());
+        String verificationLink =  frontEndUrl + token;
+        mailService.sendVerificationEmail(userDto.getEmail(), verificationLink);
 
         return UserMapper.mapToUserDto(savedUser);
     }
@@ -105,6 +136,10 @@ public class UserServiceImpl implements UserService{
 
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
             throw new ResourceNotFoundException("Invalid username or password");
+        }
+
+        if (!user.isEnabled()) {
+            throw new IllegalStateException("Please verify your email before logging in.");
         }
 
         return UserMapper.mapToUserDto(user);

@@ -2,8 +2,6 @@ package FYP.LogicGates.entity;
 
 import org.hibernate.annotations.Type;
 
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

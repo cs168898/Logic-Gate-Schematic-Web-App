@@ -85,6 +85,11 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<UserDto> loginUser(@RequestBody LoginRequest loginRequest) {
         UserDto userDto = UserService.loginUser(loginRequest.getUsername(), loginRequest.getPassword());
+        
+        if (!userDto.isEnabled()) {
+            throw new IllegalStateException("Please verify your email before logging in.");
+        }
+    
         return ResponseEntity.ok(userDto);
     }   
     

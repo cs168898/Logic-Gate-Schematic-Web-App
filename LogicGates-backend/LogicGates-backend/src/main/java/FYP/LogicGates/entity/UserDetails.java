@@ -35,6 +35,9 @@ public class UserDetails {
     @Column(name = "email", nullable = false)
     private String email;
 
+    @Column(name = "enabled", nullable = false)
+    private boolean enabled = false; // default: false (not verified)
+
     // Getters and Setters
     public Long getId() {
         return userid;

@@ -14,7 +14,8 @@ public class UserMapper {
         return new UserDto(
             user.getId(),
             user.getUserName(),
-            user.getEmail()
+            user.getEmail(),
+            user.isEnabled()
         );
     }
 
@@ -23,7 +24,10 @@ public class UserMapper {
             userDto.getId(),
             userDto.getUsername(),
             password,
-            userDto.getEmail()
+            userDto.getEmail(),
+            false // not enabled by default
         );
+        
+        
     }
 }
