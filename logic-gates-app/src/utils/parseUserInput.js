@@ -23,9 +23,12 @@ import { positionGates } from "./parseUserInputFunctions/positionGates";
 import { assignGateLevel } from "./parseUserInputFunctions/assignGateLevel";
 import { showToast } from "./showToast";
 
-    export function parseUserInput(inputString, gates, isFirstParse, setisFirstParse){
+    export function parseUserInput(inputString, gates, isFirstParse, setisFirstParse, useAI){
 
+        console.log('raw text received is: ', inputString)
+        inputString = cleanUserInput(inputString)
         console.log('PARSEUSERINPUT ACTIVATED')
+        console.log('input receiveing in parseuserinput is: ', inputString)
         // Split the input string using commas as delimiters
         const lines = inputString.split(";");
         const gatesArray = []; // Storage to store all the gates declared in this current input
@@ -41,7 +44,7 @@ import { showToast } from "./showToast";
                 // if any key already exists in parsedData (which means a gate already exists) *Second iteration
                 if (parsedData.hasOwnProperty(cleanedKey) && Object.keys(parsedData).length > 0) {
                     
-                    if (isValidGate(parsedData, gatesArray, gates)){ // Check if the gate type is valid
+                    if (isValidGate(parsedData, gatesArray, gates, isFirstParse)){ // Check if the gate type is valid
                         
                         //Add the first iteration gate we created to the gatesArray before starting with second
                         gatesArray.push({
@@ -65,7 +68,7 @@ import { showToast } from "./showToast";
       
         // Validate and push the last gate if it exists
         if (Object.keys(parsedData).length > 0) {
-            if (isValidGate(parsedData, gatesArray, gates)) {
+            if (isValidGate(parsedData, gatesArray, gates, isFirstParse)) {
                  // Check if the gate already exists in gates
                 const isDuplicate = Object.values(gates).flat().some(existingGate =>
                     existingGate.name === parsedData.name &&
@@ -93,7 +96,7 @@ import { showToast } from "./showToast";
         // then build the positioning of each gate.
         let levelledGatesObj = {};
         
-        if (isFirstParse){
+        if (isFirstParse && !useAI){
             
             levelledGatesObj = collectGateLevel(gatesArray)    // collectGateLevel returns an object with the arrays of level
 
@@ -161,8 +164,10 @@ import { showToast } from "./showToast";
 }
 
     
-  
-
+function cleanUserInput(text) {
+    // Remove code blocks delimited by triple backticks and curly brackets
+    return text.replace(/^```[\s\S]*?\n([\s\S]*?)\n```$/, '$1').trim();
+  }
     
 
 

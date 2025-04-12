@@ -1,8 +1,16 @@
 export function textToJsonb(text) {
+  // input text will provide an array of strings
     // Split on either a semicolon (with optional trailing space) OR a newline.
-    // This will produce individual segments like "name: Gate1", "type: and", "input: A, B".
+    // This will produce individual segments like "name: Gate1", "type: and", "input: A, B", "output: C", "level: 1".
     // We also call trim() in case the user has extra whitespace around semicolons.
-    const segments = text.split(/;\s*|\n/);
+    let rawString = ''
+    if (typeof(text) !== 'string'){
+      // if it is not a string, it should be an array of strings
+      rawString = text.join('\n') // new line will start with every new element in the array
+    } else{
+      rawString = text;
+    }
+    const segments = rawString.split(/;\s*|\n/);
   
     const jsonArray = [];
     let currentGate = null;

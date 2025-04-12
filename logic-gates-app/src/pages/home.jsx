@@ -23,6 +23,7 @@ import { createProject } from '../../services/createNewProject';
 import { deleteProject } from '../../services/deleteProjects';
 import CookiePopup from '../components/cookie-popup';
 import { showToast } from '../utils/showToast';
+import { generateSchematic } from '../../services/aiGenerate';
 import HowToUse from '../components/how-to-use';
 import LandingPage from '../components/landing-page';
 import handleDownload from '../konvaLogicGates/functions/downloadTextFile';
@@ -62,6 +63,8 @@ function Home() {
   const [showLandingPage, setShowLandingPage] = useState(true)
 
   const [showHowToUse, setshowHowToUse] = useState(false)
+
+  const [useAI, setUseAI] = useState(false)
 
   const isHeadless = navigator.webdriver;
   
@@ -256,8 +259,13 @@ function Home() {
   }
 
   useEffect(() => {
+    const levels = Object.values(prevGatesRef.current); // Array of arrays
+    console.log('levels text to be saved = ', levels)
+    const allExistingGates = levels.flat().map(gate => 
+      `name: ${gate.name}; type: ${gate.type}; input: ${gate.input}; output: ${gate.output}; ${gate.level? (`level: ${gate.level}`) : ''};`
+    );
     // function to merge existing gates with new user input
-    setTextToBeSaved((prevText) => {return mergeGatesText(prevText, userInput, gates)});
+    setTextToBeSaved((prevText) => {return mergeGatesText(prevText, allExistingGates, gates)});
     console.log('textToBeSaved = ', textToBeSaved)
   }, [gates])
 
@@ -273,12 +281,27 @@ function Home() {
   const handleSubmit = async (userInput) =>{
     try{
       setSpinnerVisible(true); // show spinner
+
       await new Promise(resolve => setTimeout(resolve, 0)); // allow React to render it
 
       console.log('isFirstParse in handleSubmit: ', isfirstParse)
 
+      if(useAI){
+        console.log('using GEMINI AI!!!!')
+        console.log('prevGatesRef.current = ', prevGatesRef.current)
+        const levels = Object.values(prevGatesRef.current); // Array of arrays
+        console.log('levels = ', levels)
+        const allExistingGates = levels.flat().map(gate => 
+          `name: ${gate.name}; type: ${gate.type}; input: ${gate.input}; output: ${gate.output}; level: ${gate.level};`
+        );
+        console.log("Formatted gates preview:", allExistingGates[0]);
+        const response = await generateSchematic(userInput, allExistingGates);
+        userInput = response.data;
+        console.log('the returned user input is: ', userInput)
+      }
+
       setGates(prevGates => {
-        const newGateData = parseUserInput(userInput, prevGates, isfirstParse, setIsfirstParse); // Get new gates in object format
+        const newGateData = parseUserInput(userInput, prevGates, isfirstParse, setIsfirstParse, useAI); // Get new gates in object format
     
         // Merge the new levels into the existing structure
         const updatedGates = mergeUniqueGates(prevGates, newGateData);
@@ -348,6 +371,7 @@ function Home() {
   const [loadedProjectId, setLoadedProjectId] = useState(null)
 
   async function loadProject(id) {
+    setUseAI(false);
     setLoadedProjectId(id);
     prevGatesRef.current = null;
     setqueuedProjectId(id);  
@@ -519,9 +543,9 @@ function Home() {
     setshowHowToUse(!showHowToUse)
   }
   
+  // DO NOT INSERT ANY FUNCTIONS AFTER THIS LINE!!!!
   if (!landingPageChecked) return null;
 
-  
   const shouldRender = landingPageChecked && !showLandingPage
 
   return (
@@ -643,12 +667,20 @@ function Home() {
                   maxLength={4000}
                 ></textarea>
                 <div className="button-wrapper">
-                  <button className="create-button" onClick={() => handleSubmit(inputAreaText)}>
+                  <button 
+                    id="use-ai"
+                    className={`use-ai-button ${useAI ? 'active' : ''}`}
+                    onClick={() => setUseAI(prev => !prev)}
+                  >
+                    Use AI
+                  </button>
+                  <button className="create-button" onClick={() => handleSubmit(inputAreaText)} disabled={spinnerVisible}>
                     Create Gate
                   </button>
                   <button className="delete-button" onClick={handleDeleteGate} disabled={selectedGateId === null}>
                     Delete Gate
                   </button>
+                  
                 </div>
               </div>
             </div> // user input

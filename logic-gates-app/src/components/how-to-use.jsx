@@ -36,7 +36,30 @@ function HowToUse({toggleHowToUse}) {
         
                 <li>
                     <strong>Click "Create Gate":</strong><br />
-                    This will add your gate(s) to the canvas.
+                    <span>
+                        This will add your gate(s) to the canvas. <br /><br />
+                        <ol type="a">
+                            <li>
+                                The first time you click 'Create Gate', it will use an algorithm based on input and output of gates to arrange the levels. 
+                            </li>
+                            <li>
+                                On the second time, you have to declare the levels of each gate, 
+                                unless you want it to be added to the highest level of the schematic
+                            </li>
+                        </ol>
+                        
+                    </span>
+                    
+
+                </li>
+
+                <li>
+                    <strong>Use AI:</strong><br />
+                    <span>
+                        Use AI to help structure your schematic, just click on the 'Use AI' button,
+                        enter your prompt and click 'Create Gate'. <br /><br />
+                        *Note: Input text like how you use ChatGPT.
+                    </span>
                 </li>
         
                 <li>
@@ -56,12 +79,14 @@ function HowToUse({toggleHowToUse}) {
         
                 <li>
                     <strong>Download Netlist:</strong><br />
-                    Export the gate structure for others to easily view it on this platform.
+                    Click on the Download Netlist in the toolbar window <br />
+                    It will export the gate structure for others to easily view it on this platform.
                 </li>
 
                 <li>
                     <strong>Clear All Gates:</strong><br />
-                    A quick way to completely remove all logic gates on the canvas.
+                    To quickly clear the entire canvas, click on the <span style={{color: "red"}}>Clear All Gates</span> button in the toolbar window highlighted in red.
+                    
                 </li>
                 </ol>
         

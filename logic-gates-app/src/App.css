@@ -105,6 +105,15 @@ body {
   padding: 10px 0 10px 0;
 }
 
+.how-to-use-popup ol[type="a"]{
+  border-radius: 4px;
+  background-color: #353b45;
+}
+
+.how-to-use-popup ol[type="a"] li{
+  border: none;
+}
+
 .how-to-use-popup h2 {
   margin-top: 0;
 }
@@ -866,6 +875,62 @@ body {
   text-align: end;
 }
 
+.use-ai-button {
+  position: relative;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #fff;
+  cursor: pointer;
+  z-index: 0;
+  overflow: hidden;
+  color: #111827;
+}
+
+.use-ai-button:hover {
+background-color: var(--button-hover-color);
+}
+
+.use-ai-button.active::before {
+  content: "";
+  position: absolute;
+  top: -200px;
+  left: -200px;
+  right: -200px;
+  bottom: -200px;
+  background: conic-gradient(
+    red,
+    orange,
+    yellow,
+    lime,
+    cyan,
+    blue,
+    violet,
+    red
+  );
+  z-index: -2;
+  border-radius: 10px;
+  animation: spin 2s linear infinite;
+}
+
+/* create inner layer to mask content background */
+.use-ai-button.active::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  background: white;
+  z-index: -1;
+  border-radius: 6px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .create-button {
   background-color: var(--theme-primary-color);
   color: white;
@@ -873,8 +938,15 @@ body {
   padding: 5px 10px;
   cursor: pointer;
   border-radius: 10px;
-  margin: 0 10px 0 0;
+  margin: 0 10px 0 10px;
+  border: 1px solid var(--theme-primary-color);
+}
 
+.create-button:disabled{
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .create-button:hover{
@@ -888,6 +960,14 @@ body {
   padding: 5px 10px;
   cursor: pointer;
   border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+.delete-button:disabled{
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .delete-button:hover{
@@ -923,7 +1003,7 @@ body {
 
 
 #user-input::placeholder{
-  color: white;
+  color: rgb(218, 218, 218);
 }
 
 @media screen and (max-width: 1536px){

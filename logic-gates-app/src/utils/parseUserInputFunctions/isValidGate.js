@@ -2,7 +2,7 @@ import { faL } from "@fortawesome/free-solid-svg-icons";
 import { showToast } from "../showToast";
  
  // Helper function to validate gate data before adding it to the array
- export function isValidGate(gateToBeProcessed, gatesArray, existingGates) {
+ export function isValidGate(gateToBeProcessed, gatesArray, existingGates, isFirstParse) {
     // Check required fields
     if (!gateToBeProcessed.name) {
         showToast(`One of the gates is missing a name.`);
@@ -44,13 +44,13 @@ import { showToast } from "../showToast";
 
     // find for duplicate output in current user input
     const allParsedOutputs = new Set(gatesArray.flatMap(g => g.output))
-    if (allParsedOutputs.has(gateToBeProcessed.output)){
+    if (allParsedOutputs.has(gateToBeProcessed.output) && isFirstParse){
         showToast(`Circular dependency detected for ${gateToBeProcessed.name}! Output ${gateToBeProcessed.output} has already been declared.`)
         // gateToBeProcessed.isCircular = true;
         return false;
     }
 
-    if (duplicateOutputGate) {
+    if (duplicateOutputGate && isFirstParse) {
         showToast(`ERROR: ${gateToBeProcessed.name} has the same output as ${duplicateOutputGate.name}, Circular dependency detected`);
         // gateToBeProcessed.isCircular = true;
         return false;
