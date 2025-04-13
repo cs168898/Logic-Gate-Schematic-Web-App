@@ -1,6 +1,6 @@
 export function positionGates(levelledGatesObj, gatesArray, existingGates) {
     const basePosition = [10, 0]; // Starting point (x=10, y=10)
-    let xPosition = basePosition[0];
+    let xPosition = 10;
     let interval = 14;
 
     let existingGatesObj = JSON.parse(JSON.stringify(existingGates));
@@ -25,7 +25,9 @@ export function positionGates(levelledGatesObj, gatesArray, existingGates) {
         levelGates = levelGates.map(gate => {
             yPosition += 10; // Stack gates in a column
             if (gate.level !== 1){
-                xPosition = xPosition + interval*(gate.level - 1)
+                xPosition =  basePosition[0] + interval*(gate.level - 1)
+            } else{
+                xPosition = basePosition[0]
             }
 
             console.log('the gates x position is = ', xPosition)

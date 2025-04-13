@@ -33,10 +33,19 @@ import { showToast } from "./showToast";
         const lines = inputString.split(";");
         const gatesArray = []; // Storage to store all the gates declared in this current input
         let parsedData = {}; // Temporary object to store the current gate's data
+        let levelledGatesObj = {};
+
+        
 
         lines.forEach(line => { // reiterate through each line in the user input
-            const [key,value] = line.split(":"); // Store the key value pairs by splitting the line with the delimiter ":"
 
+            if (gatesArray.length == 10){
+                showToast('please create 10 gates at a time only')
+                return levelledGatesObj
+            }
+
+            const [key,value] = line.split(":"); // Store the key value pairs by splitting the line with the delimiter ":"
+            
             if (key && value){
                 const cleanedKey = key.trim().toLowerCase();
                 const cleanedValue = value.trim();
@@ -94,7 +103,7 @@ import { showToast } from "./showToast";
         // At this point, gates array is built with all the gates already, now we create a function 
         // to check through and build the different level of gates
         // then build the positioning of each gate.
-        let levelledGatesObj = {};
+        
         
         if (isFirstParse && !useAI){
             
