@@ -598,7 +598,7 @@ function Home() {
                   {openProjectOptions == project.projectId && isSidebarOpen &&(
                     <div className='project-options' ref={projectOptionsRef}>
                       <div className='project-options-inner'>
-                        <button>Edit Name</button>
+                        {/* <button>Edit Name</button> */}
                         <button
                         onClick={handleDeleteProject}>Delete</button>
                       </div>

@@ -61,7 +61,7 @@ function Login({ toggle, setLoggedin, setUser }) {
                     
                     {registerPopup ? <Register toggleRegisterPopup = {toggleRegisterPopup} /> : null}
 
-                    <button onClick={toggleForgetPasswordPopup} className="forget-password-button"> Forgot Password? </button>
+                    {/* <button onClick={toggleForgetPasswordPopup} className="forget-password-button"> Forgot Password? </button> */}
                     {forgetPasswordPopup && <ForgetPassword toggleForgetPassword = {toggleForgetPasswordPopup}/>}
                 </div>
                 

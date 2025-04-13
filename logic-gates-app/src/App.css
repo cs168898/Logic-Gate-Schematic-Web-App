@@ -672,6 +672,7 @@ body {
   padding: 10px;
   border: 1px solid #333;
   z-index: 1;
+  min-width: 150px;
 }
 
 .sidebar .project-options-inner button{
