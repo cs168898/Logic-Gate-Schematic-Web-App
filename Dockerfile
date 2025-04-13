@@ -14,6 +14,7 @@ RUN npx playwright install --with-deps
 # Copy backend jar and Node.js script
 COPY LogicGates-backend/LogicGates-backend/target/LogicGates-backend-0.0.1-SNAPSHOT.jar app.jar
 COPY playwright-script.js ./playwright-script.js
+COPY gemini-API.js ./gemini-API.js
 
 EXPOSE 8080
 CMD ["java", "-jar", "app.jar"]

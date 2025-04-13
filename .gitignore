@@ -3,6 +3,9 @@ node_modules/
 # Ignore virtual environment
 venv/
 .env
+*.env.development
+*.env.production
+/logic-gates-app/.env.development
 
 # Ignore Python bytecode files
 __pycache__/
@@ -21,3 +24,12 @@ build/
 *.war
 *.class
 *.log
+
+
+#ignore firebase files
+.firebase/
+firebase.json
+apphosting.yaml
+*.firebase
+.firebaserc
+

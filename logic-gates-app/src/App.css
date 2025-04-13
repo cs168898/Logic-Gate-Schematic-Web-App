@@ -217,10 +217,6 @@ body {
   pointer-events: none;
 }
 
-.landing-page .dont-show{
-  
-}
-
 .landing-page .dont-show input{
   margin-right: 5px;
 }

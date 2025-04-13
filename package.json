@@ -1,9 +1,11 @@
 {
   "type": "module",
   "dependencies": {
+    "@google/genai": "^0.8.0",
     "axios": "^1.8.1",
     "dompurify": "^3.2.4",
     "dotenv": "^16.4.7",
+    "firebase": "^11.5.0",
     "playwright": "^1.51.1"
   }
 }

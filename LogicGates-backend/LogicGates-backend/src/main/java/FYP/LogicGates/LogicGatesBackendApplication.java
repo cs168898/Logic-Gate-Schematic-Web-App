@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class LogicGatesBackendApplication {
  
 	public static void main(String[] args) {
+		System.out.println(">>> Starting Spring Boot App");
 		SpringApplication.run(LogicGatesBackendApplication.class, args);
 	}
 
