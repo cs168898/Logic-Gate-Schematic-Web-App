@@ -1,6 +1,7 @@
 export function positionGates(levelledGatesObj, gatesArray, existingGates) {
     const basePosition = [10, 0]; // Starting point (x=10, y=10)
     let xPosition = basePosition[0];
+    let interval = 14;
 
     let existingGatesObj = JSON.parse(JSON.stringify(existingGates));
 
@@ -8,13 +9,12 @@ export function positionGates(levelledGatesObj, gatesArray, existingGates) {
         acc[key] = [...(existingGatesObj[key] || []), ...(levelledGatesObj[key] || [])]; // Merge arrays
         return acc;
     }, {});
-
     
 
     // Sort levels numerically before processing (ensures correct order)
     const sortedLevels = Object.keys(combinedGatesObj)
         .sort((a, b) => parseInt(a.replace("level", "")) - parseInt(b.replace("level", "")));
-
+    console.log('sorted levels = ', sortedLevels);
     // Iterate over each level in the correct order
     for (const levelKey of sortedLevels) {
         let levelGates = combinedGatesObj[levelKey];
@@ -24,6 +24,11 @@ export function positionGates(levelledGatesObj, gatesArray, existingGates) {
         // Place each gate in this level
         levelGates = levelGates.map(gate => {
             yPosition += 10; // Stack gates in a column
+            if (gate.level !== 1){
+                xPosition = xPosition + interval*(gate.level - 1)
+            }
+
+            console.log('the gates x position is = ', xPosition)
             return {
                 ...gate,
                 x: xPosition,
@@ -34,13 +39,8 @@ export function positionGates(levelledGatesObj, gatesArray, existingGates) {
         // Update combinedGatesArray with new positioned gates
         combinedGatesObj[levelKey] = levelGates;
 
-        // Move downward for the next gate in the same level
-        
-
-        // Move to the right for the next level and maintain spacing
-        xPosition += 14;
     }
 
-    console.log("CombinedGates:", combinedGatesObj);
+    
     return combinedGatesObj; // Ensure levels are retained
 }
