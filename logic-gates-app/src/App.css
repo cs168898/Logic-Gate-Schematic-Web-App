@@ -1028,8 +1028,6 @@ background-color: var(--button-hover-color);
 
   .user-input{
     top: 50vh;
-    left: 30%;
-    background-color: red;
   }
 
   .tools-window{
