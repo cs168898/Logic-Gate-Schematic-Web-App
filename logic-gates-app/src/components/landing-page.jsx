@@ -40,15 +40,17 @@ function LandingPage({ toggleLandingPage, toggleHowToUse }) {
             <div className="logo">
             Logic Gate Through Text
         </div>
+        <div className='button-group'>
+          <div className="how-to-use">
+              <span>First time here? </span>
+              <button onClick={handleHowToUse}>How to use?</button>
+          </div>
+          <div className="go-to-app">
+              <span>Jump straight into it.</span>
+              <button onClick={handleGoToApp}>Go to Application</button>
+          </div>
+        </div>
         
-        <div className="how-to-use">
-            <span>First time here? </span>
-            <button onClick={handleHowToUse}>How to use?</button>
-        </div>
-        <div className="go-to-app">
-            <span>Jump straight into it.</span>
-            <button onClick={handleGoToApp}>Go to Application</button>
-        </div>
         <br />
         <div className="dont-show">
             <input
