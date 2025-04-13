@@ -130,7 +130,6 @@ function Register({toggleRegisterPopup}) {
                         maxLength={100} 
                         onChange={e => 
                             {setConfirmPassword(e.target.value)
-                            passwordConfirmation()
                         }} />
                         {isPasswordDiff ? <span className="password-validation"> Password must be the same </span> : null}
                     </label>
