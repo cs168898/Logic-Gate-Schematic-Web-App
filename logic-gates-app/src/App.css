@@ -709,6 +709,7 @@ body {
   display: block;
   font-size: small;
   animation: slideIn 0.3s ease-in-out;
+  height: auto;
 }
 
 
@@ -1008,7 +1009,7 @@ background-color: var(--button-hover-color);
   color: rgb(218, 218, 218);
 }
 
-@media screen and (max-width: 1536px){
+@media (min-width: 1024px) and (max-width: 1440px) {
   .popup-inner-register{
     width: 100%;
   }
@@ -1026,15 +1027,15 @@ background-color: var(--button-hover-color);
   }
 
   .user-input{
-    top: 60%;
+    top: 50vh;
     left: 30%;
+    background-color: red;
   }
 
   .tools-window{
     top: 70%;
     width: auto;
     height: auto;
-    max-height: 25vh;
   }
 }
 
