@@ -39,8 +39,8 @@ import { showToast } from "./showToast";
 
         lines.forEach(line => { // reiterate through each line in the user input
 
-            if (gatesArray.length == 10){
-                showToast('please create 10 gates at a time only')
+            if (gatesArray.length == 20){
+                showToast('please create 20 gates at a time only')
                 return levelledGatesObj
             }
 
