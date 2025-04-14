@@ -8,12 +8,18 @@ const VerifyPage = () => {
   const [message, setMessage] = useState("Verifying...");
   const token = searchParams.get("token");
   const hasRun = useRef(false);
+  const [showMessage, setShowMessage] = useState(false)
 
   useEffect(() => {
+    
+  }, [token]);
+
+  const handleVerify = () => {
     if (hasRun.current) return;
     hasRun.current = true;
-
+    setShowMessage(true)
     if (token) {
+      
       verifyEmail(token).then(response => {
         setMessage(response.data)
       }).catch(error => {
@@ -24,12 +30,19 @@ const VerifyPage = () => {
     } else {
       setMessage("Token missing.");
     }
-  }, [token]);
+  }
 
   return (
-    <div className="p-4 text-center text-xl">
+  <div className='verify-wrapper'>
+  {showMessage && <div className="verify-message">
       {message}
-    </div>
+  </div>}
+
+  <button onClick={handleVerify} className='verify-button'>
+    Verify
+  </button>
+    
+  </div>
   );
 };
 

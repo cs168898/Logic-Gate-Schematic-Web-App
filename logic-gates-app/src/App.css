@@ -1006,6 +1006,36 @@ background-color: var(--button-hover-color);
   color: rgb(218, 218, 218);
 }
 
+.verify-wrapper{
+  width: 50vw;;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+
+.verify-wrapper .verify-message{
+  font-size: x-large;
+  margin: 50px;
+}
+
+.verify-wrapper .verify-button{
+  background-color: var(--theme-primary-color);
+  color: white;
+  width: 200px;
+  height: 50px;
+  border-radius: 8px;
+  margin: auto;
+  display: block;
+  margin-top: 200px;
+}
+
+.verify-wrapper .verify-button:hover{
+  background-color: var(--button-hover-color);
+  color: black;
+}
+
 @media (min-width: 1024px) and (max-width: 1440px) {
   .popup-inner-register{
     width: 100%;
