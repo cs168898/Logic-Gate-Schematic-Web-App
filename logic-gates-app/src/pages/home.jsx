@@ -30,7 +30,9 @@ import handleDownload from '../konvaLogicGates/functions/downloadTextFile';
 import DOMPurify from 'dompurify'
 import Cookies from 'js-cookie';
 import { faL } from '@fortawesome/free-solid-svg-icons';
-
+import ShowNetlist from '../components/show-netlist';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faBars } from '@fortawesome/free-solid-svg-icons'
 
 function Home() {
   /***************************** useState Definitions ***************************/
@@ -129,7 +131,6 @@ function Home() {
       if (prevGatesRef.current && JSON.stringify(prevGatesRef.current) !== JSON.stringify(gates)) {
         setIsSuccess(true);
         prevGatesRef.current = gates; // Update the previous state of the gates
-        
 
       } else {
         setIsSuccess(false);
@@ -543,6 +544,11 @@ function Home() {
     setshowHowToUse(!showHowToUse)
   }
   
+  const [showNetlist, setShowNetlist] = useState(false)
+  const toggleShowNetList = () =>{
+    setShowNetlist(!showNetlist)
+  }
+
   // DO NOT INSERT ANY FUNCTIONS AFTER THIS LINE!!!!
   if (!landingPageChecked) return null;
 
@@ -631,19 +637,40 @@ function Home() {
         
         <div className="content-overlay">
           {(shouldRender || isHeadless) && 
+            (
+            <>
             <div className="tools-window">
-            
-            
+              
+                <FontAwesomeIcon icon={faBars}
+                      className='drag-drop-icon' 
+                      id='drag-drop-icon' 
+                      />
+
               <div className="tools-window-inner">
-                
+              <button className="delete-button" onClick={handleDeleteGate} disabled={selectedGateId === null}>
+                    Delete Gate
+                  </button>
+                  
+              <button className='view-netlist' onClick={toggleShowNetList}>{showNetlist? 'Hide Netlist' : 'View Netlist'}</button>
               <button className='download-netlist' onClick={() => handleDownload(textToBeSaved)}>Download Netlist</button>
                 <button className='clear' onClick={handleClearGates2}>Clear All Gates
                 </button>
+                
 
               </div>
+              
             </div>
+            
+              {showNetlist && 
+              
+                <ShowNetlist gates={gates}/>
+              }
+
+            </>
+            )
           
           }
+          
           
           <div className='spinner-wrapper'>
             {spinnerVisible && <div className='spinner'></div>}
@@ -675,11 +702,9 @@ function Home() {
                     Use AI
                   </button>
                   <button className="create-button" onClick={() => handleSubmit(inputAreaText)} disabled={spinnerVisible}>
-                    Create Gate
+                    Create Gate&#40;s&#41;
                   </button>
-                  <button className="delete-button" onClick={handleDeleteGate} disabled={selectedGateId === null}>
-                    Delete Gate
-                  </button>
+                  
                   
                 </div>
               </div>

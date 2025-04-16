@@ -11,7 +11,9 @@
     let userInputPosition = { dom: null, x: null, y: null }; // Element position
 
     document.addEventListener('mousedown', (event) => {
-      if (event.target.classList.contains('user-input') || event.target.classList.contains('tools-window')) {
+      if (event.target.classList.contains('user-input') ||
+       event.target.classList.contains('tools-window') ||
+       event.target.classList.contains('netlist-input')){
         // Record initial cursor position and element position on mousedown
         cursor = { x: event.clientX, y: event.clientY };
         userInputPosition = {

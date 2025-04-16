@@ -27,7 +27,7 @@ function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
 
   const stageRef = useRef(null);
   const scaleBy = 1.12; // Define the zoom scale factor
-  const minScale = 0.7;  // Prevent zooming out too much
+  const minScale = 0.55;  // Prevent zooming out too much
   const maxScale = 2;  // Allow zooming in up to this limit
 
   const [stageDimensions, setStageDimensions] = useState({

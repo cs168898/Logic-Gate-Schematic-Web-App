@@ -64,7 +64,7 @@ function HowToUse({toggleHowToUse}) {
         
                 <li>
                     <strong>Delete Gates:</strong><br />
-                    Click a gate to select it, then hit "Delete Gate" to remove it.
+                    Click a gate to select it, then hit "Delete Gate" in the tools window to remove it.
                 </li>
         
                 <li>
