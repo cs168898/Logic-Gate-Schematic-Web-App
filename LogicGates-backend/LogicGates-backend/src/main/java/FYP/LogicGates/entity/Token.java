@@ -15,7 +15,8 @@ public class Token {
 
     @Id
     @GeneratedValue
-    private UUID id;
+    @Column(name = "tokenid")  // Tells JPA to use tokenid column as PK
+    private UUID tokenid;
 
     @Column(nullable = false)
     private Long userid;

@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import FYP.LogicGates.dto.UserDto;
 import FYP.LogicGates.mapper.UserMapper;
 import FYP.LogicGates.repository.TokenRepository;
@@ -42,13 +44,23 @@ public class UserServiceImpl implements UserService{
         LocalDateTime expiry = LocalDateTime.now().plusMinutes(30); // 30 minutes or your preferred time
 
         Token tokenEntity = new Token(userId, token, expiry);
-        tokenRepository.save(tokenEntity);
+        try {
+            tokenRepository.save(tokenEntity);
+            System.out.println("Token saved successfully: " + token);
+            System.out.println("userId:  " + userId);
+            System.out.println("Token Expiry: " + expiry);
+        } catch (Exception e) {
+            System.err.println("Failed to save token: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
 
         return token;
     }
 
 
     @Override
+    @Transactional
     public UserDto createUser(UserDto userDto, String password) {
         // Check if username already exists
         if (userRepository.existsByUsername(userDto.getUsername().trim().toLowerCase())) {
@@ -80,7 +92,14 @@ public class UserServiceImpl implements UserService{
         // Generate verification token and send mail
         String token = createAndStoreVerificationToken(savedUser.getUserid());
         String verificationLink =  frontEndUrl + token;
-        mailService.sendVerificationEmail(userDto.getEmail(), verificationLink);
+        try {
+            mailService.sendVerificationEmail(userDto.getEmail(), verificationLink);
+            System.out.println("Email sent to " + userDto.getEmail());
+        } catch (Exception e) {
+            System.err.println("Email sending failed: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
 
         return UserMapper.mapToUserDto(savedUser);
     }
