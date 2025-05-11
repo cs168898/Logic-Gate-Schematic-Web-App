@@ -1121,6 +1121,76 @@ color: white;
   color: black;
 }
 
+/* Chatbox */
+
+.chatbox{
+  position: fixed;
+  display: flex;
+  flex-direction: column-reverse;
+  right: 20px;
+  top: 80px;
+  background: var(--theme-primary-color);
+  padding: 24px;
+  max-width: 500px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  font-family: sans-serif;
+  z-index: 1000;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 90vh;
+  color: white;
+  animation: fadeIn 3s ease forwards;
+  scrollbar-width: thin;
+  scrollbar-color: white var(--theme-primary-color);
+  height: 90vh;
+  width: 400px;
+  font-size: large;
+}
+
+.chatbox-close-button{
+  width: 100%;
+  justify-content: end;
+  display: flex;
+  font-size: x-large;
+  height: auto;
+  position: absolute;
+  right: 15px;
+  top: 10px;
+}
+
+.chatbox-close-button span{
+  cursor: pointer;
+}
+.ai-bubble-wrapper{
+  float: left;
+}
+.ai-bubble-wrapper span{
+  justify-content: start;
+  display: flex;
+}
+.ai-bubble{
+  max-width: 100%;
+  padding: 10px;
+  color: white;
+  text-align: left;
+  height: auto;
+}
+
+.user-bubble-wrapper{
+  justify-content: end;
+  display: flex;
+  margin-bottom: 10px;
+}
+.user-bubble{
+  background-color: white;
+  border-radius: 10px;
+  min-height: 20px;
+  color: black;
+  padding: 10px;
+  width: fit-content;
+}
+
 @media (min-width: 1024px) and (max-width: 1440px) {
   .popup-inner-register{
     width: 100%;

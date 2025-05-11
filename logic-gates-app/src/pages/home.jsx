@@ -31,6 +31,7 @@ import DOMPurify from 'dompurify'
 import Cookies from 'js-cookie';
 import { faL } from '@fortawesome/free-solid-svg-icons';
 import ShowNetlist from '../components/show-netlist';
+import ChatBox from '../components/chatbox';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
 
@@ -67,6 +68,8 @@ function Home() {
   const [showHowToUse, setshowHowToUse] = useState(false)
 
   const [useAI, setUseAI] = useState(false)
+
+  const [chatboxTextArray, setChatboxTextArray] = useState([])
 
   const isHeadless = navigator.webdriver;
   
@@ -281,6 +284,9 @@ function Home() {
   // Create the handleSubmit function to send userInput into backend
   const handleSubmit = async (userInput) =>{
     try{
+      setChatboxVisible(true); // show the AI chatbox
+      // insert user input into chatbox
+      setChatboxTextArray(prevChatbox => [...prevChatbox, `${userInput}`]);
       setSpinnerVisible(true); // show spinner
 
       await new Promise(resolve => setTimeout(resolve, 0)); // allow React to render it
@@ -297,7 +303,10 @@ function Home() {
         );
         console.log("Formatted gates preview:", allExistingGates[0]);
         const response = await generateSchematic(userInput, allExistingGates);
-        userInput = response.data;
+        setChatboxTextArray(prevChatbox => [...prevChatbox, `${response.data}`]);
+        // maybe create a function to extract from delimiter (triple backticks)
+        userInput = extractTextBetweenTripleBackticks(response.data)
+        
         console.log('the returned user input is: ', userInput)
       }
 
@@ -549,6 +558,28 @@ function Home() {
     setShowNetlist(!showNetlist)
   }
 
+  const [chatboxVisible, setChatboxVisible] = useState(false);
+  const toggleChatbox = () =>{
+    console.log('chatbox toggled!', chatboxVisible)
+    setChatboxVisible(!chatboxVisible);
+  }
+
+  function extractTextBetweenTripleBackticks(input) {
+    // Step 1: Ensure input is a string
+    const text = typeof input === 'string' ? input : JSON.stringify(input, null, 2);
+  
+    // Step 2: Extract content between triple backticks
+    const match = text.match(/```([\s\S]*?)```/);
+    if (!match) return null;
+  
+    let extracted = match[1].trim();
+  
+    // Step 3: Remove all types of brackets
+    extracted = extracted.replace(/[\[\]{}()]/g, '');
+  
+    return extracted;
+  }
+
   // DO NOT INSERT ANY FUNCTIONS AFTER THIS LINE!!!!
   if (!landingPageChecked) return null;
 
@@ -565,6 +596,8 @@ function Home() {
     )}
     {showHowToUse && <HowToUse toggleHowToUse={toggleHowToUse}/>}
         <Header onSidebarToggle={toggleSidebar} toggleHowToUse={toggleHowToUse} />
+        
+    {chatboxVisible && <ChatBox toggleChatbox={toggleChatbox} chatboxTextArray={chatboxTextArray}/>}
       <div className='main-wrapper'>
         
         <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
@@ -647,6 +680,7 @@ function Home() {
                       />
 
               <div className="tools-window-inner">
+              <button className='chatbox-button' onClick={toggleChatbox}>AI Chatbox</button>
               <button className="delete-button" onClick={handleDeleteGate} disabled={selectedGateId === null}>
                     Delete Gate
                   </button>

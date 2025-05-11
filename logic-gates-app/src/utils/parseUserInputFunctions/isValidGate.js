@@ -15,7 +15,7 @@ import { showToast } from "../showToast";
         return false;
     }
     // Validate gate type
-    const gatesList = ["AND", "OR", "NOT"];
+    const gatesList = ["AND", "OR", "NOT", "NAND"];
     if (!gatesList.includes(gateToBeProcessed.type.toUpperCase())) {
         showToast(`Please input a valid gate type in ${gateToBeProcessed.name}.The valid gate types are:
         {AND, OR, NOT}`);

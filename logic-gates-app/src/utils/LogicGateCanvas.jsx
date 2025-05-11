@@ -6,6 +6,7 @@ import { Stage, Layer, Rect, Text } from 'react-konva';
 import { AndGate } from '../konvaLogicGates/andGate';
 import { OrGate } from '../konvaLogicGates/orGate';
 import { NotGate } from '../konvaLogicGates/notGate';
+import { NandGate } from '../konvaLogicGates/nandGate';
 import { CreateConnections } from '../konvaLogicGates/functions/create_connections';
 import { cleanUpWires } from '../konvaLogicGates/functions/cleanUp_wires';
 import { ConnectionsContext } from '../context/ConnectionsContext';
@@ -201,6 +202,14 @@ function LogicGateCanvas({ setSelectedGateId, selectedGateId }) {
 
               {gate.type.toUpperCase() === "NOT" && (
                 <NotGate
+                gate={gate}
+                selectedGateId={selectedGateId}
+                setSelectedGateId={setSelectedGateId}
+                onWirePositionUpdate={handleWirePositionUpdate}
+              />
+              )} 
+              {gate.type.toUpperCase() === "NAND" && (
+                <NandGate
                 gate={gate}
                 selectedGateId={selectedGateId}
                 setSelectedGateId={setSelectedGateId}
