@@ -4,7 +4,7 @@ import fs from 'fs'
 const envAPIKey = process.env.GEMINI_API_KEY || "AIzaSyD8OX2JSD78BgiOtuRWSNYpoyzaS6edFxw"
 const ai = new GoogleGenAI({ apiKey:  envAPIKey});
 
-const typesOfGates = "AND, OR, NOT"
+const typesOfGates = "AND, OR, NOT, NAND"
 
 async function callGemini() {
     const inputPath = process.argv[2];
@@ -12,15 +12,16 @@ async function callGemini() {
     const input = fs.readFileSync(inputPath, 'utf-8');
     const existingGates = JSON.parse(fs.readFileSync(existingGatesPath, 'utf-8'));
     const prompt = `
-      Read the user input to design a circuit and then only output the logic gate's name, type, input, output and level.
-      Here are some rules you must follow:
-      1. ONLY RETURN the key value pairs with a semi colon at the end of every key value pair without comments and explanations or apologies
-      2. DO NOT use code blocks, markdown syntax, or triple backticks in your response. Just return the key-value pairs as raw plain text.
+      Read the user input to design a circuit and then output the logic gate's name, type, input, output and level.
+      Here are some rules you must strictly follow:
+      1. return the key value pairs with a semi colon at the end of every key value pair
+      2. Your message at the top and Wrap the gates in triple backticks and add it at the end of your message
       3. Use unique output values if it is not specified.
       4. Only use these gate types: ${typesOfGates}
-      5. Integrate it into the existing gates structure:
+      5. Integrate it into the existing gates structure if its not empty:
         ${JSON.stringify(existingGates, null, 2)}
-      6. Strictly follow the format of the example below.
+      6. Follow the format of the example below.
+      7. Everything in the triple backticks MUST be in text only.
       
       Here is the user input ${input}, here is an example of the output:  
       name: Gate1;
