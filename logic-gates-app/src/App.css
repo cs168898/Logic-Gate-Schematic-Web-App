@@ -1057,6 +1057,7 @@ color: white;
 /* Text area for user input */
 .user-input2 {
   width: 100%;
+  max-width: 500px;
   min-width: 300px;
   border: none;
   color: white;
@@ -1125,8 +1126,6 @@ color: white;
 
 .chatbox{
   position: fixed;
-  display: flex;
-  flex-direction: column-reverse;
   right: 20px;
   top: 80px;
   background: var(--theme-primary-color);
@@ -1146,17 +1145,20 @@ color: white;
   height: 90vh;
   width: 400px;
   font-size: large;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.chatbox-content{
+  display: flex;
+  flex-direction: column;
+  
 }
 
 .chatbox-close-button{
-  width: 100%;
-  justify-content: end;
-  display: flex;
+  margin-left: auto;
   font-size: x-large;
-  height: auto;
-  position: absolute;
-  right: 15px;
-  top: 10px;
+  color: red;
 }
 
 .chatbox-close-button span{
@@ -1181,14 +1183,17 @@ color: white;
   justify-content: end;
   display: flex;
   margin-bottom: 10px;
+  width: 100%;
 }
 .user-bubble{
   background-color: white;
   border-radius: 10px;
   min-height: 20px;
   color: black;
-  padding: 10px;
+  padding: 15px;
   width: fit-content;
+  text-align: start;
+  max-width: 75%;
 }
 
 @media (min-width: 1024px) and (max-width: 1440px) {
@@ -1221,6 +1226,7 @@ color: white;
     width: auto;
     height: auto;
   }
+
 }
 
 /* CSS GLOBAL VARIABLES */

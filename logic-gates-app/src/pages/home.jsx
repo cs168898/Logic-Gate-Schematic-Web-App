@@ -294,7 +294,7 @@ function Home() {
       console.log('isFirstParse in handleSubmit: ', isfirstParse)
 
       if(useAI){
-        console.log('using GEMINI AI!!!!')
+        console.log('using GEMINI AI!!!! FRONTEND')
         console.log('prevGatesRef.current = ', prevGatesRef.current)
         const levels = Object.values(prevGatesRef.current); // Array of arrays
         console.log('levels = ', levels)
@@ -305,7 +305,7 @@ function Home() {
         const response = await generateSchematic(userInput, allExistingGates);
         setChatboxTextArray(prevChatbox => [...prevChatbox, `${response.data}`]);
         // maybe create a function to extract from delimiter (triple backticks)
-        userInput = extractTextBetweenTripleBackticks(response.data)
+        userInput = cleanGateText(response.data)
         
         console.log('the returned user input is: ', userInput)
       }
@@ -564,21 +564,19 @@ function Home() {
     setChatboxVisible(!chatboxVisible);
   }
 
-  function extractTextBetweenTripleBackticks(input) {
-    // Step 1: Ensure input is a string
-    const text = typeof input === 'string' ? input : JSON.stringify(input, null, 2);
+  function cleanGateText(rawText) {
+    // Convert input to string and remove unwanted characters
+    const text = typeof rawText === 'string' ? rawText : JSON.stringify(rawText, null, 2);
   
-    // Step 2: Extract content between triple backticks
-    const match = text.match(/```([\s\S]*?)```/);
-    if (!match) return null;
-  
-    let extracted = match[1].trim();
-  
-    // Step 3: Remove all types of brackets
-    extracted = extracted.replace(/[\[\]{}()]/g, '');
-  
-    return extracted;
+    return text
+      .replace(/[\[\]{}"']/g, '')       // remove brackets and quotes
+      .split('\n')                      // break into lines
+      .map(line => line.trim())         // trim each line
+      .filter(line => /^(name|type|input|output|level):/i.test(line)) // keep only valid gate lines
+      .join('\n')                       // rejoin
+      .trim();
   }
+  
 
   // DO NOT INSERT ANY FUNCTIONS AFTER THIS LINE!!!!
   if (!landingPageChecked) return null;
@@ -687,7 +685,7 @@ function Home() {
                   
               <button className='view-netlist' onClick={toggleShowNetList}>{showNetlist? 'Hide Netlist' : 'View Netlist'}</button>
               <button className='download-netlist' onClick={() => handleDownload(textToBeSaved)}>Download Netlist</button>
-                <button className='clear' onClick={handleClearGates2}>Clear All Gates
+                <button className='clear' onClick={handleClearGates2} disabled={spinnerVisible}>Clear All Gates
                 </button>
                 
 
