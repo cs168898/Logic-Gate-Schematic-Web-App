@@ -292,7 +292,7 @@ function Home() {
       if(useAI){
         setChatboxVisible(true); // show the AI chatbox
         // insert user input into chatbox
-        setChatboxTextArray(prevChatbox => [...prevChatbox, `${userInput}`]);
+        setChatboxTextArray(prev => [...prev, { sender: 'user', content: userInput }]);
         setSpinnerVisible(true); // show spinner
         console.log('using GEMINI AI!!!! FRONTEND')
         console.log('prevGatesRef.current = ', prevGatesRef.current)
@@ -303,7 +303,7 @@ function Home() {
         );
         console.log("Formatted gates preview:", allExistingGates[0]);
         const response = await generateSchematic(userInput, allExistingGates);
-        setChatboxTextArray(prevChatbox => [...prevChatbox, `${response.data}`]);
+        setChatboxTextArray(prev => [...prev, { sender: 'ai', content: response.data }]);
         // maybe create a function to extract from delimiter (triple backticks)
         userInput = cleanGateText(response.data)
         

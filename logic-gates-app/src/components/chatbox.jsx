@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 
 function ChatBox({toggleChatbox, chatboxTextArray }) {
     console.log('chatboxarray = ', chatboxTextArray)
-    let reversedChatboxTextArray = chatboxTextArray.reverse()
+    
+    let reversedChatboxTextArray = [...chatboxTextArray].reverse()
+
 
     function splitTextAndCode(text) {
       const match = text.match(/```([\s\S]*?)```/);
@@ -23,28 +25,16 @@ function ChatBox({toggleChatbox, chatboxTextArray }) {
               <span>&#215;</span>
             </div>
             <div className="chatbox-content">
-                {reversedChatboxTextArray.map((text, index) => {
-                  if (index % 2 === 0) {
-                    // User message
-                    return (
-                      <div key={index} className="user-bubble-wrapper">
-                        <div className="user-bubble">
-                          <span>{text}</span>
-                        </div>
+                {chatboxTextArray.map((msg, index) => {
+                  const { textOnly, codeBlock } = splitTextAndCode(msg.content);
+                  return (
+                    <div key={index} className={`${msg.sender}-bubble-wrapper`}>
+                      <div className={`${msg.sender}-bubble`}>
+                        <p>{textOnly}</p>
+                        {codeBlock && <pre>{codeBlock}</pre>}
                       </div>
-                    );
-                  } else {
-                    // AI message
-                    const { textOnly, codeBlock } = splitTextAndCode(text);
-                    return (
-                      <div key={index} className="ai-bubble-wrapper">
-                        <div className="ai-bubble">
-                          <p>{textOnly}</p>
-                          {codeBlock && <pre>{codeBlock}</pre>}
-                        </div>
-                      </div>
-                    );
-                  }
+                    </div>
+                  );
                 })}
 
                 
