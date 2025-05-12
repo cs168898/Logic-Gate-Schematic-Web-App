@@ -1190,6 +1190,12 @@ color: white;
   height: auto;
 }
 
+.ai-bubble pre{
+  background-color: #333943;
+  border-radius: 10px;
+  padding: 10px;
+}
+
 .user-bubble-wrapper{
   justify-content: end;
   display: flex;
