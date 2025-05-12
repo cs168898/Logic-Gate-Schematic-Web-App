@@ -21,7 +21,7 @@ async function callGemini() {
       5. Integrate it into the existing gates structure if its not empty:
         ${JSON.stringify(existingGates, null, 2)}
       6. Follow the format of the example below.
-      7. Everything in the triple backticks MUST be in text only.
+      7. Everything in the triple backticks must not contain any brackets or aprostophes.
       
       Here is the user input ${input}, here is an example of the output:  
       name: Gate1;
