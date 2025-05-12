@@ -284,16 +284,16 @@ function Home() {
   // Create the handleSubmit function to send userInput into backend
   const handleSubmit = async (userInput) =>{
     try{
-      setChatboxVisible(true); // show the AI chatbox
-      // insert user input into chatbox
-      setChatboxTextArray(prevChatbox => [...prevChatbox, `${userInput}`]);
-      setSpinnerVisible(true); // show spinner
 
       await new Promise(resolve => setTimeout(resolve, 0)); // allow React to render it
 
       console.log('isFirstParse in handleSubmit: ', isfirstParse)
 
       if(useAI){
+        setChatboxVisible(true); // show the AI chatbox
+        // insert user input into chatbox
+        setChatboxTextArray(prevChatbox => [...prevChatbox, `${userInput}`]);
+        setSpinnerVisible(true); // show spinner
         console.log('using GEMINI AI!!!! FRONTEND')
         console.log('prevGatesRef.current = ', prevGatesRef.current)
         const levels = Object.values(prevGatesRef.current); // Array of arrays
