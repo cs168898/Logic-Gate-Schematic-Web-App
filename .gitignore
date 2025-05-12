@@ -6,6 +6,10 @@ venv/
 *.env.development
 *.env.production
 /logic-gates-app/.env.development
+/logic-gates-app/.env.production
+.env.development
+.env.production
+
 
 # Ignore Python bytecode files
 __pycache__/
