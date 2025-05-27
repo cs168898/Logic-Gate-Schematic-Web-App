@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import fs from 'fs'
 
-const envAPIKey = process.env.GEMINI_API_KEY || "AIzaSyD8OX2JSD78BgiOtuRWSNYpoyzaS6edFxw"
+const envAPIKey = process.env.GEMINI_API_KEY;
 const ai = new GoogleGenAI({ apiKey:  envAPIKey});
 
 const typesOfGates = "AND, OR, NOT, NAND"
