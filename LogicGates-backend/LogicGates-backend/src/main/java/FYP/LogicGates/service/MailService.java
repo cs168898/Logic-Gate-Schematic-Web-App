@@ -1,17 +1,20 @@
 package FYP.LogicGates.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
+
 @Service
 public class MailService {
 
     private final RestTemplate restTemplate = new RestTemplate();
-
-    private final String BREVO_API_KEY = "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"; // Replace this or load from .env
+    
+    @Value("${brevo.api.key}")
+    private String BREVO_API_KEY;
 
     public void sendVerificationEmail(String toEmail, String verificationLink) {
         HttpHeaders headers = new HttpHeaders();

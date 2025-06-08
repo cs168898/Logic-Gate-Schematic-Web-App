@@ -5,6 +5,8 @@ target/
 !**/src/test/**/target/
 .env
 .env.development
+application.properties
+application-dev.properties
 
 ### STS ###
 .apt_generated

@@ -18,8 +18,10 @@ public class WebConfig {
                             "http://localhost:3000",             // local dev
                             "http://localhost:8080",
                             "https://logic-gate-schematic-web-app.onrender.com", // production domain
-                            "https://fyp-fsm.web.app"         // fallback Render domain
-                            
+                            "https://fyp-fsm.web.app",        // fallback Render domain
+                            "https://logic-gate-schematic-web-app-e3pu.onrender.com", // FYP Render for Prof
+                            "https://ntueeefyp2025-fsm.web.app"
+
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
