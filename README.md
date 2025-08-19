@@ -2,6 +2,9 @@
 
 A comprehensive full-stack web application for creating, editing, and managing logic gate schematics using AI-assisted text-based input and visual canvas rendering. This project combines multiple technologies to provide an interactive platform for digital circuit design and education.
 
+<img width="1916" height="912" alt="Screenshot 2025-05-13 131805" src="https://github.com/user-attachments/assets/caf8328b-1df3-4fcb-9602-95a5144517de" />
+
+
 ## Features
 
 ### Core Functionality
