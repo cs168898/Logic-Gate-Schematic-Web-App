@@ -4,6 +4,7 @@ A comprehensive full-stack web application for creating, editing, and managing l
 
 <img width="1916" height="912" alt="Screenshot 2025-05-13 131805" src="https://github.com/user-attachments/assets/caf8328b-1df3-4fcb-9602-95a5144517de" />
 
+The above image shows the Homepage of the application where users will enter their text or prompt to start building their personalized schematic.
 
 ## Features
 
