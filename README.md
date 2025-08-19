@@ -2,7 +2,7 @@
 
 A comprehensive full-stack web application for creating, editing, and managing logic gate schematics using AI-assisted text-based input and visual canvas rendering. This project combines multiple technologies to provide an interactive platform for digital circuit design and education.
 
-## 🚀 Features
+## Features
 
 ### Core Functionality
 - **Text-to-Schematic Conversion**: Convert plain text descriptions into visual logic gate schematics
