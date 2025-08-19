@@ -7,15 +7,13 @@ A comprehensive full-stack web application for creating, editing, and managing l
 ### Core Functionality
 - **Text-to-Schematic Conversion**: Convert plain text descriptions into visual logic gate schematics
 - **AI-Powered Generation**: Google Gemini AI integration for intelligent circuit suggestions
-- **Interactive Canvas**: Drag-and-drop interface using React Konva for schematic manipulation
-- **Real-time Rendering**: Dynamic canvas updates with proper wire positioning and connections
+- **Real-time Rendering**: Dynamic canvas updates with automatic wire positioning and connections
 - **Project Management**: Save, load, and manage multiple circuit projects
 - **User Authentication**: Secure login/registration system with JWT tokens
 
 ### Advanced Features
 - **Multiple Gate Types**: Support for AND, OR, NOT, NAND gates with customizable inputs/outputs
 - **Netlist Generation**: Export circuit descriptions in standard netlist format
-- **Automated Testing**: Playwright-based headless browser testing for circuit validation
 - **Responsive Design**: Mobile-friendly interface with Bootstrap styling
 - **Export Capabilities**: Download schematics as text files and generate visual representations
 
@@ -34,11 +32,11 @@ This project follows a microservices architecture with multiple backend services
 │   React Frontend│    │  Spring Boot API │    │  Playwright Service  │
 │   (Vite + Konva)│◄──►│   (Java 17)      │◄──►│   (JavaScript)       │
 └─────────────────┘    └──────────────────┘    └──────────────────────┘
-         │                       │                          │
-         │                       │                          │
-         ▼                       ▼                          ▼
-┌─────────────────┐    ┌──────────────────┐       ┌─────────────────┐
-│   Firebase      │    │   PostgreSQL     │       │   Gemini AI     │
+         │                       │         \                │
+         │                       │          \               │
+         ▼                       ▼           \              ▼
+┌─────────────────┐    ┌──────────────────┐   \   ┌─────────────────┐
+│   Firebase      │    │   PostgreSQL     │    ▶ │    Gemini AI     │
 │   Hosting       │    │   Database       │       │   API           │
 └─────────────────┘    └──────────────────┘       └─────────────────┘
 ```
@@ -85,16 +83,8 @@ Logic-Gate-Schematic-Web-App/
 │       ├── src/main/resources/        # Configuration files
 │       └── pom.xml                    # Maven dependencies
 │
-├── fastapi_postgresql_project/         # FastAPI Service (Python)
-│   ├── app/
-│   │   ├── main.py                    # FastAPI application
-│   │   ├── models.py                  # Database models
-│   │   ├── schemas.py                 # Pydantic schemas
-│   │   └── database.py                # Database connection
-│   └── requirements.txt               # Python dependencies
-│
 ├── gemini-API.js                      # Google Gemini AI integration
-├── playwright-script.js               # Automated testing script
+├── playwright-script.js               # 3rd Party App Integration
 ├── Dockerfile                         # Container configuration
 ├── firebase.json                      # Firebase hosting config
 └── package.json                       # Root dependencies
@@ -119,7 +109,7 @@ Logic-Gate-Schematic-Web-App/
 
 ### AI & Testing
 - **Google Gemini AI** - AI-powered circuit generation
-- **Playwright** - 3rd Party Integration
+- **Playwright** - 3rd Party App Integration
 - **Node.js** - Runtime for automation scripts
 
 ### DevOps & Deployment
